@@ -1,7 +1,22 @@
-# Tauri + React + Typescript
+### Apricity
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+Apricity is a modern writing application designed to help writers organize, draft, and export their projects with ease. 
+This is built using NextJS and Tauri.
 
-## Recommended IDE Setup
+---
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+### Features
+
+* Hierarchical project structure with folders and documents
+* Rich text / Markdown editor with live word and character count
+* Corkboard view for story planning and reordering scenes
+* Split view to reference multiple documents side-by-side
+* Snapshots / version history for safe editing
+* Export projects or selections to TXT, Markdown, or PDF
+* Minimal, distraction-free writing interface
+
+---
+
+### License
+
+MIT License © 2025
