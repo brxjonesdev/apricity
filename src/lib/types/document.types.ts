@@ -18,6 +18,10 @@ export interface Document{
     contentHash: string;
 }
 
+export interface DocumentCreate extends Omit<Document, 'id' | 'createdAt' | 'updatedAt'> {}
+
+export interface DocumentUpdate extends Partial<DocumentCreate> {}
+
 export interface DocumentMetadata {
     pov?: string;
     primaryLocation?: string;
