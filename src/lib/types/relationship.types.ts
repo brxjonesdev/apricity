@@ -10,6 +10,7 @@ export interface Relationship {
   description?: string;
   attributes: Record<string, any>;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface RelationshipCreate extends Omit<Relationship, 'id' | 'createdAt'> {}
