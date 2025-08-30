@@ -12,6 +12,10 @@ export interface Relationship {
   createdAt: Date;
 }
 
+export interface RelationshipCreate extends Omit<Relationship, 'id' | 'createdAt'> {}
+
+export interface RelationshipUpdate extends Partial<RelationshipCreate> {}
+
 export interface DocumentEntityAssociation {
   id: string;
   documentId: string;
