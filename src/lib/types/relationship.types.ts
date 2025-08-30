@@ -3,8 +3,8 @@ import { EntityType } from "./entity.types";
 export interface Relationship {
   id: string;
   projectId: string;
-  fromEntity: string; // format: "characters:char_123"
-  toEntity: string; // format: "locations:loc_456"
+  fromEntityID: string; // format: "characters:char_123"
+  toEntityID: string; // format: "locations:loc_456"
   relationshipType: string;
   strength: number; // 0-1
   description?: string;
