@@ -21,11 +21,13 @@ export interface FileChange {
 
 export interface Snapshot {
   id: string;
-  projectId: string;
+  documentId: string;
   name: string;
   description?: string;
   snapshotPath: string;
-  fileCount: number;
-  totalWordCount: number;
   createdAt: Date;
+  data: {
+    content: string;
+    metadata: Record<string, any>;
+  }
 }
