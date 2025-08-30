@@ -1,7 +1,7 @@
 import { Character } from "@/lib/types";
-import { BaseEntityRepository } from "./entity.repository.index";
+import { EntityRepository } from "./entity.repository.index";
 
-export interface CharacterRepository extends BaseEntityRepository {
+export interface CharacterRepository extends EntityRepository<Character> {
   findByName(name: string): Promise<Character | null>;
-  findByRace(race: string): Promise<Character[]>;
+  searchByQuery(query: string): Promise<Character[]>;
 }

@@ -1,9 +1,9 @@
 import { BaseEntity } from "@/lib/types";
 
-export interface BaseEntityRepository {
-  create(entity: BaseEntity): Promise<BaseEntity>;
-  findById(id: string): Promise<BaseEntity | null>;
-  findAll(): Promise<BaseEntity[]>;
-  update(id: string, entity: BaseEntity): Promise<BaseEntity | null>;
+export interface EntityRepository<T extends BaseEntity> {
+  create(entity: T): Promise<T>;
+  update(id: string, entity: Partial<T>): Promise<T | null>;
   delete(id: string): Promise<boolean>;
+  getById(id: string): Promise<T | null>;
+  getAllByProject(projectId: string): Promise<T[]>;
 }

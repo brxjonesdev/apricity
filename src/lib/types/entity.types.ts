@@ -28,11 +28,9 @@ export interface Character extends BaseEntity {
 }
 
 export interface Location extends BaseEntity {
-  coordinates?: {
-    x: number;
-    y: number;
-  };
+  name: string;
   description?: string;
+  childrenLocations?: Location[];
 }
 
 export interface PlotThread extends BaseEntity {
