@@ -1,0 +1,50 @@
+
+# Node modules and build outputs
+node_modules
+dist
+build
+out
+coverage
+.cache
+.next
+.next/*
+public
+/.vercel
+/.netlify
+
+# Editor and OS files
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Generated and bundled files
+*.min.js
+*.bundle.js
+*.generated.js
+*.map
+*.lock
+
+# Common binary and media files (not suitable for Prettier)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.webp
+*.mp4
+*.mov
+*.zip
+*.tar
+*.gz
+*.svg.gz
+
+# Vendor and generated folders
+vendor
+generated
+tmp
+temp
+
+# Optional: ignore large dependency trees or specific scripts
+public/assets/*
+build-output/*
