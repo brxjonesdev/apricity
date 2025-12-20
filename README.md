@@ -1,49 +1,29 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with
-[`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Apricity - Forge Worlds, Weave Stories
+**The author's workspace where manuscripts meet worldbuilding.**
 
-## Getting Started
+## Your Tool for Creative Mastery
 
-First, run the development server:
+Apricity is designed specifically to help authors craft complex narratives by uniting the writing process with deep worldbuilding:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+*   **Write & Connect:** Draft your manuscript with scenes that link directly to plot events, character arcs, and worldbuilding elements.
+*   **Weave Intricate Plots:** Track events across multiple timelines and storylines with Plotweaver—see how every thread intertwines.
+*   **Build Living Worlds:** Create detailed locations, cultures, magic systems, and histories that inform every scene.
+*   **Develop Rich Characters:** Track profiles, relationships, and character arcs that evolve throughout your story.
+*   **Never Lose an Idea:** Capture research, inspiration, and notes—all organized and searchable in one place.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the
-result.
+## What Makes Us Different?
 
-You can start editing the page by modifying `app/page.tsx`. The page
-auto-updates as you edit the file.
+*   **Bidirectional Linking:** Connect scenes to events, characters to locations, plot threads to character arcs—and navigate between them instantly.
+*   **Timeline-Driven Storytelling:** Your plot events and scenes exist on a visual timeline, making non-linear narratives manageable.
+*   **Unified Workspace:** No more juggling between Word docs, spreadsheets, and note apps—everything lives together.
+*   **Built for Authors, By Authors:** Every feature exists to serve your story, not distract from it.
 
-This project uses
-[`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts)
-to automatically optimize and load [Geist](https://vercel.com/font), a new font
-family for Vercel.
+## Core MVP Features
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out
-[the Next.js GitHub repository](https://github.com/vercel/next.js) - your
-feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the
-[Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)
-from the creators of Next.js.
-
-Check out our
-[Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying)
-for more details.
+- 📝 **Manuscript Editor** - Organize chapters and scenes with word count tracking
+- 🎭 **Plotweaver** - Timeline-based event management with plot thread tracking
+- 👥 **Character Profiles** - Character details with relationship mapping
+- 🌍 **Worldbuilding Hub** - Locations, cultures, magic systems, and history
+- 📓 **Notes & Research** - Capture ideas and reference materials
+- 🔗 **Smart Connections** - Link scenes, events, characters, and world elements
+- 🎯 **Progress Tracking** - Word count goals and session statistics
