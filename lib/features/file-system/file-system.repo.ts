@@ -7,8 +7,14 @@ import {
 import { Result, ok, err } from '@/lib/utils';
 
 export interface FileSystemRepository {
-  findAll(userId: string): Promise<Result<FileSystemItem[], string>>;
-  findById(id: string, userId: string): Promise<Result<FileSystemItem, string>>;
+  findAll(
+    userId: string,
+    projectId: string,
+  ): Promise<Result<FileSystemItem[], string>>;
+  findById(
+    id: string,
+    userId: string,
+  ): Promise<Result<FileSystemItem | null, string>>;
   findByParentId(
     parentId: string | undefined,
     userId: string,
@@ -26,6 +32,7 @@ export interface FileSystemRepository {
   search(
     query: string,
     userId: string,
+    projectId: string,
   ): Promise<Result<FileSystemItem[], string>>;
 }
 
