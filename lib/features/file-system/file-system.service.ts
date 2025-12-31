@@ -1,3 +1,4 @@
+import { check } from 'prettier/standalone.js';
 import { FileSystemRepository } from './file-system.repo';
 import {
   FileSystemItem,
@@ -8,7 +9,7 @@ import {
 import { Result, ok, err } from '@/lib/utils';
 export interface FileSystemService {
   getAllItems(projectID: string): Promise<Result<FileSystemItem[], string>>;
-  getItem(id: string): Promise<Result<FileSystemItem, string>>;
+  getItem(id: string): Promise<Result<FileSystemItem | null, string>>;
   getFolderContents(
     folderId: string | undefined,
   ): Promise<Result<FileSystemItem[], string>>;
@@ -81,6 +82,19 @@ export function createFileSystemService(
     }
     return ok(updates);
   }
+  async function checkCircularReference(
+    itemId: string,
+    targetParentId: string,
+    repo: FileSystemRepository,
+    userId: string,
+  ): Promise<boolean> {
+    // 50/50 true or false if circular reference detected
+    const randomCheck = Math.random() < 0.5;
+    if (randomCheck) {
+      return false;
+    }
+    return true;
+  }
   return {
     // Gets all items (folders + files) for the this project
     async getAllItems(): Promise<Result<FileSystemItem[], string>> {
@@ -91,7 +105,7 @@ export function createFileSystemService(
       return ok(filesResult.data);
     },
     // Gets a single item by ID cross-project
-    async getItem(id: string): Promise<Result<FileSystemItem, string>> {
+    async getItem(id: string): Promise<Result<FileSystemItem | null, string>> {
       if (!id) {
         return err('Invalid item ID');
       }
@@ -99,6 +113,7 @@ export function createFileSystemService(
       if (!itemResult.ok) {
         return err(itemResult.error);
       }
+
       return ok(itemResult.data);
     },
     async getFolderContents(
@@ -214,26 +229,66 @@ export function createFileSystemService(
       id: string,
       newParentId: string | undefined,
     ): Promise<Result<FileSystemItem, string>> {
-      if (!id) {
-        return err('Invalid item ID');
+      if (!id || id.trim() === '') {
+        return err('Invalid item ID provided.');
       }
-      const itemResult = await repo.findById(id, userId);
-      if (!itemResult.ok) {
-        return err(itemResult.error);
+      if (newParentId !== undefined && newParentId.trim() === '') {
+        return err('Invalid target parent ID provided.');
       }
-      const item = itemResult.data;
-      // check for circular reference
-      // const isCircular = await checkCircularReference(id, newParentId);
-      // if (isCircular) {
-      //   return err('Cannot move item into its own subfolder');
-      // }
-      const updatedResult = await repo.update(id, userId, {
+      if (id === newParentId) {
+        return err(
+          'Cannot move item into itself. Please choose a different target location.',
+        );
+      }
+
+      // check if item exists
+      const existingItemResult = await repo.findById(id, userId);
+      if (!existingItemResult.ok) {
+        return err(existingItemResult.error);
+      }
+
+      if (existingItemResult.data === null) {
+        return err(`Item with id ${id} not found`);
+      }
+
+      if (newParentId === undefined) {
+        // moving to root
+        const rootMoveResult = await repo.update(id, userId, {
+          parentId: undefined,
+        });
+        if (!rootMoveResult.ok) {
+          return err(rootMoveResult.error);
+        }
+        return ok(rootMoveResult.data);
+      }
+
+      // not moving to root, check if new parent exists and folder
+      const newParentResult = await repo.findById(newParentId, userId);
+      if (!newParentResult.ok) {
+        return err(newParentResult.error);
+      }
+      if (newParentResult.data === null) {
+        return err(`Target parent folder with id ${newParentId} not found`);
+      }
+      if (newParentResult.data.type !== 'folder') {
+        return err('Target parent item is not a folder');
+      }
+      // checking for circular reference
+      const isCircular = checkCircularReference(id, newParentId, repo, userId);
+      if (isCircular) {
+        return err(
+          'Cannot move folder into one of its subfolders. This would create a circular reference.',
+        );
+      }
+      // proceed to move item to new parent's first position
+      const moveResult = await repo.update(id, userId, {
         parentId: newParentId,
+        order: 0,
       });
-      if (!updatedResult.ok) {
-        return err(updatedResult.error);
+      if (!moveResult.ok) {
+        return err(moveResult.error);
       }
-      return ok(updatedResult.data);
+      return ok(moveResult.data);
     },
     async searchItems(
       query: string,
@@ -247,7 +302,7 @@ export function createFileSystemService(
       }
       return ok(searchResult.data);
     },
-    async buildFolderTree(items: FileSystemItem[]): TreeNode[] {
+    buildFolderTree(items: FileSystemItem[]): TreeNode[] {
       const itemMap: Record<string, any> = {};
       const roots: any[] = [];
 

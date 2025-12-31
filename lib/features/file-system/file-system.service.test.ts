@@ -84,6 +84,26 @@ describe('FileSystemService', () => {
     name: 'Renamed Folder',
   };
 
+  const generateChildren = (
+    parentId: string,
+    count: number,
+  ): FileSystemItem[] => {
+    const items: FileSystemItem[] = [];
+    for (let i = 0; i < count; i++) {
+      items.push({
+        id: `child-${i}`,
+        userId,
+        projectId,
+        name: `Child Item ${i}`,
+        type: i % 2 === 0 ? 'file' : 'folder',
+        parentId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    }
+    return items;
+  };
+
   const generateItemList = (count: number): FileSystemItem[] => {
     const items: FileSystemItem[] = [];
     for (let i = 0; i < count; i++) {
@@ -566,8 +586,18 @@ describe('FileSystemService', () => {
           expect(result.data).toBeNull();
         }
       });
-      it('should delete an empty folder successfully');
+      it('should delete an empty folder successfully', async () => {
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(folderItem));
+        vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok([]));
+        vi.mocked(mockRepo.delete).mockResolvedValueOnce(ok(null));
+        const result = await fileSystemService.deleteItem(folderItem.id);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.data).toBeNull();
+        }
+      });
       it('should recursively delete folder with all contents');
+      it('should return an error if any of the child deletions error');
       it('should return error when repository fails during delete', async () => {
         vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(fileItem));
         vi.mocked(mockRepo.delete).mockResolvedValueOnce(
@@ -582,137 +612,75 @@ describe('FileSystemService', () => {
     });
   });
 
-  // describe('moveItem', () => {
-  //   it('should move item to another folder', async () => {
-  //     const now = new Date();
-  //     const moved: FileSystemItem = {
-  //       ...fileItem,
-  //       parentId: folderItem.id,
-  //       updatedAt: now,
-  //     } as FileSystemItem;
-  //     vi.mocked(mockRepo.findById)
-  //       .mockResolvedValueOnce(ok(fileItem)) // find item
-  //       .mockResolvedValueOnce(ok(folderItem)); // find target folder
-  //     vi.mocked(mockRepo.update).mockResolvedValueOnce(ok(moved));
+  describe('moveItem', () => {
+    describe('validates input', () => {
+      it('should return error for invalid target parent ID', async () => {
+        const badParentID = '';
+        const badID = '';
+        const result = await fileSystemService.moveItem(badID, badParentID);
+        expect(result.ok).toBe(false);
+      });
+      it('should return an error if id === newParentId', async () => {
+        const itemID = 'item-123';
+        const parentID = itemID;
+        const result = await fileSystemService.moveItem(itemID, parentID);
+        expect(result.ok).toBe(false);
+        if (!result.ok) {
+          expect(result.error).toBe(
+            'Cannot move item into itself. Please choose a different target location.',
+          );
+        }
+      });
+    });
+    describe('checks if item exists', () => {
+      it('should return error when item not found', async () => {
+        const badID = 'non-existent-id';
+      });
+      it('should return error when repository fails during find');
+      it('should return nothing if the parent id matches');
+    });
+    describe('checks if target parent folder exists', () => {
+      it('should return error when target parent folder not found');
+      it('should return error when repository fails during target parent find');
+      it('should return an error if new parent is a file');
+      it("should return an error if user doesn't own the target parent folder");
+      it('should return an error if new parent ID is in another project');
+    });
 
-  //     const result = await fileSystemService.moveItem(
-  //       fileItem.id,
-  //       folderItem.id,
-  //     );
-  //     expect(result.ok).toBe(true);
-  //     if (result.ok) {
-  //       expect(result.data).toEqual(moved);
-  //     }
-  //     expect(mockRepo.findById).toHaveBeenCalledWith(fileItem.id, userId);
-  //     expect(mockRepo.findById).toHaveBeenCalledWith(folderItem.id, userId);
-  //     expect(mockRepo.update).toHaveBeenCalledWith(
-  //       fileItem.id,
-  //       userId,
-  //       expect.objectContaining({ parentId: folderItem.id }),
-  //     );
-  //   });
+    describe('handles name conflicts', () => {
+      it('should rename item if name conflict in target folder');
+      it('should allow move is name is different only by case-insenstivity');
+    });
 
-  //   it('should move item to root level', async () => {
-  //     const now = new Date();
-  //     const moved: FileSystemItem = {
-  //       ...fileItem,
-  //       parentId: undefined,
-  //       updatedAt: now,
-  //     } as FileSystemItem;
-  //     vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(fileItem));
-  //     vi.mocked(mockRepo.update).mockResolvedValueOnce(ok(moved));
+    describe('prevents circular references', () => {
+      it('should reject moving folder into itself');
+      it('should reject moving folder into its direct child');
+      it('should reject moving folder into its descendant');
+      it('should allow moving file anywhere (files cannot contain children)');
+      it('should allow moving folder to unrelated branch');
+    });
 
-  //     const result = await fileSystemService.moveItem(fileItem.id, undefined);
-  //     expect(result.ok).toBe(true);
-  //     if (result.ok) {
-  //       expect(result.data).toEqual(moved);
-  //     }
-  //     expect(mockRepo.update).toHaveBeenCalledWith(
-  //       fileItem.id,
-  //       userId,
-  //       expect.objectContaining({ parentId: undefined }),
-  //     );
-  //   });
+    describe('moves item successfully', () => {
+      it('should move file to new parent and preserve all properties');
+      it('should move folder to new parent');
+      it('should move item to root level (undefined parent)');
+      it('should preserve isPinned status when moving');
+      it('should preserve tags when moving');
+      it('should update updatedAt timestamp');
+      it('should handle moving item that is already at destination (no-op)');
+    });
 
-  //   it('should prevent moving folder into itself', async () => {
-  //     vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(folderItem));
-  //     const result = await fileSystemService.moveItem(
-  //       folderItem.id,
-  //       folderItem.id,
-  //     );
-  //     expect(result.ok).toBe(false);
-  //     if (!result.ok) {
-  //       expect(result.error).toMatch(/cannot move.*itself/i);
-  //     }
-  //   });
+    describe('handles repository errors', () => {
+      it('should return error when repository fails during update');
+      it('should return error when checking destination children fails');
+    });
 
-  //   it('should prevent moving folder into its descendant', async () => {
-  //     const parent = { ...folderItem, id: 'f-parent' } as FileSystemItem;
-  //     const child = {
-  //       ...folderItem,
-  //       id: 'f-child',
-  //       parentId: 'f-parent',
-  //     } as FileSystemItem;
-  //     vi.mocked(mockRepo.findById)
-  //       .mockResolvedValueOnce(ok(parent)) // item being moved
-  //       .mockResolvedValueOnce(ok(child)); // target folder (child)
-  //     // mock findByParentId to return child's children when traversing ancestry
-  //     vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(
-  //       ok([
-  //         {
-  //           id: 'f-child',
-  //           userId,
-  //           name: 'child',
-  //           type: 'folder',
-  //           createdAt: new Date(),
-  //           updatedAt: new Date(),
-  //         } as FileSystemItem,
-  //       ]),
-  //     );
-  //     const result = await fileSystemService.moveItem(parent.id, child.id);
-  //     expect(result.ok).toBe(false);
-  //     if (!result.ok) {
-  //       expect(result.error).toMatch(/descendant/i);
-  //     }
-  //   });
-
-  //   it('should return error when target folder does not exist', async () => {
-  //     vi.mocked(mockRepo.findById)
-  //       .mockResolvedValueOnce(ok(fileItem)) // item
-  //       .mockResolvedValueOnce(err('Item with id target not found')); // target
-  //     const result = await fileSystemService.moveItem(fileItem.id, 'target');
-  //     expect(result.ok).toBe(false);
-  //     if (!result.ok) {
-  //       expect(result.error).toMatch(/target folder/i);
-  //     }
-  //   });
-
-  //   it('should return error when item not found', async () => {
-  //     vi.mocked(mockRepo.findById).mockResolvedValueOnce(
-  //       err('Item with id missing not found'),
-  //     );
-  //     const result = await fileSystemService.moveItem('missing', 'any');
-  //     expect(result.ok).toBe(false);
-  //     if (!result.ok) {
-  //       expect(result.error).toMatch(/not found/i);
-  //     }
-  //   });
-
-  //   it('should return error when repository fails', async () => {
-  //     vi.mocked(mockRepo.findById)
-  //       .mockResolvedValueOnce(ok(fileItem))
-  //       .mockResolvedValueOnce(ok(folderItem));
-  //     vi.mocked(mockRepo.update).mockResolvedValueOnce(err('DB update failed'));
-  //     const result = await fileSystemService.moveItem(
-  //       fileItem.id,
-  //       folderItem.id,
-  //     );
-  //     expect(result.ok).toBe(false);
-  //     if (!result.ok) {
-  //       expect(result.error).toBe('DB update failed');
-  //     }
-  //   });
-  // });
+    describe('edge cases', () => {
+      it('should handle moving item with no tags');
+      it('should handle moving item with no order');
+      it('should handle moving unpinned item');
+    });
+  });
 
   describe('searchItems', () => {
     describe('validates query', async () => {
@@ -775,373 +743,50 @@ describe('FileSystemService', () => {
     });
   });
 
-  // describe('buildFolderTree', () => {
-  //   it('should build a tree from flat list of items', async () => {
-  //     const root: FileSystemItem = {
-  //       id: 'r',
-  //       userId,
-  //       projectId,
-  //       name: 'root',
-  //       type: 'folder',
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-  //     const child: FileSystemItem = {
-  //       id: 'c',
-  //       userId,
-  //       projectId,
-  //       name: 'child',
-  //       type: 'folder',
-  //       parentId: 'r',
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-  //     const file: FileSystemItem = {
-  //       id: 'f',
-  //       userId,
-  //       projectId,
-  //       name: 'file',
-  //       type: 'file',
-  //       parentId: 'c',
-  //       content: 'x',
-  //       size: 1,
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
+  describe('buildFolderTree', () => {
+    describe('basic tree construction', () => {
+      it('builds a tree from a flat list of items');
+      it('creates correct parent-child relationships');
+      it('supports mixed file and folder nodes');
+    });
 
-  //     const tree = fileSystemService.buildFolderTree([
-  //       root,
-  //       child,
-  //       file,
-  //     ]) as TreeNode[];
+    describe('root-level handling', () => {
+      it('places items with no parent at root level');
+      it('supports multiple root-level items');
+      it('returns empty array when given empty list');
+    });
 
-  //     expect(tree).toHaveLength(1); // one root item
-  //     expect(tree[0].id).toBe('r');
-  //     expect(tree[0].children).toHaveLength(1);
-  //     expect(tree[0].children[0].id).toBe('c');
-  //     expect(tree[0].children[0].children).toHaveLength(1);
-  //     expect(tree[0].children[0].children[0].id).toBe('f');
-  //   });
+    describe('nested structures', () => {
+      it('handles deeply nested folders');
+      it('places files correctly within nested folders');
+      it('maintains correct depth ordering');
+    });
 
-  //   it('should handle items with no parent (root level)', async () => {
-  //     const a: FileSystemItem = {
-  //       id: 'a',
-  //       userId,
-  //       projectId,
-  //       name: 'A',
-  //       type: 'file',
-  //       content: 'test',
-  //       size: 4,
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
+    describe('orphaned items', () => {
+      it('places items with missing parent at root level');
+      it('does not throw when parent reference is invalid');
+    });
 
-  //     const tree = (await fileSystemService.buildFolderTree([a])) as TreeNode[];
+    describe('mixed hierarchy scenarios', () => {
+      it('handles mix of root files and root folders');
+      it('handles root files alongside nested folder trees');
+    });
 
-  //     expect(tree).toHaveLength(1);
-  //     expect(tree[0].id).toBe('a');
-  //     expect(tree[0].children).toHaveLength(0);
-  //   });
+    describe('node shape guarantees', () => {
+      it('adds children array to all nodes');
+      it('ensures files have empty children arrays');
+      it('preserves original item properties on nodes');
+    });
 
-  //   it('should handle nested folders', async () => {
-  //     const a: FileSystemItem = {
-  //       id: 'a',
-  //       userId,
-  //       projectId,
-  //       name: 'A',
-  //       type: 'folder',
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-  //     const b: FileSystemItem = {
-  //       id: 'b',
-  //       userId,
-  //       projectId,
-  //       name: 'B',
-  //       type: 'folder',
-  //       parentId: 'a',
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-  //     const c: FileSystemItem = {
-  //       id: 'c',
-  //       userId,
-  //       projectId,
-  //       name: 'C',
-  //       type: 'file',
-  //       parentId: 'b',
-  //       content: 'x',
-  //       size: 1,
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
+    describe('ordering behavior', () => {
+      it('preserves input order for root-level items');
+      it('preserves input order for sibling nodes');
+    });
 
-  //     const tree = (await fileSystemService.buildFolderTree([
-  //       a,
-  //       b,
-  //       c,
-  //     ])) as TreeNode[];
-
-  //     expect(tree).toHaveLength(1);
-  //     expect(tree[0].id).toBe('a');
-  //     expect(tree[0].children).toHaveLength(1);
-  //     expect(tree[0].children[0].id).toBe('b');
-  //     expect(tree[0].children[0].children).toHaveLength(1);
-  //     expect(tree[0].children[0].children[0].id).toBe('c');
-  //   });
-
-  //   it('should handle empty list', async () => {
-  //     const tree = (await fileSystemService.buildFolderTree([])) as TreeNode[];
-
-  //     expect(tree).toEqual([]);
-  //   });
-
-  //   it('should handle multiple root items', async () => {
-  //     const a: FileSystemItem = {
-  //       id: 'a',
-  //       userId,
-  //       projectId,
-  //       name: 'A',
-  //       type: 'folder',
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-  //     const b: FileSystemItem = {
-  //       id: 'b',
-  //       userId,
-  //       projectId,
-  //       name: 'B',
-  //       type: 'file',
-  //       content: 'test',
-  //       size: 4,
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-
-  //     const tree = fileSystemService.buildFolderTree([
-  //       a,
-  //       b,
-  //     ]) as TreeNode[];
-  //     expect(tree).toHaveLength(2);
-  //     expect(tree[0].id).toBe('a');
-  //     expect(tree[1].id).toBe('b');
-  //     expect(tree[0].children).toHaveLength(0);
-  //     expect(tree[1].children).toHaveLength(0);
-  //   });
-
-  //   it('should handle orphaned items', async () => {
-  //     // An item referencing a parent id that does not exist
-  //     const orphan: FileSystemItem = {
-  //       id: 'o',
-  //       userId,
-  //       projectId,
-  //       name: 'Orphan',
-  //       type: 'file',
-  //       parentId: 'nope', // non-existent parent
-  //       content: 'orphaned',
-  //       size: 8,
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-
-  //     const tree = fileSystemService.buildFolderTree([orphan]) as TreeNode[];
-
-  //     // Orphaned items should still appear in the tree (at root level as fallback)
-  //     expect(tree).toHaveLength(1);
-  //     expect(tree[0].id).toBe('o');
-  //     expect(tree[0].children).toHaveLength(0);
-  //   });
-
-  //   it('should handle mixed root and nested items', async () => {
-  //     const rootFile: FileSystemItem = {
-  //       id: 'rf',
-  //       userId,
-  //       projectId,
-  //       name: 'RootFile',
-  //       type: 'file',
-  //       content: 'root',
-  //       size: 4,
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-  //     const folder: FileSystemItem = {
-  //       id: 'fold',
-  //       userId,
-  //       projectId,
-  //       name: 'Folder',
-  //       type: 'folder',
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-  //     const nestedFile: FileSystemItem = {
-  //       id: 'nf',
-  //       userId,
-  //       projectId,
-  //       name: 'NestedFile',
-  //       type: 'file',
-  //       parentId: 'fold',
-  //       content: 'nested',
-  //       size: 6,
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-
-  //     const tree = fileSystemService.buildFolderTree([
-  //       rootFile,
-  //       folder,
-  //       nestedFile,
-  //     ]) as TreeNode[];
-
-  //     expect(tree).toHaveLength(2); // rootFile and folder at root
-  //     const folderNode = tree.find((n) => n.id === 'fold');
-  //     expect(folderNode).toBeDefined();
-  //     expect(folderNode!.children).toHaveLength(1);
-  //     expect(folderNode!.children[0].id).toBe('nf');
-  //   });
-  // });
-
-  // describe('integration scenarios', () => {
-  //   it('should create folder, add file, then retrieve contents', async () => {
-  //     const createdFolder: FileSystemItem = {
-  //       ...newFolderDTO,
-  //       id: 'folder-int-1',
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-  //     vi.mocked(mockRepo.create).mockResolvedValueOnce(ok(createdFolder));
-  //     const resFolder = await fileSystemService.createItem(newFolderDTO);
-  //     expect(resFolder.ok).toBe(true);
-  //     if (resFolder.ok) expect(resFolder.data).toEqual(createdFolder);
-  //     // add file
-  //     const fileDTO = { ...newFileDTO, parentId: createdFolder.id };
-  //     const createdFile: FileSystemItem = {
-  //       ...fileDTO,
-  //       id: 'file-int-1',
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //       size: fileDTO.content!.length,
-  //     } as FileSystemItem;
-  //     vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(createdFolder)); // for parent check
-  //     vi.mocked(mockRepo.create).mockResolvedValueOnce(ok(createdFile));
-  //     const resFile = await fileSystemService.createItem(fileDTO);
-  //     expect(resFile.ok).toBe(true);
-  //     if (resFile.ok) expect(resFile.data).toEqual(createdFile);
-  //     // retrieving contents
-  //     vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(
-  //       ok([createdFile]),
-  //     );
-  //     const contents = await fileSystemService.getFolderContents(
-  //       createdFolder.id,
-  //     );
-  //     expect(contents.ok).toBe(true);
-  //     if (contents.ok) expect(contents.data).toEqual([createdFile]);
-  //   });
-
-  //   it('should move file between folders', async () => {
-  //     const srcFolder: FileSystemItem = {
-  //       id: 'src',
-  //       userId,
-  //       name: 'Src',
-  //       type: 'folder',
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-  //     const dstFolder: FileSystemItem = {
-  //       id: 'dst',
-  //       userId,
-  //       name: 'Dst',
-  //       type: 'folder',
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-  //     const fileToMove: FileSystemItem = {
-  //       ...fileItem,
-  //       parentId: srcFolder.id,
-  //     } as FileSystemItem;
-  //     vi.mocked(mockRepo.findById)
-  //       .mockResolvedValueOnce(ok(fileToMove)) // find item
-  //       .mockResolvedValueOnce(ok(dstFolder)); // target folder
-  //     const moved = {
-  //       ...fileToMove,
-  //       parentId: dstFolder.id,
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-  //     vi.mocked(mockRepo.update).mockResolvedValueOnce(ok(moved));
-  //     const result = await fileSystemService.moveItem(
-  //       fileToMove.id,
-  //       dstFolder.id,
-  //     );
-  //     expect(result.ok).toBe(true);
-  //     if (result.ok) expect(result.data).toEqual(moved);
-  //   });
-
-  //   it('should rename folder and verify all children maintain reference', async () => {
-  //     const parent: FileSystemItem = {
-  //       id: 'p',
-  //       userId,
-  //       name: 'Parent',
-  //       type: 'folder',
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-  //     const child: FileSystemItem = {
-  //       id: 'ch',
-  //       userId,
-  //       name: 'Child',
-  //       type: 'file',
-  //       parentId: 'p',
-  //       content: 'x',
-  //       size: 1,
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-  //     vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(parent));
-  //     vi.mocked(mockRepo.update).mockResolvedValueOnce(
-  //       ok({
-  //         ...parent,
-  //         name: 'Parent Renamed',
-  //         updatedAt: new Date(),
-  //       } as FileSystemItem),
-  //     );
-  //     // renaming parent should not change child's parentId; we assert that when fetching child later
-  //     const renameRes = await fileSystemService.updateItem(parent.id, {
-  //       name: 'Parent Renamed',
-  //     });
-  //     expect(renameRes.ok).toBe(true);
-  //     vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(child));
-  //     const childFetch = await fileSystemService.getItem(child.id);
-  //     expect(childFetch.ok).toBe(true);
-  //     if (childFetch.ok) expect(childFetch.data.parentId).toBe(parent.id);
-  //   });
-
-  //   it('should delete folder and verify children are deleted', async () => {
-  //     const parent: FileSystemItem = {
-  //       id: 'pdel',
-  //       userId,
-  //       name: 'ParentDel',
-  //       type: 'folder',
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-  //     const child: FileSystemItem = {
-  //       id: 'cdel',
-  //       userId,
-  //       name: 'ChildDel',
-  //       type: 'file',
-  //       parentId: 'pdel',
-  //       content: 'y',
-  //       size: 1,
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     } as FileSystemItem;
-  //     vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(parent));
-  //     vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok([child]));
-  //     // ensure delete called for child then parent
-  //     vi.mocked(mockRepo.delete).mockResolvedValue(ok(null));
-  //     const delRes = await fileSystemService.deleteItem(parent.id);
-  //     expect(delRes.ok).toBe(true);
-  //     expect(mockRepo.delete).toHaveBeenCalledWith(child.id, userId);
-  //     expect(mockRepo.delete).toHaveBeenCalledWith(parent.id, userId);
-  //   });
-  // });
+    describe('edge cases', () => {
+      it('handles single-item input');
+      it('handles list containing only files');
+      it('handles list containing only folders');
+    });
+  });
 });
