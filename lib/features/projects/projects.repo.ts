@@ -1,7 +1,9 @@
+import { Result } from '@/lib/utils';
 import { Project, CreateProjectDTO, UpdateProjectDTO } from './types';
+import { ok } from '@/lib/utils';
 
 export interface ProjectsRepository {
-  create(project: Project): Promise<Project>;
+  create(user: string, project: Project): Promise<Result<Project, string>>;
   update(id: string, updates: UpdateProjectDTO): Promise<Project | null>;
   delete(id: string): Promise<boolean>;
   getById(id: string): Promise<Project | null>;
@@ -12,9 +14,9 @@ export function createInMemoryProjectsRepo(): ProjectsRepository {
   const store = new Map<string, Project>();
 
   return {
-    async create(project) {
+    async create(userId, project) {
       store.set(project.id, project);
-      return project;
+      return ok(project);
     },
 
     async update(id, updates) {

@@ -22,59 +22,81 @@ export function createProjectsService(
     throw new Error('ProjectsService requires a userId');
   }
 
-  return {
-    async createProject(input) {
-      if (!input.name) {
-        return err('Project name is required');
+  function validateProjectInput(input: CreateProjectDTO | UpdateProjectDTO): string | null {
+    if (input.name !== undefined) {
+      if (typeof input.name !== 'string' || input.name.trim().length === 0) {
+        return 'Project name must be a non-empty string';
       }
+    }
+    if (input.blurb !== undefined) {
+      if (typeof input.blurb !== 'string') {
+        return 'Project blurb must be a string';
+      }
+      if (input.blurb.length > 500) {
+        return 'Project blurb must be less than 500 characters';
+      }
+    }
+    return null;
+  }
 
-      const now = new Date();
+  return {
+    async createProject(input: CreateProjectDTO) {
+      const validationError = validateProjectInput(input);
+      if (validationError) return err(validationError);
 
-      const project: Project = {
-        id: `project-${nanoid(12)}`,
+      const newProject: Project = {
+        id: `proj_${nanoid(15)}`,
         userId,
         name: input.name,
-        blurb: input.blurb || '',
-        createdAt: now,
-        updatedAt: now,
-      };
+        blurb: input.blurb,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
 
-      const created = await repo.create(project);
-      return ok(created);
+      const creationResult = await repo.create(userId, newProject);
+      if(creationResult.ok){
+        return ok(creationResult.data);
+      }
+      return err(creationResult.error);
     },
 
-    async updateProject(id, updates) {
+    async updateProject(id: string, updates: UpdateProjectDTO) {
+      const updateErrors = validateProjectInput(updates);
+      if (updateErrors) return err(updateErrors);
+
       const existing = await repo.getById(id);
       if (!existing) return err('Project not found');
-      if (existing.userId !== userId) return err('Unauthorized');
+      if (existing.userId !== userId) return err('You are not authorized to update this project');
+      const updatedResult = await repo.update(id, updates);
+      if (!updatedResult) return err('Failed to update project');
 
-      const updated = await repo.update(id, updates);
-      if (!updated) return err('Failed to update project');
+      return ok(updatedResult);
 
-      return ok(updated);
     },
 
     async deleteProject(id) {
       const existing = await repo.getById(id);
       if (!existing) return err('Project not found');
-      if (existing.userId !== userId) return err('Unauthorized');
+      if (existing.userId !== userId) return err('You are not authorized to delete this project');
 
-      const deleted = await repo.delete(id);
-      if (!deleted) return err('Failed to delete project');
-
+      const deletionSuccess = await repo.delete(id);
+      if (!deletionSuccess) return err('Failed to delete project');
       return ok(null);
     },
 
     async getProject(id) {
+      if (!id) return err('Project ID is required');
+
       const project = await repo.getById(id);
       if (!project) return err('Project not found');
-      if (project.userId !== userId) return err('Unauthorized');
+      if (project.userId !== userId) return err('You are not authorized to view this project');
 
       return ok(project);
     },
 
     async getAllProjects() {
       const projects = await repo.getAllByUser(userId);
+      if (!projects) return err('Failed to retrieve projects');
       return ok(projects);
     },
   };
