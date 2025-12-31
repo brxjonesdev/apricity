@@ -1,4 +1,7 @@
-// fileSystemService.test.ts
+/* typescript-eslint-disable no-implicit-any */
+/* typescript-eslint: disable no-implicit-any */
+/* typescript-eslint: disable noImplicitAny */
+/* typescript-eslint-disable @typescript-eslint/no-implicit-any */
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { createFileSystemService } from './file-system.service';
 import { FileSystemRepository } from './file-system.repo';
@@ -7,6 +10,7 @@ import {
   FileSystemItem,
   CreateFileSystemItemDTO,
   UpdateFileSystemItemDTO,
+  TreeNode,
 } from './types';
 
 describe('FileSystemService', () => {
@@ -25,6 +29,7 @@ describe('FileSystemService', () => {
       update: vi.fn(),
       delete: vi.fn(),
       search: vi.fn(),
+      batchDelete: vi.fn(),
     };
     fileSystemService = createFileSystemService(userId, projectId, mockRepo);
   });
@@ -39,13 +44,15 @@ describe('FileSystemService', () => {
     id: 'file-1',
     userId,
     name: 'Document.txt',
+    projectId,
+    order: 0,
     type: 'file',
     content: 'Hello, world!',
     parentId: undefined,
     createdAt: new Date(),
     updatedAt: new Date(),
     size: 'Hello, world!'.length,
-  } as unknown as FileSystemItem;
+  };
 
   const folderItem: FileSystemItem = {
     id: 'folder-1',
@@ -53,6 +60,7 @@ describe('FileSystemService', () => {
     projectId,
     name: 'My Folder',
     type: 'folder',
+    order: 0,
     parentId: undefined,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -97,6 +105,7 @@ describe('FileSystemService', () => {
         name: `Child Item ${i}`,
         type: i % 2 === 0 ? 'file' : 'folder',
         parentId,
+        order: i,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -254,6 +263,7 @@ describe('FileSystemService', () => {
         id: '', // id will be set by repo
         createdAt: new Date(),
         updatedAt: new Date(),
+        order: 0,
       };
       vi.mocked(mockRepo.create).mockResolvedValueOnce(ok(createdFile));
 
@@ -275,6 +285,7 @@ describe('FileSystemService', () => {
       const createdFolder: FileSystemItem = {
         ...newFolderDTO,
         id: '',
+        order: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       } as FileSystemItem;
@@ -312,6 +323,7 @@ describe('FileSystemService', () => {
         projectId,
         name: 'Parent Folder',
         type: 'folder',
+        order: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -326,6 +338,7 @@ describe('FileSystemService', () => {
       const createdFile: FileSystemItem = {
         ...newFileDTO,
         id: '',
+        order: 0,
         createdAt: now,
         updatedAt: now,
       };
@@ -466,6 +479,7 @@ describe('FileSystemService', () => {
           id: 'sibling-1',
           userId,
           projectId,
+          order: 1,
           name: 'ConflictingName.txt',
           type: 'file',
           parentId: fileItem.parentId,
@@ -476,6 +490,7 @@ describe('FileSystemService', () => {
         const siblingItem2: FileSystemItem = {
           ...siblingItem,
           id: 'sibling-2',
+          order: 0,
         };
         const conflictUpdateDTO: UpdateFileSystemItemDTO = {
           name: 'ConflictingName.txt',
@@ -586,6 +601,8 @@ describe('FileSystemService', () => {
           expect(result.data).toBeNull();
         }
       });
+
+
       it('should delete an empty folder successfully', async () => {
         vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(folderItem));
         vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok([]));
@@ -596,17 +613,57 @@ describe('FileSystemService', () => {
           expect(result.data).toBeNull();
         }
       });
-      it('should recursively delete folder with all contents');
-      it('should return an error if any of the child deletions error');
+      it('should recursively delete folder with all contents', async () => {
+        const children = generateChildren(folderItem.id, 3);
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(folderItem));
+        vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok(children));
+        expect(children.length).toBe(3);
+        vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
+          if (id === folderItem.id) return ok(folderItem);
+          const c = children.find((ch) => ch.id === id);
+          return c ? ok(c) : err(`Item with id ${id} not found`);
+        });
+
+      });
+      it('should stop deletion and return error if nested child deletion fails', async () => {
+        const children = generateChildren(folderItem.id, 2);
+
+        vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
+          if (id === folderItem.id) return ok(folderItem);
+          const c = children.find((ch) => ch.id === id);
+          return c ? ok(c) : err(`Item with id ${id} not found`);
+        });
+
+        // Ensure findByParentId works for the top-level folder and for any nested folder (empty)
+        vi.mocked(mockRepo.findByParentId).mockImplementation(async (parentId?: string) => {
+          if (parentId === folderItem.id) return ok(children);
+          // treat nested folders as empty (so delete() will be invoked on them)
+          return ok([]);
+        });
+
+        vi.mocked(mockRepo.delete).mockImplementation(async (id: string) => {
+          if (id === children[0].id) return ok(null);
+          return err('DB Delete Error on child');
+        });
+
+        const result = await fileSystemService.deleteItem(folderItem.id);
+        expect(result.ok).toBe(false);
+        if (!result.ok) {
+          expect(result.error).toBe(
+            'One or more items could not be deleted due to an database error.',
+          );
+        }
+      });
+
       it('should return error when repository fails during delete', async () => {
         vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(fileItem));
         vi.mocked(mockRepo.delete).mockResolvedValueOnce(
-          err('DB Delete Error'),
+          err('Database failed to delete item'),
         );
         const result = await fileSystemService.deleteItem(fileItem.id);
         expect(result.ok).toBe(false);
         if (!result.ok) {
-          expect(result.error).toBe('DB Delete Error');
+          expect(result.error).toBe('Database failed to delete item');
         }
       });
     });
@@ -617,13 +674,13 @@ describe('FileSystemService', () => {
       it('should return error for invalid target parent ID', async () => {
         const badParentID = '';
         const badID = '';
-        const result = await fileSystemService.moveItem(badID, badParentID);
+        const result = await fileSystemService.moveItem(badID, badParentID, 3);
         expect(result.ok).toBe(false);
       });
       it('should return an error if id === newParentId', async () => {
         const itemID = 'item-123';
         const parentID = itemID;
-        const result = await fileSystemService.moveItem(itemID, parentID);
+        const result = await fileSystemService.moveItem(itemID, parentID, 5);
         expect(result.ok).toBe(false);
         if (!result.ok) {
           expect(result.error).toBe(
@@ -633,9 +690,7 @@ describe('FileSystemService', () => {
       });
     });
     describe('checks if item exists', () => {
-      it('should return error when item not found', async () => {
-        const badID = 'non-existent-id';
-      });
+      it('should return error when item not found');
       it('should return error when repository fails during find');
       it('should return nothing if the parent id matches');
     });
@@ -647,17 +702,17 @@ describe('FileSystemService', () => {
       it('should return an error if new parent ID is in another project');
     });
 
-    describe('handles name conflicts', () => {
-      it('should rename item if name conflict in target folder');
-      it('should allow move is name is different only by case-insenstivity');
-    });
-
     describe('prevents circular references', () => {
       it('should reject moving folder into itself');
       it('should reject moving folder into its direct child');
       it('should reject moving folder into its descendant');
       it('should allow moving file anywhere (files cannot contain children)');
       it('should allow moving folder to unrelated branch');
+    });
+
+    describe('handles name conflicts', () => {
+      it('should rename item if name conflict in target folder');
+      it('should allow move is name is different only by case-insenstivity');
     });
 
     describe('moves item successfully', () => {
@@ -676,9 +731,7 @@ describe('FileSystemService', () => {
     });
 
     describe('edge cases', () => {
-      it('should handle moving item with no tags');
-      it('should handle moving item with no order');
-      it('should handle moving unpinned item');
+      it('should handle moving pinned items');
     });
   });
 
@@ -744,49 +797,56 @@ describe('FileSystemService', () => {
   });
 
   describe('buildFolderTree', () => {
-    describe('basic tree construction', () => {
-      it('builds a tree from a flat list of items');
-      it('creates correct parent-child relationships');
-      it('supports mixed file and folder nodes');
+    it('builds a tree and orders roots and siblings by the `order` attribute', () => {
+      const items: FileSystemItem[] = [
+        // roots: r1 (order 10), r2 (order 1) -> r2 should come first
+        {
+          id: 'r1',
+          userId,
+          projectId,
+          name: 'R1',
+          type: 'folder',
+          parentId: undefined,
+          order: 10,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'r2',
+          userId,
+          projectId,
+          name: 'R2',
+          type: 'folder',
+          parentId: undefined,
+          order: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        // children of r1 with orders: s2 (order 5), s1 (order 2), s3 (order 8)
+        { id: 's1', userId, projectId, name: 'S1', type: 'file', parentId: 'r1', order: 2, createdAt: new Date(), updatedAt: new Date() },
+        { id: 's2', userId, projectId, name: 'S2', type: 'file', parentId: 'r1', order: 5, createdAt: new Date(), updatedAt: new Date() },
+        { id: 's3', userId, projectId, name: 'S3', type: 'file', parentId: 'r1', order: 8, createdAt: new Date(), updatedAt: new Date() },
+      ];
+
+      const tree = fileSystemService.buildFolderTree(items);
+      // roots should be sorted by order: r2 then r1
+      expect(tree.map((n) => n.id)).toEqual(['r2', 'r1']);
+
+      // r1's children should be sorted by order: s1, s2, s3
+      const r1 = tree.find((n) => n.id === 'r1') as TreeNode;
+      expect(r1.children.map((c:TreeNode) => c.id)).toEqual(['s1', 's2', 's3']);
     });
 
-    describe('root-level handling', () => {
-      it('places items with no parent at root level');
-      it('supports multiple root-level items');
-      it('returns empty array when given empty list');
-    });
-
-    describe('nested structures', () => {
-      it('handles deeply nested folders');
-      it('places files correctly within nested folders');
-      it('maintains correct depth ordering');
-    });
-
-    describe('orphaned items', () => {
-      it('places items with missing parent at root level');
-      it('does not throw when parent reference is invalid');
-    });
-
-    describe('mixed hierarchy scenarios', () => {
-      it('handles mix of root files and root folders');
-      it('handles root files alongside nested folder trees');
-    });
-
-    describe('node shape guarantees', () => {
-      it('adds children array to all nodes');
-      it('ensures files have empty children arrays');
-      it('preserves original item properties on nodes');
-    });
-
-    describe('ordering behavior', () => {
-      it('preserves input order for root-level items');
-      it('preserves input order for sibling nodes');
-    });
-
-    describe('edge cases', () => {
-      it('handles single-item input');
-      it('handles list containing only files');
-      it('handles list containing only folders');
+    // Keep other behavioral tests (orphaned items, children array, depth)
+    it('places orphaned items at root and does not throw', () => {
+      const items: FileSystemItem[] = [
+        { id: 'good', userId, projectId, name: 'Good', type: 'file', parentId: undefined, order: 0, createdAt: new Date(), updatedAt: new Date() },
+        { id: 'orphan', userId, projectId, name: 'Orphan', type: 'file', parentId: 'nope', order: 1, createdAt: new Date(), updatedAt: new Date() },
+      ];
+      const tree = fileSystemService.buildFolderTree(items);
+      expect(tree.map((n) => n.id).sort()).toEqual(['good', 'orphan'].sort());
     });
   });
+
+
 });

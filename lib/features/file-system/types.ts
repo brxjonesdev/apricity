@@ -16,7 +16,7 @@ export interface FileSystemItem {
 
 export type CreateFileSystemItemDTO = Omit<
   FileSystemItem,
-  'id' | 'createdAt' | 'updatedAt' | 'size'
+  'id' | 'createdAt' | 'updatedAt' | 'size' | 'order'
 >;
 
 export type UpdateFileSystemItemDTO = Partial<

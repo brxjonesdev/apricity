@@ -29,6 +29,10 @@ export interface FileSystemRepository {
     updates: UpdateFileSystemItemDTO,
   ): Promise<Result<FileSystemItem, string>>;
   delete(id: string, userId: string): Promise<Result<null, string>>;
+  batchDelete(
+    ids: string[],
+    userId: string,
+  ) : Promise<Result<null, string>>;
   search(
     query: string,
     userId: string,
@@ -90,6 +94,7 @@ export function createInMemoryFileSystemRepository(): FileSystemRepository {
         const newItem: FileSystemItem = {
           id: crypto.randomUUID(),
           ...item,
+          order: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -138,6 +143,26 @@ export function createInMemoryFileSystemRepository(): FileSystemRepository {
         return ok(null);
       } catch (error) {
         return err(`Failed to delete item: ${error}`);
+      }
+    },
+    async batchDelete(
+      ids: string[],
+      userId: string,
+    ): Promise<Result<null, string>> {
+      try {
+        for (const id of ids) {
+          const item = store.get(id);
+          if (!item) {
+            return err(`Item with id ${id} not found`);
+          }
+          if (item.userId !== userId) {
+            return err('Unauthorized access');
+          }
+          store.delete(id);
+        }
+        return ok(null);
+      } catch (error) {
+        return err(`Failed to batch delete items: ${error}`);
       }
     },
 
