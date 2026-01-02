@@ -1,4 +1,3 @@
-import { check } from 'prettier/standalone.js';
 import { FileSystemRepository } from './file-system.repo';
 import {
   FileSystemItem,
@@ -255,22 +254,14 @@ export function createFileSystemService(
       }
 
       // check if item exists
-      const existingItemResult = await repo.findById(id, userId);
-      if (!existingItemResult.ok) {
-        return err(existingItemResult.error);
-      }
-      if (existingItemResult.data === null) {
-        return err(`Item with id ${id} not found`);
-      }
-      // if parentID is undefined, move item to root at the end
-      if(newParentId === undefined){
-        const moveToRootResult = await repo.update(id, userId, { parentId: undefined, order: order });
-      }
-      // if parentID is defined, check if parent exists and is a folder
-      // check for circular references
-      // check for naming conflicts in target parent folder
-      // proceed to move item to given position in target parent folder (or root) given order
-      // NOTE: pinned items are always at the top, so order is among unpinned items only
+      // handle if moving to root (newParentId undefined)
+        // check for named item in root with same name
+      // check if target parent exists and is a folder
+      // check for circular reference
+        // check for named item in target folder with same name
+      // perform move
+
+
 
       return err('Not implemented yet');
     },
