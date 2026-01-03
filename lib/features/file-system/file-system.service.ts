@@ -89,13 +89,23 @@ export function createFileSystemService(
     repo: FileSystemRepository,
     userId: string,
   ): Promise<boolean> {
-    // 50/50 true or false if circular reference detected
-    const randomCheck = Math.random() < 0.5;
-    if (randomCheck) {
-      return false;
-    }
-    return true;
+    // PSEUDOCODE:
+    // if no target -> cannot be circular
+    // if target === item -> circular
+    // keep a visited set to guard against existing bad cycles in data
+    // loop:
+    //   fetch node = await repo.findById(currentId, userId)
+    //   if repo returns error -> throw / bubble error (or return true to be safe)
+    //   if node is null -> break (reached a parent outside store)
+    //   if node.parentId is undefined -> break (reached root)
+    //   if node.parentId === itemId -> return true (moving under descendant)
+    //   if visited already contains node.parentId -> return true (existing cycle)
+    //   add node.parentId to visited
+    //   currentId = node.parentId
+    // end loop
+    // return false (no circular reference found)
   }
+
   return {
     // Gets all items (folders + files) for the this project
     async getAllItems(): Promise<Result<FileSystemItem[], string>> {
@@ -190,51 +200,78 @@ export function createFileSystemService(
       if (!id || id.trim() === '') {
         return err('Invalid item ID provided.');
       }
-      // check if item exists
-      const existingItemResult = await repo.findById(id, userId);
-      if (!existingItemResult.ok) {
-        return err(existingItemResult.error);
+
+      // quick existence check (keeps current behavior for "not found" and auth errors)
+      const rootResult = await repo.findById(id, userId);
+      if (!rootResult.ok) {
+        return err(rootResult.error);
       }
-      if (existingItemResult.data === null) {
+      if (rootResult.data === null) {
         return err(`Item with id ${id} not found`);
       }
 
-      // if folder, get all children and delete them recursively
-      if (existingItemResult.data.type === 'folder') {
-        const childrenResult = await repo.findByParentId(id, userId);
-        if (!childrenResult.ok) {
-          return err(childrenResult.error);
-        }
-        if (childrenResult.data.length > 0) {
-          for (const child of childrenResult.data) {
-            const deleteChildResult = await this.deleteItem(child.id);
-            if (!deleteChildResult.ok) {
-              // Standardize the message when any nested deletion fails
-              return err(
-                'One or more items could not be deleted due to an database error.',
-              );
+      // iterative DFS to produce a POST-ORDER list of IDs (children before parent)
+      const stack: Array<{ id: string; expanded: boolean }> = [{ id, expanded: false }];
+      const visited = new Set<string>();
+      const postOrderIds: string[] = [];
+
+      while (stack.length > 0) {
+        const node = stack.pop()!;
+        const nodeId = node.id;
+
+        if (!node.expanded) {
+          // detect cycles: if we already expanded this id earlier in the path, a cycle exists
+          if (visited.has(nodeId)) {
+            return err(`Circular reference detected for item ${nodeId}`);
+          }
+          visited.add(nodeId);
+
+          // push back as expanded so we add it to postOrder after children
+          stack.push({ id: nodeId, expanded: true });
+
+          // fetch the node to see if it's a folder and to get its children
+          const itemRes = await repo.findById(nodeId, userId);
+          if (!itemRes.ok) {
+            return err(itemRes.error);
+          }
+          if (itemRes.data === null) {
+            return err(`Item with id ${nodeId} not found`);
+          }
+          const item = itemRes.data;
+
+          if (item.type === 'folder') {
+            const childrenRes = await repo.findByParentId(nodeId, userId);
+            if (!childrenRes.ok) {
+              return err(childrenRes.error);
+            }
+
+            // deterministic order for deletion: sort by `order` (missing -> 0)
+            const children = childrenRes.data.slice().sort(
+              (a, b) => (typeof a.order === 'number' ? a.order : 0) - (typeof b.order === 'number' ? b.order : 0),
+            );
+
+            // push children onto stack so they'll be processed before the parent (LIFO)
+            for (let i = children.length - 1; i >= 0; i--) {
+              stack.push({ id: children[i].id, expanded: false });
             }
           }
         } else {
-          // empty folder -> delete directly
-          const deleteEmptyFolderResult = await repo.delete(id, userId);
-          if (!deleteEmptyFolderResult.ok) {
-            return err(
-              'One or more items could not be deleted due to an database error.',
-            );
-          }
-          return ok(null);
+          // post-order time: children already handled
+          postOrderIds.push(nodeId);
         }
       }
 
-      const deleteResult = await repo.delete(id, userId);
-      if (!deleteResult.ok) {
-        return err(
-          'Database failed to delete item',
-        );
+      // Now delete everything in one go via batchDelete (children-first ordering preserved)
+      const batchRes = await repo.batchDelete(postOrderIds, userId);
+      if (!batchRes.ok) {
+        // Standardize nested-delete failure message for consistency with existing tests.
+        // If you prefer to surface repo errors directly, return err(batchRes.error) instead.
+        return err('One or more items could not be deleted due to an database error.');
       }
+
       return ok(null);
-    },
+    }
+,
     async moveItem(
       id: string,
       newParentId: string | undefined,
@@ -254,16 +291,138 @@ export function createFileSystemService(
       }
 
       // check if item exists
+      const existingItemResult = await repo.findById(id, userId);
+      if (!existingItemResult.ok) {
+        return err(existingItemResult.error);
+      }
+      if (existingItemResult.data === null) {
+        return err(`Item with id ${id} not found`);
+      }
+      if (existingItemResult.data.parentId === newParentId) {
+        // check if order is the same
+        if (existingItemResult.data.order === order) {
+          // do nothing, item is already where it needs to be
+          return ok(existingItemResult.data);
+        }
+        // else, just update the order
+        const updatedOrderResult = await repo.update(id, userId, {
+          order,
+        });
+        if (!updatedOrderResult.ok) {
+          return err(updatedOrderResult.error);
+        }
+        return ok(updatedOrderResult.data
+        )
+      }
+      const itemToMove = existingItemResult.data;
       // handle if moving to root (newParentId undefined)
+      if (newParentId === undefined) {
         // check for named item in root with same name
+        const rootItemsResult = await repo.findByParentId(
+          undefined,
+          userId,
+        );
+        if (!rootItemsResult.ok) {
+          return err(rootItemsResult.error);
+        }
+        const nameConflict = rootItemsResult.data.find(
+          (item) =>
+            item.name === itemToMove.name && item.id !== itemToMove.id,
+        );
+        // if name conflict, add (n) suffix
+        // check for current suffixes
+        if (nameConflict) {
+          let suffixNumber = 1;
+          let newName = `${itemToMove.name} (${suffixNumber})`;
+          while (
+            rootItemsResult.data.find(
+              (item) =>
+                item.name === newName && item.id !== itemToMove.id,
+            )
+          ) {
+            suffixNumber += 1;
+            newName = `${itemToMove.name} (${suffixNumber})`;
+          }
+          itemToMove.name = newName;
+        }
+        // perform move to root
+        const movedRootResult = await repo.update(id, userId, {
+          parentId: undefined,
+          order,
+          name: itemToMove.name,
+        });
+        if (!movedRootResult.ok) {
+          return err(movedRootResult.error);
+        }
+        return ok(movedRootResult.data);
+      }
       // check if target parent exists and is a folder
+      const targetParentResult = await repo.findById(newParentId, userId);
+      if (!targetParentResult.ok) {
+        return err(targetParentResult.error);
+      }
+      if (targetParentResult.data === null) {
+        return err('Target parent folder does not exist.');
+      }
+      if (targetParentResult.data.type !== 'folder') {
+        return err('Target parent must be a folder.');
+      }
+
+      if (targetParentResult.data.userId !== userId){
+        return err('Unauthorized to access target parent folder.');
+      }
+      if (targetParentResult.data.projectId !== projectId) {
+        return err('Target parent folder does not belong to the same project.');
+      }
       // check for circular reference
-        // check for named item in target folder with same name
+      const hasCircularRef = await checkCircularReference(
+        id,
+        newParentId,
+        repo,
+        userId,
+      );
+      if (hasCircularRef) {
+        return err(
+          'Cannot move item into one of its subfolders. Please choose a different target location.',
+        );
+      }
+      // get contents of target folder to check for name conflicts
+      const targetFolderContentsResult = await repo.findByParentId(
+        newParentId,
+        userId,
+      );
+      if (!targetFolderContentsResult.ok) {
+        return err(targetFolderContentsResult.error);
+      }
+      const nameConflict = targetFolderContentsResult.data.find(
+        (item) =>
+          item.name === itemToMove.name && item.id !== itemToMove.id,
+      );
+      // if name conflict, add (n) suffix
+      if (nameConflict) {
+        let suffixNumber = 1;
+        let newName = `${itemToMove.name} (${suffixNumber})`;
+        while (
+          targetFolderContentsResult.data.find(
+            (item) =>
+              item.name === newName && item.id !== itemToMove.id,
+          )
+        ) {
+          suffixNumber += 1;
+          newName = `${itemToMove.name} (${suffixNumber})`;
+        }
+        itemToMove.name = newName;
+      }
       // perform move
-
-
-
-      return err('Not implemented yet');
+      const movedResult = await repo.update(id, userId, {
+        parentId: newParentId,
+        order,
+        name: itemToMove.name,
+      });
+      if (!movedResult.ok) {
+        return err(movedResult.error);
+      }
+      return ok(movedResult.data);
     },
     async searchItems(
       query: string,

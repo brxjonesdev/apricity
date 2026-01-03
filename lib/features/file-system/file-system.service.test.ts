@@ -580,9 +580,7 @@ describe('FileSystemService', () => {
         }
       });
       it('should return error when repository fails during find', async () => {
-        vi.mocked(mockRepo.findById).mockResolvedValueOnce(
-          err('DB find error'),
-        );
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(err('DB find error'));
         const result = await fileSystemService.deleteItem('some-id');
         expect(result.ok).toBe(false);
         if (!result.ok) {
@@ -593,38 +591,65 @@ describe('FileSystemService', () => {
 
     describe('deletes item from repository', () => {
       it('should delete a file successfully', async () => {
-        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(fileItem));
-        vi.mocked(mockRepo.delete).mockResolvedValueOnce(ok(null));
+        // ensure findById always returns the file for all calls during traversal
+        vi.mocked(mockRepo.findById).mockResolvedValue(ok(fileItem));
+        vi.mocked(mockRepo.batchDelete).mockResolvedValueOnce(ok(null));
+
         const result = await fileSystemService.deleteItem(fileItem.id);
         expect(result.ok).toBe(true);
         if (result.ok) {
           expect(result.data).toBeNull();
         }
+
+        expect(vi.mocked(mockRepo.batchDelete)).toHaveBeenCalledWith([fileItem.id], userId);
       });
 
-
       it('should delete an empty folder successfully', async () => {
-        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(folderItem));
+        // ensure findById always returns the folder for all calls during traversal
+        vi.mocked(mockRepo.findById).mockResolvedValue(ok(folderItem));
         vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok([]));
-        vi.mocked(mockRepo.delete).mockResolvedValueOnce(ok(null));
+        vi.mocked(mockRepo.batchDelete).mockResolvedValueOnce(ok(null));
+
         const result = await fileSystemService.deleteItem(folderItem.id);
         expect(result.ok).toBe(true);
         if (result.ok) {
           expect(result.data).toBeNull();
         }
+
+        expect(vi.mocked(mockRepo.batchDelete)).toHaveBeenCalledWith([folderItem.id], userId);
       });
+
       it('should recursively delete folder with all contents', async () => {
         const children = generateChildren(folderItem.id, 3);
-        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(folderItem));
-        vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok(children));
+
+        // Provide findByParentId impl: return children for the root, empty for nested parents
+        vi.mocked(mockRepo.findByParentId).mockImplementation(async (parentId?: string) => {
+          if (parentId === folderItem.id) return ok(children);
+          return ok([]);
+        });
         expect(children.length).toBe(3);
+
+        // traversal will call findById for each id; provide implementation that returns
+        // the folder for the root id and the correct child for each child id.
         vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
           if (id === folderItem.id) return ok(folderItem);
           const c = children.find((ch) => ch.id === id);
           return c ? ok(c) : err(`Item with id ${id} not found`);
         });
 
+        vi.mocked(mockRepo.batchDelete).mockResolvedValueOnce(ok(null));
+
+        const result = await fileSystemService.deleteItem(folderItem.id);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.data).toBeNull();
+        }
+
+        const expectedOrder = [...children.map((c) => c.id), folderItem.id];
+        expect(vi.mocked(mockRepo.batchDelete)).toHaveBeenCalledWith(expectedOrder, userId);
       });
+
+
       it('should stop deletion and return error if nested child deletion fails', async () => {
         const children = generateChildren(folderItem.id, 2);
 
@@ -634,17 +659,13 @@ describe('FileSystemService', () => {
           return c ? ok(c) : err(`Item with id ${id} not found`);
         });
 
-        // Ensure findByParentId works for the top-level folder and for any nested folder (empty)
         vi.mocked(mockRepo.findByParentId).mockImplementation(async (parentId?: string) => {
           if (parentId === folderItem.id) return ok(children);
-          // treat nested folders as empty (so delete() will be invoked on them)
           return ok([]);
         });
 
-        vi.mocked(mockRepo.delete).mockImplementation(async (id: string) => {
-          if (id === children[0].id) return ok(null);
-          return err('DB Delete Error on child');
-        });
+        // Simulate batch delete failing
+        vi.mocked(mockRepo.batchDelete).mockResolvedValueOnce(err('DB Delete Error on child'));
 
         const result = await fileSystemService.deleteItem(folderItem.id);
         expect(result.ok).toBe(false);
@@ -656,18 +677,22 @@ describe('FileSystemService', () => {
       });
 
       it('should return error when repository fails during delete', async () => {
-        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(fileItem));
-        vi.mocked(mockRepo.delete).mockResolvedValueOnce(
-          err('Database failed to delete item'),
-        );
+        // ensure findById always returns the file for traversal
+        vi.mocked(mockRepo.findById).mockResolvedValue(ok(fileItem));
+        vi.mocked(mockRepo.batchDelete).mockResolvedValueOnce(err('Database failed to delete item'));
+
         const result = await fileSystemService.deleteItem(fileItem.id);
         expect(result.ok).toBe(false);
         if (!result.ok) {
-          expect(result.error).toBe('Database failed to delete item');
+          expect(result.error).toBe(
+            'One or more items could not be deleted due to an database error.',
+          );
         }
       });
     });
+
   });
+
 
   describe('moveItem', () => {
     describe('validates input', () => {
@@ -690,16 +715,103 @@ describe('FileSystemService', () => {
       });
     });
     describe('checks if item exists', () => {
-      it('should return error when item not found');
-      it('should return error when repository fails during find');
-      it('should return nothing if the parent id matches');
+      it('should return error when item not found', async () => {
+        const badID = 'non-existent-id';
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(null));
+        const result = await fileSystemService.moveItem(badID, 'some-parent', 2);
+        expect(result.ok).toBe(false);
+        if (!result.ok) {
+          expect(result.error).toBe(`Item with id ${badID} not found`);
+        }
+      });
+      it("should handle if parentIDs are the same", async () => {
+        const movingItem = { ...fileItem, parentId: folderItem.id };
+        const targetDestination = folderItem.id;
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(movingItem));
+        const result = await fileSystemService.moveItem(movingItem.id, targetDestination, 0);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.data).toEqual(movingItem);
+        }
+      })
+      it('should move order if parentIDs are the same', async () => {
+        const movingItem = { ...fileItem, parentId: folderItem.id };
+        const targetDestination = folderItem.id;
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(movingItem));
+        vi.mocked(mockRepo.update).mockResolvedValueOnce(ok({
+          ...movingItem,
+          order: 1,
+        }))
+        const result = await fileSystemService.moveItem(movingItem.id, targetDestination, 1);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.data).toEqual({
+            ...movingItem,
+            order: 1,
+          });
+        }
+      })
     });
     describe('checks if target parent folder exists', () => {
-      it('should return error when target parent folder not found');
-      it('should return error when repository fails during target parent find');
-      it('should return an error if new parent is a file');
-      it("should return an error if user doesn't own the target parent folder");
-      it('should return an error if new parent ID is in another project');
+      it('should return error when target parent folder not found', async () => {
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(fileItem));
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(null));
+        const result = await fileSystemService.moveItem(fileItem.id, 'non-existent-parent', 2);
+        expect(result.ok).toBe(false);
+        if (!result.ok) {
+          expect(result.error).toBe('Target parent folder does not exist.');
+        }
+      });
+      it('should return an error if new parent is a file', async () => {
+        const badParent = { ...fileItem, id: 'parent-file', parentId: undefined, type: 'file' as const };
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(fileItem));
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(badParent));
+        const result = await fileSystemService.moveItem(fileItem.id, badParent.id, 2);
+        expect(result.ok).toBe(false);
+        if (!result.ok) {
+          expect(result.error).toBe('Target parent must be a folder.');
+        }
+
+      });
+      it("should return an error if user doesn't own the target parent folder", async () => {
+        const anotherUsersFolder = { ...folderItem, id: 'other-user-folder', userId: 'different-user' };
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(fileItem));
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(anotherUsersFolder));
+        const result = await fileSystemService.moveItem(fileItem.id, anotherUsersFolder.id, 2);
+        expect(result.ok).toBe(false);
+        if (!result.ok) {
+          expect(result.error).toBe('Unauthorized to access target parent folder.');
+        }
+
+      });
+      it('should return an error if new parent ID is in another project', async () => {
+        const anotherProjectsFolder = { ...folderItem, id: 'other-project-folder', projectId: 'different-project' };
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(fileItem));
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(anotherProjectsFolder));
+        const result = await fileSystemService.moveItem(fileItem.id, anotherProjectsFolder.id, 2);
+        expect(result.ok).toBe(false);
+        if (!result.ok) {
+          expect(result.error).toBe('Target parent folder does not belong to the same project.');
+        }
+      });
+      it("should move to root if parentId is undefined", async () => {
+        const movingItem = { ...fileItem, parentId: undefined};
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(fileItem));
+        vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok([]));
+        vi.mocked(mockRepo.update).mockResolvedValueOnce(ok({
+          ...movingItem,
+          order: 0,
+        }))
+        const result = await fileSystemService.moveItem(movingItem.id, undefined, 0);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.data).toEqual({
+            ...movingItem,
+            order: 0,
+          });
+        }
+
+      })
     });
 
     describe('prevents circular references', () => {
@@ -722,16 +834,20 @@ describe('FileSystemService', () => {
       it('should preserve isPinned status when moving');
       it('should preserve tags when moving');
       it('should update updatedAt timestamp');
-      it('should handle moving item that is already at destination (no-op)');
     });
 
     describe('handles repository errors', () => {
       it('should return error when repository fails during update');
       it('should return error when checking destination children fails');
-    });
-
-    describe('edge cases', () => {
-      it('should handle moving pinned items');
+      it('should return error when repository fails during find', async () => {
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(err('DB find error'));
+        const result = await fileSystemService.moveItem('some-id', 'some-parent', 2);
+        expect(result.ok).toBe(false);
+        if (!result.ok) {
+          expect(result.error).toBe('DB find error');
+        }
+      });
+      it('should return error when repository fails during target parent find');
     });
   });
 
@@ -847,6 +963,4 @@ describe('FileSystemService', () => {
       expect(tree.map((n) => n.id).sort()).toEqual(['good', 'orphan'].sort());
     });
   });
-
-
 });
