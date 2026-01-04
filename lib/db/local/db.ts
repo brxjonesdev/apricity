@@ -1,6 +1,6 @@
 import { Dexie, type EntityTable } from "dexie"
 import { Project } from "@/lib/features/projects/types"
-import { FileSystemItem } from "@/lib/features/file-system/types"
+import { FileSystemItem } from "../../features/file-system/types"
 
 const db = new Dexie("FriendsDatabase") as Dexie & {
   projects: EntityTable<Project, "id">
