@@ -815,40 +815,333 @@ describe('FileSystemService', () => {
     });
 
     describe('prevents circular references', () => {
-      it('should reject moving folder into itself');
-      it('should reject moving folder into its direct child');
-      it('should reject moving folder into its descendant');
-      it('should allow moving file anywhere (files cannot contain children)');
-      it('should allow moving folder to unrelated branch');
+      it('should reject moving folder into itself', async () => {
+        const movingFolder = { ...folderItem, id: 'folder-self' };
+        // findById should return the moving folder when asked
+        vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
+          if (id === movingFolder.id) return ok(movingFolder);
+          return ok(null);
+        });
+
+        const result = await fileSystemService.moveItem(movingFolder.id, movingFolder.id, 0);
+        expect(result.ok).toBe(false);
+      });
+
+      it('should reject moving folder into its direct child', async () => {
+        const parent = { ...folderItem, id: 'parent-folder' };
+        const child = { ...folderItem, id: 'child-folder', parentId: parent.id };
+
+        vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
+          if (id === parent.id) return ok(parent);
+          if (id === child.id) return ok(child);
+          return ok(null);
+        });
+
+        const result = await fileSystemService.moveItem(parent.id, child.id, 0);
+        expect(result.ok).toBe(false);
+      });
+
+      it('should reject moving folder into its descendant (grandchild)', async () => {
+        const parent = { ...folderItem, id: 'parent-folder-2' };
+        const child = { ...folderItem, id: 'child-folder-2', parentId: parent.id };
+        const grandchild = { ...folderItem, id: 'grandchild-folder-2', parentId: child.id };
+
+        vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
+          if (id === parent.id) return ok(parent);
+          if (id === child.id) return ok(child);
+          if (id === grandchild.id) return ok(grandchild);
+          return ok(null);
+        });
+
+        const result = await fileSystemService.moveItem(parent.id, grandchild.id, 0);
+        expect(result.ok).toBe(false);
+      });
+
+      it('should allow moving file anywhere (files cannot contain children)', async () => {
+        const file = { ...fileItem, id: 'movable-file' };
+        const targetFolder = { ...folderItem, id: 'some-folder', parentId: undefined };
+
+        // findById used for the moving item and the target parent
+        vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
+          if (id === file.id) return ok(file);
+          if (id === targetFolder.id) return ok(targetFolder);
+          return ok(null);
+        });
+
+        // findByParentId used to list target folder contents (no name conflicts)
+        vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok([]));
+
+        // repo.update will be called to perform the move — mock it to return the moved item
+        vi.mocked(mockRepo.update).mockResolvedValueOnce(
+          ok({ ...file, parentId: targetFolder.id, order: 0 }),
+        );
+
+        const result = await fileSystemService.moveItem(file.id, targetFolder.id, 0);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.data).toEqual({ ...file, parentId: targetFolder.id, order: 0 });
+        }
+      });
+
+      it('should allow moving folder to an unrelated branch', async () => {
+        const movingFolder = { ...folderItem, id: 'moving-folder' };
+        const unrelatedFolder = { ...folderItem, id: 'unrelated-folder', parentId: undefined };
+
+        vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
+          if (id === movingFolder.id) return ok(movingFolder);
+          if (id === unrelatedFolder.id) return ok(unrelatedFolder);
+          return ok(null);
+        });
+
+        // target folder has no children for conflict-check
+        vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok([]));
+
+        // repo.update will be called to perform the move — mock it to return the moved folder
+        vi.mocked(mockRepo.update).mockResolvedValueOnce(
+          ok({ ...movingFolder, parentId: unrelatedFolder.id, order: 0 }),
+        );
+
+        const result = await fileSystemService.moveItem(movingFolder.id, unrelatedFolder.id, 0);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.data).toEqual({ ...movingFolder, parentId: unrelatedFolder.id, order: 0 });
+        }
+      });
+
     });
 
     describe('handles name conflicts', () => {
-      it('should rename item if name conflict in target folder');
-      it('should allow move is name is different only by case-insenstivity');
+      it('should rename item if name conflict in target folder', async () => {
+        const movingItem = { ...fileItem, id: 'move-1', name: 'Doc' };
+        const sibling1 = { ...fileItem, id: 'sibling-1', name: 'Doc', parentId: 'target' };
+        const sibling2 = { ...fileItem, id: 'sibling-2', name: 'Doc (1)', parentId: 'target' };
+        const targetFolder = { ...folderItem, id: 'target' };
+
+        // findById should return the moving item then target parent when asked
+        vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
+          if (id === movingItem.id) return ok(movingItem);
+          if (id === targetFolder.id) return ok(targetFolder);
+          return ok(null);
+        });
+
+        // target folder contains sibling1 and sibling2, forcing suffix to increment to (2)
+        vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok([sibling1, sibling2]));
+
+        // expect repo.update to return the moved item with name "Doc (2)"
+        vi.mocked(mockRepo.update).mockResolvedValueOnce(
+          ok({ ...movingItem, parentId: targetFolder.id, order: 0, name: 'Doc (2)' }),
+        );
+
+        const result = await fileSystemService.moveItem(movingItem.id, targetFolder.id, 0);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.data!.name).toBe('Doc (2)');
+          expect(result.data!.parentId).toBe(targetFolder.id);
+        }
+      });
+
+      it('should allow move is name is different only by case-insenstivity', async () => {
+        const movingItem = { ...fileItem, id: 'move-2', name: 'Doc' };
+        const existing = { ...fileItem, id: 'existing-1', name: 'doc', parentId: 'target' };
+        const targetFolder = { ...folderItem, id: 'target' };
+
+        vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
+          if (id === movingItem.id) return ok(movingItem);
+          if (id === targetFolder.id) return ok(targetFolder);
+          return ok(null);
+        });
+
+        // existing has same name differing only by case -> should NOT be treated as conflict
+        vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok([existing]));
+
+        vi.mocked(mockRepo.update).mockResolvedValueOnce(
+          ok({ ...movingItem, parentId: targetFolder.id, order: 0, name: movingItem.name }),
+        );
+
+        const result = await fileSystemService.moveItem(movingItem.id, targetFolder.id, 0);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.data!.name).toBe('Doc');
+          expect(result.data!.parentId).toBe(targetFolder.id);
+        }
+      });
     });
 
     describe('moves item successfully', () => {
-      it('should move file to new parent and preserve all properties');
-      it('should move folder to new parent');
-      it('should move item to root level (undefined parent)');
-      it('should preserve isPinned status when moving');
-      it('should preserve tags when moving');
-      it('should update updatedAt timestamp');
+      it('should move file to new parent and preserve all properties', async () => {
+        const moving = { ...fileItem, id: 'move-file', isPinned: true, tags: ['a'], parentId: undefined };
+        const target = { ...folderItem, id: 'target-folder' };
+
+        vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
+          if (id === moving.id) return ok(moving);
+          if (id === target.id) return ok(target);
+          return ok(null);
+        });
+
+        vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok([]));
+        vi.mocked(mockRepo.update).mockResolvedValueOnce(
+          ok({ ...moving, parentId: target.id, order: 0 }),
+        );
+
+        const result = await fileSystemService.moveItem(moving.id, target.id, 0);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.data).toEqual({ ...moving, parentId: target.id, order: 0 });
+        }
+      });
+
+      it('should move folder to new parent', async () => {
+        const movingFolder = { ...folderItem, id: 'move-folder' };
+        const target = { ...folderItem, id: 'target-folder-2' };
+
+        vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
+          if (id === movingFolder.id) return ok(movingFolder);
+          if (id === target.id) return ok(target);
+          return ok(null);
+        });
+
+        vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok([]));
+        vi.mocked(mockRepo.update).mockResolvedValueOnce(
+          ok({ ...movingFolder, parentId: target.id, order: 0 }),
+        );
+
+        const result = await fileSystemService.moveItem(movingFolder.id, target.id, 0);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.data).toEqual({ ...movingFolder, parentId: target.id, order: 0 });
+        }
+      });
+
+      it('should move item to root level (undefined parent)', async () => {
+        const moving = { ...fileItem, id: 'move-root', parentId: 'some-parent' };
+
+        vi.mocked(mockRepo.findById).mockResolvedValueOnce(ok(moving));
+        // root has no items (no name conflicts)
+        vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok([]));
+        vi.mocked(mockRepo.update).mockResolvedValueOnce(
+          ok({ ...moving, parentId: undefined, order: 5 }),
+        );
+
+        const result = await fileSystemService.moveItem(moving.id, undefined, 5);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.data).toEqual({ ...moving, parentId: undefined, order: 5 });
+        }
+      });
+
+      it('should preserve isPinned status when moving', async () => {
+        const moving = { ...fileItem, id: 'pinned', isPinned: true, tags: ['x'] };
+        const target = { ...folderItem, id: 'target-pin' };
+
+        vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
+          if (id === moving.id) return ok(moving);
+          if (id === target.id) return ok(target);
+          return ok(null);
+        });
+
+        vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok([]));
+        vi.mocked(mockRepo.update).mockResolvedValueOnce(
+          ok({ ...moving, parentId: target.id, order: 0 }),
+        );
+
+        const result = await fileSystemService.moveItem(moving.id, target.id, 0);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.data!.isPinned).toBe(true);
+        }
+      });
+
+      it('should preserve tags when moving', async () => {
+        const moving = { ...fileItem, id: 'tagged', tags: ['t1', 't2'] };
+        const target = { ...folderItem, id: 'target-tags' };
+
+        vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
+          if (id === moving.id) return ok(moving);
+          if (id === target.id) return ok(target);
+          return ok(null);
+        });
+
+        vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok([]));
+        vi.mocked(mockRepo.update).mockResolvedValueOnce(
+          ok({ ...moving, parentId: target.id, order: 0 }),
+        );
+
+        const result = await fileSystemService.moveItem(moving.id, target.id, 0);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.data!.tags).toEqual(['t1', 't2']);
+        }
+      });
+
+      it('should update updatedAt timestamp', async () => {
+        const now = new Date();
+        const moving = { ...fileItem, id: 'time-move', updatedAt: new Date(now.getTime() - 10000) };
+        const target = { ...folderItem, id: 'time-target' };
+
+        vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
+          if (id === moving.id) return ok(moving);
+          if (id === target.id) return ok(target);
+          return ok(null);
+        });
+
+        vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok([]));
+        const updatedAt = new Date();
+        vi.mocked(mockRepo.update).mockResolvedValueOnce(
+          ok({ ...moving, parentId: target.id, order: 0, updatedAt }),
+        );
+
+        const result = await fileSystemService.moveItem(moving.id, target.id, 0);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(new Date(result.data!.updatedAt).getTime()).toBeGreaterThan(moving.updatedAt.getTime());
+        }
+      });
     });
 
     describe('handles repository errors', () => {
-      it('should return error when repository fails during update');
-      it('should return error when checking destination children fails');
-      it('should return error when repository fails during find', async () => {
-        vi.mocked(mockRepo.findById).mockResolvedValueOnce(err('DB find error'));
-        const result = await fileSystemService.moveItem('some-id', 'some-parent', 2);
+      it('should return error when repository fails during update', async () => {
+        const moving = { ...fileItem, id: 'err-update' };
+
+        // handle repeated findById calls for both the moving item and the target parent
+        vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
+          if (id === moving.id) return ok(moving);
+          if (id === 'some-parent') return ok({ ...folderItem, id: 'some-parent' });
+          return ok(null);
+        });
+
+        vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(ok([]));
+        vi.mocked(mockRepo.update).mockResolvedValueOnce(err('DB update error'));
+
+        const result = await fileSystemService.moveItem(moving.id, 'some-parent', 0);
         expect(result.ok).toBe(false);
         if (!result.ok) {
-          expect(result.error).toBe('DB find error');
+          expect(result.error).toBe('DB update error');
         }
       });
+
+
+      it('should return error when checking destination children fails', async () => {
+        const moving = { ...fileItem, id: 'err-children' };
+        const target = { ...folderItem, id: 'target-err' };
+
+        vi.mocked(mockRepo.findById).mockImplementation(async (id: string) => {
+          if (id === moving.id) return ok(moving);
+          if (id === target.id) return ok(target);
+          return ok(null);
+        });
+
+        vi.mocked(mockRepo.findByParentId).mockResolvedValueOnce(err('DB children error'));
+
+        const result = await fileSystemService.moveItem(moving.id, target.id, 0);
+        expect(result.ok).toBe(false);
+        if (!result.ok) {
+          expect(result.error).toBe('DB children error');
+        }
+      });
+
       it('should return error when repository fails during target parent find');
     });
+
   });
 
   describe('searchItems', () => {

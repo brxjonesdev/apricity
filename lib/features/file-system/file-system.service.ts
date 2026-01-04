@@ -68,6 +68,11 @@ export function createFileSystemService(
       };
     }
     if (input.type === 'folder') {
+      newItem = {
+        ...newItem,
+        content: undefined,
+        size: undefined,
+      };
     }
     return ok(newItem);
   }
@@ -91,19 +96,38 @@ export function createFileSystemService(
   ): Promise<boolean> {
     // PSEUDOCODE:
     // if no target -> cannot be circular
+    if (!targetParentId) {
+      return false;
+    }
     // if target === item -> circular
-    // keep a visited set to guard against existing bad cycles in data
-    // loop:
-    //   fetch node = await repo.findById(currentId, userId)
-    //   if repo returns error -> throw / bubble error (or return true to be safe)
-    //   if node is null -> break (reached a parent outside store)
-    //   if node.parentId is undefined -> break (reached root)
-    //   if node.parentId === itemId -> return true (moving under descendant)
-    //   if visited already contains node.parentId -> return true (existing cycle)
-    //   add node.parentId to visited
-    //   currentId = node.parentId
-    // end loop
-    // return false (no circular reference found)
+    if (targetParentId === itemId) {
+      return true;
+    }
+    let currentId = targetParentId;
+    const visited = new Set<string>();
+
+    while (true) {
+      const nodeResult = await repo.findById(currentId, userId);
+      if (!nodeResult.ok) {
+        return true; // might be safer to assume circular on error
+      }
+      if (nodeResult.data === null) {
+        break;
+      }
+      const node = nodeResult.data;
+      if (!node.parentId) {
+        break; // reached root
+      }
+      if (node.parentId === itemId) {
+        return true; // circular reference found!
+      }
+      if (visited.has(node.parentId)) {
+        return true; // existing cycle detected
+      }
+      visited.add(node.parentId);
+      currentId = node.parentId;
+    }
+    return false;
   }
 
   return {
@@ -128,7 +152,7 @@ export function createFileSystemService(
       return ok(itemResult.data);
     },
     async getFolderContents(
-      parentId: string,
+      parentId: string | undefined,
     ): Promise<Result<FileSystemItem[], string>> {
       // if the parentId is undefined, we are fetching root items
       if (parentId === undefined) {
