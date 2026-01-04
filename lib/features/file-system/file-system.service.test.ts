@@ -49,6 +49,7 @@ describe('FileSystemService', () => {
     type: 'file',
     content: 'Hello, world!',
     parentId: undefined,
+    isPinned: false,
     createdAt: new Date(),
     updatedAt: new Date(),
     size: 'Hello, world!'.length,
@@ -60,6 +61,7 @@ describe('FileSystemService', () => {
     projectId,
     name: 'My Folder',
     type: 'folder',
+    isPinned: false,
     order: 0,
     parentId: undefined,
     createdAt: new Date(),
@@ -70,6 +72,7 @@ describe('FileSystemService', () => {
     userId,
     projectId,
     name: 'NewFile.txt',
+    isPinned: false,
     type: 'file',
     content: '',
     parentId: undefined,
@@ -83,6 +86,7 @@ describe('FileSystemService', () => {
   const newFolderDTO: CreateFileSystemItemDTO = {
     userId,
     projectId,
+    isPinned: false,
     name: 'New Folder',
     type: 'folder',
     parentId: undefined,
@@ -102,6 +106,7 @@ describe('FileSystemService', () => {
         id: `child-${i}`,
         userId,
         projectId,
+        isPinned: false,
         name: `Child Item ${i}`,
         type: i % 2 === 0 ? 'file' : 'folder',
         parentId,
@@ -321,6 +326,8 @@ describe('FileSystemService', () => {
         id: 'parent-folder',
         userId,
         projectId,
+        isPinned: false,
+        parentId: undefined,
         name: 'Parent Folder',
         type: 'folder',
         order: 0,
@@ -331,6 +338,7 @@ describe('FileSystemService', () => {
         userId,
         name: 'ChildFile.txt',
         projectId,
+        isPinned: false,
         type: 'file' as const,
         content: '',
         parentId: parentFolder.id,
@@ -482,6 +490,7 @@ describe('FileSystemService', () => {
           order: 1,
           name: 'ConflictingName.txt',
           type: 'file',
+          isPinned: false,
           parentId: fileItem.parentId,
           createdAt: now,
           updatedAt: now,
@@ -1215,6 +1224,7 @@ describe('FileSystemService', () => {
           projectId,
           name: 'R1',
           type: 'folder',
+          isPinned: false,
           parentId: undefined,
           order: 10,
           createdAt: new Date(),
@@ -1226,15 +1236,16 @@ describe('FileSystemService', () => {
           projectId,
           name: 'R2',
           type: 'folder',
+          isPinned: false,
           parentId: undefined,
           order: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         // children of r1 with orders: s2 (order 5), s1 (order 2), s3 (order 8)
-        { id: 's1', userId, projectId, name: 'S1', type: 'file', parentId: 'r1', order: 2, createdAt: new Date(), updatedAt: new Date() },
-        { id: 's2', userId, projectId, name: 'S2', type: 'file', parentId: 'r1', order: 5, createdAt: new Date(), updatedAt: new Date() },
-        { id: 's3', userId, projectId, name: 'S3', type: 'file', parentId: 'r1', order: 8, createdAt: new Date(), updatedAt: new Date() },
+        { id: 's1', userId, projectId, name: 'S1', type: 'file', parentId: 'r1', order: 2, createdAt: new Date(), updatedAt: new Date(),isPinned: false },
+        { id: 's2', userId, projectId, name: 'S2', type: 'file', parentId: 'r1', order: 5, createdAt: new Date(), updatedAt: new Date(),isPinned: false },
+        { id: 's3', userId, projectId, name: 'S3', type: 'file', parentId: 'r1', order: 8, createdAt: new Date(), updatedAt: new Date(),isPinned: false },
       ];
 
       const tree = fileSystemService.buildFolderTree(items);
@@ -1249,8 +1260,8 @@ describe('FileSystemService', () => {
     // Keep other behavioral tests (orphaned items, children array, depth)
     it('places orphaned items at root and does not throw', () => {
       const items: FileSystemItem[] = [
-        { id: 'good', userId, projectId, name: 'Good', type: 'file', parentId: undefined, order: 0, createdAt: new Date(), updatedAt: new Date() },
-        { id: 'orphan', userId, projectId, name: 'Orphan', type: 'file', parentId: 'nope', order: 1, createdAt: new Date(), updatedAt: new Date() },
+        { id: 'good', userId, projectId, name: 'Good', type: 'file', parentId: undefined, order: 0, createdAt: new Date(), updatedAt: new Date(), isPinned: false },
+        { id: 'orphan', userId, projectId, name: 'Orphan', type: 'file', parentId: 'nope', order: 1, createdAt: new Date(), updatedAt: new Date(), isPinned: false },
       ];
       const tree = fileSystemService.buildFolderTree(items);
       expect(tree.map((n) => n.id).sort()).toEqual(['good', 'orphan'].sort());

@@ -4,11 +4,11 @@ export interface FileSystemItem {
   projectId: string;
   name: string;
   type: 'file' | 'folder';
-  parentId?: string; // undefined for root items
+  parentId: string | undefined | null; // undefined for root items
   content?: string; // only for files
   size?: number; // in bytes, only for files
   order: number; // for ordering within its parent folder and root
-  isPinned?: boolean; // user can pin important items
+  isPinned: boolean; // user can pin important items
   tags?: string[]; // user-defined tags for categorization, seperate from tags in the markdown content
   createdAt: Date;
   updatedAt: Date;
