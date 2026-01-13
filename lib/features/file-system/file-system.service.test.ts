@@ -139,7 +139,7 @@ describe('FileSystemService', () => {
       const items = generateItemList(5);
       vi.mocked(mockRepo.findAll).mockResolvedValueOnce(ok(items));
 
-      const result = await fileSystemService.getAllItems(projectId);
+      const result = await fileSystemService.getAllItems();
       expect(result.ok).toBe(true);
       if (result.ok) {
         expect(result.data).toEqual(items);
@@ -151,7 +151,7 @@ describe('FileSystemService', () => {
       vi.mocked(mockRepo.findAll).mockResolvedValueOnce(
         err('Error fetching items'),
       );
-      const result = await fileSystemService.getAllItems(projectId);
+      const result = await fileSystemService.getAllItems();
       expect(result.ok).toBe(false);
       if (!result.ok) {
         expect(result.error).toBe('Error fetching items');

@@ -18,11 +18,11 @@ import EmptyProjects from "@/lib/features/projects/components/empty-projects";
 import { getSupabaseUser } from "@/lib/features/authentication/supabase/utils";
 import { createClient } from "@/lib/features/authentication/supabase/server";
 import { createProjectService } from "@/lib/features/projects/index";
+import { CreateProject } from "@/lib/features/projects/components/create-project";
 
 export default async function StartPage() {
   const supabase = await createClient();
   const user = await getSupabaseUser(supabase);
-  console.log("User:", user);
 
   const projectsService = createProjectService(user.id)
   const projects = await projectsService.getAllProjects();
@@ -61,7 +61,14 @@ export default async function StartPage() {
                 <p className="text-xs text-muted-foreground">Junior Novelist</p>
               </div>
             </div>
-            <h1 className="text-sm font-medium text-muted-foreground uppercase tracking-widest">Projects</h1>
+            {projects && projects.data.length < 1 ? (
+              <h1 className="text-sm font-medium text-muted-foreground uppercase tracking-widest">
+                Projects
+              </h1>
+            ) : (
+                <CreateProject id={user.id} />
+            )}
+
           </header>
 
           {/* Main Content Area */}
@@ -92,7 +99,7 @@ export default async function StartPage() {
                 </ScrollArea>
               )}
               {projects.data.length === 0 && (
-                <EmptyProjects/>
+                <EmptyProjects id={user.id}/>
               )}
             </section>
           </div>
