@@ -7,7 +7,7 @@ import {
 } from './types';
 import { Result, ok, err } from '@/lib/utils';
 export interface FileSystemService {
-  getAllItems(projectID: string): Promise<Result<FileSystemItem[], string>>;
+  getAllItems(): Promise<Result<FileSystemItem[], string>>;
   getItem(id: string): Promise<Result<FileSystemItem | null, string>>;
   getFolderContents(
     folderId: string | undefined,

@@ -1,19 +1,16 @@
 "use client";
 
 import { Button } from "@/lib/components/ui/button";
-import { ro } from "date-fns/locale";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-export default function AuthButton() {
-  const router = useRouter();
-  function handleSignIn() {
-    // Implement sign-in logic here
-    router.push('/auth/signin');
-  }
-
-  return(
+export default function AuthButton({text, classname }: {text?: string, classname?: string}) {
+  return (
+    <Link href="/auth/signin">
     <Button
-      onClick={handleSignIn}
-      variant="outline">Sign In</Button>
+      className={`${classname ? classname : ''}`}
+      variant="default">
+        {text ? text : 'Sign In'}
+      </Button>
+    </Link>
   )
 }
