@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/lib/components/ui/avatar"
 import { Button } from "@/lib/components/ui/button"
 import { ScrollArea } from "@/lib/components/ui/scroll-area"
-import { ChevronDown, PlayCircle } from "lucide-react"
+import { ChevronDown, PlayCircle, Projector } from "lucide-react"
 import { Project } from "@/lib/features/projects/types";
 import {
   DropdownMenu,
@@ -19,7 +19,7 @@ import { getSupabaseUser } from "@/lib/features/authentication/supabase/utils";
 import { createClient } from "@/lib/features/authentication/supabase/server";
 import { createProjectService } from "@/lib/features/projects/index";
 import { CreateProject } from "@/lib/features/projects/components/create-project";
-
+import ProjectCard from "@/lib/features/projects/components/project-card";
 export default async function StartPage() {
   const supabase = await createClient();
   const user = await getSupabaseUser(supabase);
@@ -79,21 +79,7 @@ export default async function StartPage() {
                 <ScrollArea className="h-full flex-1 flex">
                   <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 h-full ">
                     {projects.data.map((project: Project) => (
-                      <Card key={project.id} className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                          <CardTitle className="text-lg">{project.name}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground">{project.blurb}</p>
-                        </CardContent>
-                        <CardFooter>
-                          <Link href={`workspace/${project.id}/${project.userId}`} className="w-full">
-                            <Button variant="secondary" size="sm" className="px-2 w-full">
-                              Continue Working
-                            </Button>
-                          </Link>
-                        </CardFooter>
-                      </Card>
+                      <ProjectCard key={project.id} project={project} userID={user.id} />
                     ))}
                   </div>
                 </ScrollArea>

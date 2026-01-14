@@ -1,8 +1,7 @@
 
 import { err, Result } from '@/lib/utils';
-import { Project, CreateProjectDTO, UpdateProjectDTO } from './types';
+import { Project, UpdateProjectDTO } from './types';
 import { ok } from '@/lib/utils';
-import { db } from '@/lib/db/local/db';
 import { createClient } from '../authentication/supabase/client';
 
 export interface ProjectsRepository {
@@ -38,25 +37,77 @@ export function createInMemoryProjectsRepo(): ProjectsRepository {
     },
 
     async update(id, updates) {
-      const existing = store.get(id);
-      if (!existing) return null;
+      const { data, error } = await supabase
+        .from('projects')
+        .update({
+          ...updates,
+          updated_at: new Date(),
+        })
+        .eq('project_id', id)
+        .select('*')
+        .single();
 
-      const updated: Project = {
-        ...existing,
-        ...updates,
-        updatedAt: new Date(),
+      if (error) {
+        console.error('Error updating project:', error.message);
+        return null;
+      }
+
+      if (!data) {
+        return null;
+      }
+
+      const updatedProject: Project = {
+        id: data.project_id,
+        userId: data.user_id,
+        name: data.name,
+        blurb: data.blurb,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at),
       };
 
-      store.set(id, updated);
-      return updated;
+      return updatedProject;
     },
 
     async delete(id) {
-      return store.delete(id);
+      const { error } = await supabase
+        .from('projects')
+        .delete()
+        .eq('project_id', id);
+
+      if (error) {
+        console.error('Error deleting project:', error.message);
+        return false;
+      }
+
+      return true;
     },
 
     async getById(id) {
-      return store.get(id) ?? null;
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('project_id', id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching project by ID:', error.message);
+        return null;
+      }
+
+      if (!data) {
+        return null;
+      }
+
+      const project: Project = {
+        id: data.project_id,
+        userId: data.user_id,
+        name: data.name,
+        blurb: data.blurb,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at),
+      };
+
+      return project;
     },
 
     async getAllByUser(userId) {
