@@ -8,7 +8,7 @@ export default async function WorkspaceLayout({
   }) {
   const { projectID, userID } = await params;
   return (
-    <main className="flex min-h-screen  p-6">
+    <main className="flex min-h-screen gap-4 p-6">
       <FileSystemSidebar project={projectID} user={userID} />
       {children}
     </main>

@@ -9,10 +9,7 @@ import { db } from '@/lib/db/local/db';
 import { createClient } from '../authentication/supabase/client';
 
 export interface FileSystemRepository {
-  findAll(
-    userId: string,
-    projectId: string,
-  ): Promise<Result<FileSystemItem[], string>>;
+  findAll(userId: string): Promise<Result<FileSystemItem[], string>>;
   findById(
     id: string,
     userId: string,
@@ -70,7 +67,6 @@ export function createFileSystemRepository(): FileSystemRepository {
         createdAt: new Date(item.created_at),
         updatedAt: new Date(item.updated_at),
       }));
-
       return ok(items);
 
     },
@@ -165,7 +161,23 @@ export function createFileSystemRepository(): FileSystemRepository {
       if (error) {
         return err(error.message);
       }
-      return ok(data as FileSystemItem);
+
+      const created: FileSystemItem = {
+             id: data.id,
+             userId: data.user_id,
+             projectId: data.project_id,
+             name: data.name,
+             type: data.type,
+             parentId: data.parent_id,
+             content: data.content,
+             size: data.size,
+             order: data.order,
+             isPinned: data.is_pinned,
+             tags: data.tags,
+             createdAt: new Date(data.created_at),
+             updatedAt: new Date(data.updated_at),
+           };
+      return ok(created);
     },
 
     async update(
@@ -187,8 +199,27 @@ export function createFileSystemRepository(): FileSystemRepository {
       if (error) {
         return err(error.message);
       }
-      return ok(data as FileSystemItem);
+
+      // Map DB row to FileSystemItem
+      const updated: FileSystemItem = {
+        id: data.id,
+        userId: data.user_id,
+        projectId: data.project_id,
+        name: data.name,
+        type: data.type,
+        parentId: data.parent_id,
+        content: data.content,
+        size: data.size,
+        order: data.order,
+        isPinned: data.is_pinned,
+        tags: data.tags,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at),
+      };
+
+      return ok(updated);
     },
+
 
     async delete(id: string, userId: string): Promise<Result<null, string>> {
       const { error } = await supabase

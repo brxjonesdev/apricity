@@ -1,6 +1,7 @@
 import { getSupabaseUser } from "@/lib/features/authentication/supabase/utils";
 import { createClient } from "@/lib/features/authentication/supabase/server";
 import { redirect } from "next/navigation";
+import { Card } from "@/lib/components/ui/card";
 
 export default async function WorkspaceHome({params}: {
   params: Promise<{projectID: string, userID: string}>
@@ -12,10 +13,10 @@ export default async function WorkspaceHome({params}: {
     redirect('/auth/signin')
   }
 
-   return (<>
-     <section className='flex-1 p-4 flex'>
-
-
-     </section>
-   </>)
+  return <Card className="flex-1">
+    <p>
+      Welcome to the workspace for project {projectID}, user {userID}!
+    </p>
+   this shows a broad view of the project workspace where you can access various features and tools related to your project.
+   </Card>
 }

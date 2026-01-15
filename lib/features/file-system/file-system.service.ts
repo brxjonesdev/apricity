@@ -36,6 +36,7 @@ export function createFileSystemService(
   projectId: string,
   repo: FileSystemRepository,
 ): FileSystemService {
+  console.log("Creating FS service for user:", userId, "project:", projectId);
   async function validateCreateInput(
     input: CreateFileSystemItemDTO,
   ): Promise<Result<FileSystemItem, string>> {
@@ -134,7 +135,9 @@ export function createFileSystemService(
   return {
     // Gets all items (folders + files) for the this project
     async getAllItems(): Promise<Result<FileSystemItem[], string>> {
-      const filesResult = await repo.findAll(userId, projectId);
+      const user = userId;
+      console.log("Getting all FS items for user:", user);
+      const filesResult = await repo.findAll(user);
       if (!filesResult.ok) {
         return err(filesResult.error);
       }
