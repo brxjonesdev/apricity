@@ -1,6 +1,6 @@
 "use client"
 import { Button } from "@/lib/components/ui/button";
-import { createClient } from "@/lib/features/authentication/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 export default function GoogleSignIn() {
   const supabase = createClient()
   async function signInWithGoogle() {

@@ -15,8 +15,8 @@ import {
 } from "@/lib/components/ui/dropdown-menu"
 
 import EmptyProjects from "@/lib/features/projects/components/empty-projects";
-import { getSupabaseUser } from "@/lib/features/authentication/supabase/utils";
-import { createClient } from "@/lib/features/authentication/supabase/server";
+import { getSupabaseUser } from "@/lib/supabase/utils";
+import { createClient } from "@/lib/supabase/server";
 import { createProjectService } from "@/lib/features/projects/index";
 import { CreateProject } from "@/lib/features/projects/components/create-project";
 import ProjectCard from "@/lib/features/projects/components/project-card";
