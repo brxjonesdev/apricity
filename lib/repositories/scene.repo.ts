@@ -17,13 +17,39 @@ export function createSupabaseSceneRepo(): SceneRepository {
 
   return {
     async create(scene): Promise<Result<Scene, string>> {
-      return err("Not implemented");
+      const { data, error } = await supabase
+        .from('scene')
+        .insert(scene)
+        .select()
+        .single();
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
     },
     async update(id, updates): Promise<Result<Scene, string>> {
-      return err("Not implemented");
+      const { data, error } = await supabase
+        .from('scene')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
     },
     async delete(id): Promise<Result<null, string>> {
-      return err("Not implemented");
+      const { error } = await supabase
+        .from('scene')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(null);
     },
   }
 }

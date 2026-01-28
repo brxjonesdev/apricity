@@ -18,7 +18,7 @@ export interface ChapterRepository {
 
   // content management methods <3
   addContent(chapterId: number, content: Omit<ChapterContentInsert, 'id' | 'created_at' | 'updated_at'>): Promise<Result<ChapterContent, string>>;
-  updateContent(id: number, updates: ChapterContentUpdate): Promise<Result<ChapterContent, string>>;
+  updateContent(id: number, updates: ChapterContentUpdate, type: 'scene' | 'image'): Promise<Result<ChapterContent, string>>;
   deleteContent(id: number): Promise<Result<null, string>>;
   reorderContent(chapterId: number, newPosition: number): Promise<Result<null, string>>;
 
@@ -29,26 +29,81 @@ export function createSupabaseChapterRepo(): ChapterRepository {
 
   return {
     async create(chapter): Promise<Result<Chapter, string>> {
-      return err("Not implemented");
+      const { data, error } = await supabase
+        .from('chapter')
+        .insert(chapter)
+        .select()
+        .single();
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
     },
     async update(id, updates): Promise<Result<Chapter, string>> {
-      return err("Not implemented");
+      const { data, error } = await supabase
+        .from('chapter')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
     },
     async delete(id): Promise<Result<null, string>> {
-      return err("Not implemented");
+      const { error } = await supabase
+        .from('chapter')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(null);
     },
     async reorder(id, newPosition): Promise<Result<null, string>> {
       return err("Not implemented");
     },
 
+    // content management methods, these are for adding/updating/deleting/reordering chapter content only.
+    // they do not handle scenes or images directly, just the chapter content entries that reference them.
+    //
     async addContent(chapterId, content): Promise<Result<ChapterContent, string>> {
-      return err("Not implemented");
+      const { data, error } = await supabase
+        .from('chapter_content')
+        .insert(content)
+        .select()
+        .single();
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
     },
     async updateContent(id, updates): Promise<Result<ChapterContent, string>> {
-      return err("Not implemented");
+      const { data, error } = await supabase
+        .from('chapter_content')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
     },
     async deleteContent(id): Promise<Result<null, string>> {
-      return err("Not implemented");
+      const { error } = await supabase
+        .from('chapter_content')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(null);
     },
     async reorderContent(chapterId, newPosition): Promise<Result<null, string>> {
       return err("Not implemented");

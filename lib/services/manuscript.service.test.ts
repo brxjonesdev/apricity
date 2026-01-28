@@ -22,7 +22,8 @@ describe("ManuscriptService", () => {
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      getByProjectId: vi.fn(),
+      getAllManuscriptsWithChapters: vi.fn(),
+      reorder: vi.fn(),
     }
     mockChapterRepo = {
       create: vi.fn(),

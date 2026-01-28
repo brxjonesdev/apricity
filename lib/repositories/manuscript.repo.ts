@@ -19,7 +19,8 @@ export interface ManuscriptRepository {
   create(manuscript: Omit<ManuscriptInsert, 'id' | 'created_at' | 'updated_at'>): Promise<Result<Manuscript, string>>;
   update(id: number, updates: ManuscriptUpdate): Promise<Result<Manuscript, string>>;
   delete(id: number): Promise<Result<null, string>>;
-  getByProjectId(projectId: string): Promise<Result<ManuscriptWithChapters[], string>>;
+  reorder(id:number, newPosition:number): Promise<Result<null, string>>;
+  getAllManuscriptsWithChapters(projectId: string): Promise<Result<ManuscriptWithChapters[], string>>;
 }
 
 export function createSupabaseManuscriptRepo(): ManuscriptRepository {
@@ -27,20 +28,69 @@ export function createSupabaseManuscriptRepo(): ManuscriptRepository {
 
   return {
     async create(manuscript): Promise<Result<Manuscript, string>> {
-      // Implementation
-      return err("Not implemented");
+      const { data, error } = await supabase
+        .from('manuscript')
+        .insert(manuscript)
+        .select()
+        .single();
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
     },
     async update(id, updates): Promise<Result<Manuscript, string>> {
-      // Implementation
-      return err("Not implemented");
+      const { data, error } = await supabase
+        .from('manuscript')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
     },
     async delete(id): Promise<Result<null, string>> {
-      // Implementation
-      return err("Not implemented");
+      const { error } = await supabase
+        .from('manuscript')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(null);
     },
-    async getByProjectId(projectId): Promise<Result<ManuscriptWithChapters[], string>> {
-      // Implementation
-      return err("Not implemented");
+
+    async reorder(id, newPosition): Promise<Result<null, string>> {
+      // Reordering logic would go here
+      return ok(null);
+    },
+
+    async getAllManuscriptsWithChapters(projectId): Promise<Result<ManuscriptWithChapters[], string>> {
+      // This is used to load full project data into the manuscript editor and global state.
+      const { data, error } = await supabase
+        .from('manuscript')
+        .select(`
+          *,
+          chapter(
+            *,
+              chapter_content(
+                *,
+                scene:scene_id(*),
+                image:image_id(*)
+            )
+          )
+        `)
+        .eq('project_id', projectId)
+        .order('position', { referencedTable: 'chapter', ascending: true })
+        .order('position', { referencedTable: 'chapter.chapter_content', ascending: true });
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data as ManuscriptWithChapters[]);
     },
   }
 }

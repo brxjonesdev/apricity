@@ -1,6 +1,8 @@
 import { Database } from "@/lib/supabase/types";
 import { Result, ok, err } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { nanoid } from "nanoid";
+import { Nanum_Gothic_Coding } from "next/font/google";
 
 type User = Database['public']['Tables']['user']['Row'];
 type UserInsert = Database['public']['Tables']['user']['Insert'];
@@ -18,20 +20,55 @@ export function createSupabaseUserRepo(): UserRepository {
 
   return {
     async create(user): Promise<Result<User, string>> {
-      // Implementation
-      return err("Not implemented");
+      const { data, error } = await supabase
+        .from('user')
+        .insert({
+          id: `user_${nanoid(15)}`,
+          ...user,
+        })
+        .select()
+        .single();
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
+
     },
     async update(id, updates): Promise<Result<User, string>> {
-      // Implementation
-      return err("Not implemented");
+      const { data, error } = await supabase
+        .from('user')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
     },
     async delete(id): Promise<Result<null, string>> {
-      // Implementation
-      return err("Not implemented");
+      const { error } = await supabase
+        .from('user')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(null);
     },
     async getById(id): Promise<Result<User, string>> {
-      // Implementation
-      return err("Not implemented");
+      const { data, error } = await supabase
+        .from('user')
+        .select()
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
     },
   }
 }

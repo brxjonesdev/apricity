@@ -17,13 +17,39 @@ export function createSupabaseImageRepo(): ImageRepository {
 
   return {
     async create(image): Promise<Result<Image, string>> {
-      return err("Not implemented");
+      const { data, error } = await supabase
+        .from('image')
+        .insert(image)
+        .select()
+        .single();
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
     },
     async update(id, updates): Promise<Result<Image, string>> {
-      return err("Not implemented");
+      const { data, error } = await supabase
+        .from('image')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
     },
     async delete(id): Promise<Result<null, string>> {
-      return err("Not implemented");
+      const { error } = await supabase
+        .from('image')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(null);
     },
   }
 }
