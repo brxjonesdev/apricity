@@ -5,6 +5,7 @@ import { ChapterRepository } from '../repositories/chapter.repo';
 import { SceneRepository } from '../repositories/scene.repo';
 import { ImageRepository } from '../repositories/image.repo';
 import { ProjectsRepository } from '../repositories/projects.repo';
+import { UserRepository } from '../repositories/user.repo';
 
 describe("ManuscriptService", () => {
   // mock repositories
@@ -13,6 +14,7 @@ describe("ManuscriptService", () => {
   let mockSceneRepo: SceneRepository;
   let mockImageRepo: ImageRepository;
   let mockProjectsRepo: ProjectsRepository;
+  let mockUserRepo: UserRepository;
   let manuscriptService: ReturnType<typeof createManuscriptService>
 
   beforeEach(() => {
@@ -48,12 +50,22 @@ describe("ManuscriptService", () => {
       delete: vi.fn(),
       getAllByUser: vi.fn(),
     }
+
+    mockUserRepo = {
+      create: vi.fn(),
+      update: vi.fn(),
+      getById: vi.fn(),
+      delete: vi.fn(),
+    }
+
+
     manuscriptService = createManuscriptService(
       mockManuscriptRepo,
       mockChapterRepo,
       mockSceneRepo,
       mockImageRepo,
       mockProjectsRepo,
+      mockUserRepo
     )
   })
   afterEach(() => {

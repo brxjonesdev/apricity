@@ -1,10 +1,11 @@
 import { Result, ok, err } from "@/lib/utils";
-import { ManuscriptRepository } from "@/lib/features/repositories/manuscript.repo";
-import { ChapterRepository } from "@/lib/features/repositories/chapter.repo";
-import { SceneRepository } from "@/lib/features/repositories/scene.repo";
-import { ImageRepository } from "@/lib/features/repositories/image.repo";
+import { ManuscriptRepository } from "@/lib/repositories/manuscript.repo";
+import { ChapterRepository } from "@/lib/repositories/chapter.repo";
+import { SceneRepository } from "@/lib/repositories/scene.repo";
+import { ImageRepository } from "@/lib/repositories/image.repo";
 import { ProjectsRepository } from "../repositories/projects.repo";
 import type { Database } from "@/lib/supabase/types";
+import { UserRepository } from "../repositories/user.repo";
 
 type Manuscript = Database['public']['Tables']['manuscript']['Row'];
 type ManuscriptWithChapters = Database['public']['Tables']['manuscript']['Row'] & {
@@ -27,6 +28,7 @@ export function createManuscriptService(
   sceneRepo: SceneRepository,
   imageRepo: ImageRepository,
   projectsRepo: ProjectsRepository,
+  userRepo: UserRepository
 ) {
   return {
     async createManuscript(manuscript: Omit<Manuscript, 'id' | 'created_at' | 'updated_at'>): Promise<Result<Manuscript, string>> {
