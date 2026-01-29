@@ -19,6 +19,7 @@ export interface ManuscriptRepository {
   create(manuscript: Omit<ManuscriptInsert, 'id' | 'created_at' | 'updated_at'>): Promise<Result<Manuscript, string>>;
   update(id: number, updates: ManuscriptUpdate): Promise<Result<Manuscript, string>>;
   delete(id: number): Promise<Result<null, string>>;
+  reorderManuscripts(targetPosition: number, manuscriptId: number): Promise<Result<null, string>>;
   getAllManuscriptsWithChapters(projectId: string): Promise<Result<ManuscriptWithChapters[], string>>;
   getById(id: number): Promise<Result<Manuscript, string>>;
 }
@@ -84,6 +85,17 @@ export function createSupabaseManuscriptRepo(supabase: SupabaseClient): Manuscri
         return err(error.message);
       }
       return ok(data as ManuscriptWithChapters[]);
+    },
+    async reorderManuscripts(targetPosition: number, manuscriptId: number): Promise<Result<null, string>> {
+      const { error } = await supabase.rpc('reorder_manuscripts', {
+        p_target_position: targetPosition,
+        p_manuscript_id: manuscriptId,
+      });
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(null);
     },
 
     async getById(id): Promise<Result<Manuscript, string>> {

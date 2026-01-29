@@ -28,7 +28,6 @@ type ImageInsert = Database['public']['Tables']['image']['Insert'];
 type ChapterContent = Database['public']['Tables']['chapter_content']['Row'];
 
 export function createManuscriptService(
-  supabase: SupabaseClient,
   manuscriptRepo: ManuscriptRepository,
   chapterRepo: ChapterRepository,
   sceneRepo: SceneRepository,
@@ -116,19 +115,11 @@ export function createManuscriptService(
       if (!manuscriptId) {
         return err("Manuscript ID is required");
       }
-      try {
-        const { error } = await supabase.rpc('reorder_manuscripts', {
-          p_target_position: targetPosition,
-          p_manuscript_id: manuscriptId
-        });
-        if (error) {
-          return err(`Failed to reorder manuscripts: ${error.message}`);
-        }
-        return ok(null);
-
-      } catch (error) {
-        return err(`Failed to reorder manuscripts: ${error}`);
+      const reorderResult = await manuscriptRepo.reorderManuscripts(targetPosition, manuscriptId);
+      if (!reorderResult.ok) {
+        return err(`Failed to reorder manuscripts: ${reorderResult.error}`);
       }
+      return ok(null);
     },
 
     async getManuscriptsWithChaptersAndContent( manuscriptId: string ): Promise<Result<ManuscriptWithChapters[], string>> {
@@ -202,46 +193,35 @@ export function createManuscriptService(
       return ok(null);
     },
 
-    async reorderChapters( manuscriptId: number, targetPosition: number): Promise<Result<null, string>> {
-      if (!manuscriptId) {
+    async reorderChapters( chapterId: number, targetPosition: number): Promise<Result<null, string>> {
+      if (!chapterId) {
         return err("Manuscript ID is required");
       }
       if (targetPosition === undefined || targetPosition === null) {
         return err("Target position is required");
       }
-      try {
-        const { error } = await supabase.rpc('reorder_chapters', {
-          p_manuscript_id: manuscriptId,
-          p_target_position: targetPosition
-        });
-        if (error) {
-          return err(`Failed to reorder chapters: ${error.message}`);
-        }
-        return ok(null);
-
-      } catch (error) {
-        return err(`Failed to reorder chapters: ${error}`);
+      const reorderResult = await chapterRepo.reorderChapter(chapterId, targetPosition);
+      if (!reorderResult.ok) {
+        return err(`Failed to reorder chapters: ${reorderResult.error}`);
       }
+      return ok(null);
     },
 
     // --- Manage chapter contents (add, update, delete, reorder) ---
     //
     async addContentToChapter(chapterID: number, type: 'scene' | 'image', position?: number): Promise<Result<ChapterContent, string>> {
-      try {
-        const { data, error } = await supabase.rpc('add_content_to_chapter', {
-          p_chapter_id: chapterID,
-          p_content_type: type,
-          p_content_position: position ?? null
-        })
-
-        if (error) {
-          return err(`Failed to add content to chapter: ${error.message}`);
-        }
-        return ok(data as ChapterContent);
-
-      } catch (error) {
-        return err(`Failed to add content to chapter: ${error}`);
+     if (!chapterID) {
+        return err("Chapter ID is required");
       }
+      if (type !== 'scene' && type !== 'image') {
+        return err("Invalid content type");
+      }
+
+      const addContentResult = await chapterRepo.addContent(chapterID, type, position);
+      if (!addContentResult.ok) {
+        return err(`Failed to add content to chapter: ${addContentResult.error}`);
+      }
+      return ok(addContentResult.data);
     },
 
     async reorderChapterContents(chapterID: number, targetPosition: number): Promise<Result<null, string>> {
@@ -251,19 +231,11 @@ export function createManuscriptService(
       if (targetPosition === undefined || targetPosition === null) {
         return err("Target position is required");
       }
-      try {
-        const { error } = await supabase.rpc('reorder_chapter_contents', {
-          p_chapter_id: chapterID,
-          p_target_position: targetPosition
-        });
-        if (error) {
-          return err(`Failed to reorder chapter contents: ${error.message}`);
-        }
-        return ok(null);
-
-      } catch (error) {
-        return err(`Failed to reorder chapter contents: ${error}`);
+      const reorderResult = await chapterRepo.reorderContent(chapterID, targetPosition);
+      if (!reorderResult.ok) {
+        return err(`Failed to reorder chapter contents: ${reorderResult.error}`);
       }
+      return ok(null);
     },
 
     // --- Scene Methods ---

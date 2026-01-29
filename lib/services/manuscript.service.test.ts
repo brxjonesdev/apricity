@@ -23,17 +23,20 @@ describe("ManuscriptService", () => {
       update: vi.fn(),
       delete: vi.fn(),
       getById: vi.fn(),
+      reorderManuscripts: vi.fn(),
       getAllManuscriptsWithChapters: vi.fn(),
     }
     mockChapterRepo = {
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      reorderContent: vi.fn(),
       getById: vi.fn(),
       addContent: vi.fn(),
       getContentById: vi.fn(),
       updateContent: vi.fn(),
       deleteContent: vi.fn(),
+      reorderChapter: vi.fn(),
     }
     mockSceneRepo = {
       create: vi.fn(),
@@ -61,7 +64,6 @@ describe("ManuscriptService", () => {
 
 
     manuscriptService = createManuscriptService(
-      mockSupabaseClient,
       mockManuscriptRepo,
       mockChapterRepo,
       mockSceneRepo,

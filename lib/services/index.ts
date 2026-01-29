@@ -9,7 +9,6 @@ export async function getServices() {
 
   return {
     manuscriptService: createManuscriptService(
-      supabase,
       repos.manuscriptRepo,
       repos.chapterRepo,
       repos.sceneRepo,
