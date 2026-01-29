@@ -1,6 +1,6 @@
 import { Database } from "@/lib/supabase/types";
 import { Result, ok, err } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 type Image = Database['public']['Tables']['image']['Row'];
 type ImageInsert = Database['public']['Tables']['image']['Insert'];
@@ -13,9 +13,7 @@ export interface ImageRepository {
   getById(id: number): Promise<Result<Image, string>>;
 }
 
-export function createSupabaseImageRepo(): ImageRepository {
-  const supabase = createClient();
-
+export function createSupabaseImageRepo(supabase: SupabaseClient): ImageRepository {
   return {
     async getById(id): Promise<Result<Image, string>> {
       const { data, error } = await supabase

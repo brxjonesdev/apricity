@@ -1,6 +1,6 @@
 import { Database, Tables } from "@/lib/supabase/types";
 import { Result, ok, err } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 type Manuscript = Database['public']['Tables']['manuscript']['Row'];
 type ManuscriptInsert = Database['public']['Tables']['manuscript']['Insert'];
@@ -24,9 +24,7 @@ export interface ManuscriptRepository {
   getById(id: number): Promise<Result<Manuscript, string>>;
 }
 
-export function createSupabaseManuscriptRepo(): ManuscriptRepository {
-  const supabase = createClient();
-
+export function createSupabaseManuscriptRepo(supabase: SupabaseClient): ManuscriptRepository {
   return {
     async create(manuscript): Promise<Result<Manuscript, string>> {
       const { data, error } = await supabase

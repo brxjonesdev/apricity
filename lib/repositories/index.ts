@@ -4,13 +4,14 @@ import {createSupabaseImageRepo} from './image.repo';
 import {createSupabaseManuscriptRepo} from './manuscript.repo';
 import {createSupabaseSceneRepo} from './scene.repo';
 import { createSupabaseProjectRepo } from './projects.repo';
+import { SupabaseClient } from '@supabase/supabase-js'
 
-export default function createSupabaseRepositories() {
+export default function createRepositories(supabase: SupabaseClient) {
   return {
-    chapterRepo: createSupabaseChapterRepo(),
-    imageRepo: createSupabaseImageRepo(),
-    manuscriptRepo: createSupabaseManuscriptRepo(),
-    sceneRepo: createSupabaseSceneRepo(),
-    projectRepo: createSupabaseProjectRepo(),
+    chapterRepo: createSupabaseChapterRepo(supabase),
+    imageRepo: createSupabaseImageRepo(supabase),
+    manuscriptRepo: createSupabaseManuscriptRepo(supabase),
+    sceneRepo: createSupabaseSceneRepo(supabase),
+    projectRepo: createSupabaseProjectRepo(supabase),
   };
 }

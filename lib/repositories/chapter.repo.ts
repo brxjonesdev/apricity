@@ -1,7 +1,6 @@
 import { Database } from "@/lib/supabase/types";
 import { Result, ok, err } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
-import { get } from "react-hook-form";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 type Chapter = Database['public']['Tables']['chapter']['Row'];
 type ChapterInsert = Database['public']['Tables']['chapter']['Insert'];
@@ -27,8 +26,7 @@ export interface ChapterRepository {
 
 }
 
-export function createSupabaseChapterRepo(): ChapterRepository {
-  const supabase = createClient();
+export function createSupabaseChapterRepo(supabase: SupabaseClient): ChapterRepository {
 
   return {
     async create(chapter): Promise<Result<Chapter, string>> {

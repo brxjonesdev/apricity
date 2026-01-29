@@ -1,6 +1,6 @@
 import { Database } from "@/lib/supabase/types";
 import { Result, ok, err } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { nanoid } from "nanoid";
 
 type Project = Database['public']['Tables']['projects']['Row'];
@@ -15,8 +15,8 @@ export interface ProjectsRepository {
   getByID(id: string): Promise<Result<Project, string>>;
 }
 
-export function createSupabaseProjectRepo(): ProjectsRepository {
-  const supabase = createClient();
+export function createSupabaseProjectRepo(supabase: SupabaseClient): ProjectsRepository {
+
 
   return {
     async create(project): Promise<Result<Project, string>> {

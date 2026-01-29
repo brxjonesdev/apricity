@@ -1,7 +1,7 @@
-import { Database, Tables } from "@/lib/supabase/types";
+import { Database} from "@/lib/supabase/types";
 import { Result, ok, err } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
-import { get } from "react-hook-form";
+import { SupabaseClient } from "@supabase/supabase-js";
+
 
 type Scene = Database['public']['Tables']['scene']['Row'];
 type SceneInsert = Database['public']['Tables']['scene']['Insert'];
@@ -14,8 +14,8 @@ export interface SceneRepository {
   getById(id: number): Promise<Result<Scene, string>>;
 }
 
-export function createSupabaseSceneRepo(): SceneRepository {
-  const supabase = createClient();
+export function createSupabaseSceneRepo(supabase: SupabaseClient): SceneRepository {
+
 
   return {
     async getById(id): Promise<Result<Scene, string>> {
