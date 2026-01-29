@@ -12,6 +12,7 @@ export interface ProjectsRepository {
   update(id: string, updates: ProjectUpdate): Promise<Result<Project, string>>;
   delete(id: string): Promise<Result<null, string>>;
   getAllByUser(userId: string): Promise<Result<Project[], string>>;
+  getByID(id: string): Promise<Result<Project, string>>;
 }
 
 export function createSupabaseProjectRepo(): ProjectsRepository {
@@ -63,6 +64,18 @@ export function createSupabaseProjectRepo(): ProjectsRepository {
         .from('projects')
         .select()
         .eq('user_id', userId);
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
+    },
+    async getByID(id): Promise<Result<Project, string>> {
+      const { data, error } = await supabase
+        .from('projects')
+        .select()
+        .eq('project_id', id)
+        .single();
 
       if (error) {
         return err(error.message);

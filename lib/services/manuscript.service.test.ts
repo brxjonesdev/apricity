@@ -50,6 +50,7 @@ describe("ManuscriptService", () => {
       update: vi.fn(),
       delete: vi.fn(),
       getAllByUser: vi.fn(),
+      getByID: vi.fn(),
     }
 
     mockUserRepo = {

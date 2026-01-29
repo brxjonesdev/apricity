@@ -6,8 +6,10 @@ import { ImageRepository } from "@/lib/repositories/image.repo";
 import { ProjectsRepository } from "../repositories/projects.repo";
 import type { Database } from "@/lib/supabase/types";
 import { UserRepository } from "../repositories/user.repo";
+import { title } from "node:process";
 
 type Manuscript = Database['public']['Tables']['manuscript']['Row'];
+type ManuscriptInsert = Database['public']['Tables']['manuscript']['Insert'];
 type ManuscriptWithChapters = Database['public']['Tables']['manuscript']['Row'] & {
   chapter: (Database['public']['Tables']['chapter']['Row'] & {
     chapter_content: (Database['public']['Tables']['chapter_content']['Row'] & {
@@ -36,9 +38,33 @@ export function createManuscriptService(
     async createManuscript(data: {
       project_id: string;
       title: string;
-      description?: string;
+      position?: number;
     }): Promise<Result<Manuscript, string>> {
-      return err("Not implemented");
+      if (data.title.trim().length === 0) {
+        return err("Title cannot be empty");
+      }
+      if (data.title.length > 255) {
+        return err("Title cannot exceed 255 characters");
+      }
+
+      if (!data.project_id) {
+        return err("Project ID is required");
+      }
+
+      const projectResult = await projectsRepo.getByID(data.project_id);
+      if (!projectResult.ok || !projectResult.data) {
+        return err("Project not found");
+      }
+      const newManuscript: ManuscriptInsert = {
+        story_id: data.project_id,
+        title: data.title,
+        position: data.position || 0,
+      }
+      const manuscriptCreationResult = await manuscriptRepo.create(newManuscript);
+      if (!manuscriptCreationResult.ok) {
+        return err(`Failed to create manuscript: ${manuscriptCreationResult.error}`);
+      }
+      return ok(manuscriptCreationResult.data);
     },
 
     // Update manuscript details
