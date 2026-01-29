@@ -10,12 +10,25 @@ export interface ImageRepository {
   create(image: Omit<ImageInsert, 'id' | 'created_at' | 'updated_at'>): Promise<Result<Image, string>>;
   update(id: number, updates: ImageUpdate): Promise<Result<Image, string>>;
   delete(id: number): Promise<Result<null, string>>;
+  getById(id: number): Promise<Result<Image, string>>;
 }
 
 export function createSupabaseImageRepo(): ImageRepository {
   const supabase = createClient();
 
   return {
+    async getById(id): Promise<Result<Image, string>> {
+      const { data, error } = await supabase
+        .from('image')
+        .select()
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
+    },
     async create(image): Promise<Result<Image, string>> {
       const { data, error } = await supabase
         .from('image')

@@ -7,6 +7,11 @@ const createUserService = (repo: UserRepository) => {
   return {
     // create user profile
     async onboardUserProfile(userData: User): Promise<Result<User, string>> {
+      const usernameTakenResult = await repo.getByUsername(userData.username);
+      if (usernameTakenResult.ok && usernameTakenResult.data) {
+        return err('Username is already taken');
+      }
+
       const userExistsResult = await this.userExists(userData.auth_id);
       if (!userExistsResult.ok) {
         return err(userExistsResult.error);

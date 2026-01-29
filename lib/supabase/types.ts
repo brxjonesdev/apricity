@@ -113,7 +113,7 @@ export type Database = {
           alt_text: string
           created_at?: string
           id?: number
-          updated_at: string
+          updated_at?: string
           url: string
         }
         Update: {
@@ -206,7 +206,7 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: number
-          updated_at: string
+          updated_at?: string
         }
         Update: {
           content?: string | null

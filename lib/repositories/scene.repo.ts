@@ -1,6 +1,7 @@
 import { Database, Tables } from "@/lib/supabase/types";
 import { Result, ok, err } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { get } from "react-hook-form";
 
 type Scene = Database['public']['Tables']['scene']['Row'];
 type SceneInsert = Database['public']['Tables']['scene']['Insert'];
@@ -10,12 +11,25 @@ export interface SceneRepository {
   create(scene: Omit<SceneInsert, 'id' | 'created_at' | 'updated_at'>): Promise<Result<Scene, string>>;
   update(id: number, updates: SceneUpdate): Promise<Result<Scene, string>>;
   delete(id: number): Promise<Result<null, string>>;
+  getById(id: number): Promise<Result<Scene, string>>;
 }
 
 export function createSupabaseSceneRepo(): SceneRepository {
   const supabase = createClient();
 
   return {
+    async getById(id): Promise<Result<Scene, string>> {
+      const { data, error } = await supabase
+        .from('scene')
+        .select()
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
+    },
     async create(scene): Promise<Result<Scene, string>> {
       const { data, error } = await supabase
         .from('scene')

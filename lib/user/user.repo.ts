@@ -11,6 +11,7 @@ export interface UserRepository {
   update(id: number, updates: UserUpdate): Promise<Result<User, string>>;
   delete(id: number): Promise<Result<null, string>>;
   getById(authID: number): Promise<Result<User, string>>;
+  getByUsername(username: string): Promise<Result<User, string>>;
 }
 
 export function createSupabaseUserRepo(): UserRepository {
@@ -57,6 +58,18 @@ export function createSupabaseUserRepo(): UserRepository {
         .from('user')
         .select()
         .eq('user_id', userID)
+        .single();
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
+    },
+    async getByUsername(username): Promise<Result<User, string>> {
+      const { data, error } = await supabase
+        .from('user')
+        .select()
+        .eq('username', username)
         .single();
 
       if (error) {

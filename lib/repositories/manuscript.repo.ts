@@ -65,7 +65,26 @@ export function createSupabaseManuscriptRepo(): ManuscriptRepository {
     },
 
     async reorder(id, newPosition): Promise<Result<null, string>> {
-      // Reordering logic would go here
+      // get the manuscript to be moved
+      const manuscriptResult = await this.getById(id);
+      if (!manuscriptResult.ok) {
+        return err(manuscriptResult.error);
+      }
+      const manuscript = manuscriptResult.data;
+      // shift other manuscripts accordingly
+      const { error } = await supabase.rpc('shift_manuscript_positions', {
+        manuscript_id: id,
+        start_position: manuscript.position,
+        shift: 1
+      });
+      if (error) {
+        return err(error.message);
+      }
+      // update the position of the moved manuscript
+      const updateResult = await this.update(id, { position: newPosition });
+      if (!updateResult.ok) {
+        return err(updateResult.error);
+      }
       return ok(null);
     },
 

@@ -3,7 +3,7 @@ import { Button } from "@/lib/components/ui/button"
 import { Input } from "@/lib/components/ui/input"
 import { Badge } from "@/lib/components/ui/badge"
 import { BookOpen, Github, Twitter, Feather, Globe, Users, ChevronRight } from "lucide-react"
-import AuthButton from "@/lib/authentication/components/auth-button"
+import AuthButton from "@/lib/components/auth/auth-button"
 
 export default function LandingPage() {
   return (

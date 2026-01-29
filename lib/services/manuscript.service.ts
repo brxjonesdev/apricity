@@ -20,7 +20,11 @@ type Chapter = Database['public']['Tables']['chapter']['Row'];
 type ChapterInsert = Database['public']['Tables']['chapter']['Insert'];
 type ChapterUpdate = Database['public']['Tables']['chapter']['Update'];
 type Scene = Database['public']['Tables']['scene']['Row'];
+type SceneInsert = Database['public']['Tables']['scene']['Insert'];
+type SceneUpdate = Database['public']['Tables']['scene']['Update'];
 type Image = Database['public']['Tables']['image']['Row'];
+type ImageInsert = Database['public']['Tables']['image']['Insert'];
+type ImageUpdate = Database['public']['Tables']['image']['Update'];
 type ChapterContent = Database['public']['Tables']['chapter_content']['Row'];
 type ChapterContentInsert = Database['public']['Tables']['chapter_content']['Insert'];
 type ChapterContentUpdate = Database['public']['Tables']['chapter_content']['Update'];
@@ -106,12 +110,19 @@ export function createManuscriptService(
       return ok(null);
     },
 
-    // Reorder manuscripts
-    async reorderManuscripts(
-      projectId: string,
-      manuscriptIds: string[]
-    ): Promise<Result<null, string>> {
-      throw new Error("Not implemented");
+    async reorderManuscripts(targetPosition: number,manuscriptId: number): Promise<Result<null, string>> {
+      if (targetPosition === undefined || targetPosition === null) {
+        return err("Target position is required");
+      }
+      if (!manuscriptId) {
+        return err("Manuscript ID is required");
+      }
+
+      const reorderResult = await manuscriptRepo.reorder(manuscriptId, targetPosition);
+      if (!reorderResult.ok) {
+        return err(`Failed to reorder manuscripts: ${reorderResult.error}`);
+      }
+      return ok(null);
     },
 
     async getManuscriptsWithChaptersAndContent( manuscriptId: string ): Promise<Result<ManuscriptWithChapters[], string>> {
@@ -185,12 +196,19 @@ export function createManuscriptService(
       return ok(null);
     },
 
-    // Reorder chapters
-    async reorderChapters(
-      manuscriptId: string,
-      chapterIds: string[]
-    ): Promise<Result<null, string>> {
-      throw new Error("Not implemented");
+    async reorderChapters( manuscriptId: number, targetPosition: number): Promise<Result<null, string>> {
+      if (!manuscriptId) {
+        return err("Manuscript ID is required");
+      }
+      if (targetPosition === undefined || targetPosition === null) {
+        return err("Target position is required");
+      }
+
+      const reorderResult = await chapterRepo.reorder(manuscriptId, targetPosition);
+      if (!reorderResult.ok) {
+        return err(`Failed to reorder chapters: ${reorderResult.error}`);
+      }
+      return ok(null);
     },
 
     // --- Manage chapter contents (add, update, delete, reorder) ---
@@ -211,9 +229,17 @@ export function createManuscriptService(
       throw new Error("Not implemented");
     },
 
-    // Delete content from chapter
-    async deleteChapterContent(id: string): Promise<Result<null, string>> {
-      throw new Error("Not implemented");
+    async deleteChapterContent(id: number): Promise<Result<null, string>> {
+      const existingChapterResult = await chapterRepo.getContentById(id);
+      if (!existingChapterResult.ok || !existingChapterResult.data) {
+        return err("Chapter content not found");
+      }
+
+      const deletionResult = await chapterRepo.deleteContent(id);
+      if (!deletionResult.ok) {
+        return err(`Failed to delete chapter content: ${deletionResult.error}`);
+      }
+      return ok(null);
     },
 
     // Reorder contents within chapter
@@ -225,59 +251,87 @@ export function createManuscriptService(
     },
 
     // --- Scene Methods ---
-
-    // Create a new scene
-    async createScene(data: {
-      title?: string;
-      content: string;
-      word_count?: number;
-    }): Promise<Result<Scene, string>> {
-      throw new Error("Not implemented");
-    },
-
-    // Update scene details
-    async updateScene(
-      id: string,
-      updates: {
-        title?: string;
-        content?: string;
-        word_count?: number;
+    async createScene(data: SceneInsert): Promise<Result<Scene, string>> {
+      if (!data.content || data.content === null) {
+        return err("Scene content is required");
       }
-    ): Promise<Result<Scene, string>> {
-      throw new Error("Not implemented");
+      const newScene: SceneInsert = {
+        content: data.content || "",
+      };
+      const sceneCreationResult = await sceneRepo.create(newScene);
+      if (!sceneCreationResult.ok) {
+        return err(`Failed to create scene: ${sceneCreationResult.error}`);
+      }
+      return ok(sceneCreationResult.data);
     },
 
-    // Delete a scene
-    async deleteScene(id: string): Promise<Result<null, string>> {
-      throw new Error("Not implemented");
+    async updateScene( id: number, updates: SceneUpdate): Promise<Result<Scene, string>> {
+      const existingSceneResult = await sceneRepo.getById(id);
+      if (!existingSceneResult.ok || !existingSceneResult.data) {
+        return err("Scene not found");
+      }
+
+      const updatedSceneResult = await sceneRepo.update(id, updates);
+      if (!updatedSceneResult.ok) {
+        return err(`Failed to update scene: ${updatedSceneResult.error}`);
+      }
+      return ok(updatedSceneResult.data);
+    },
+
+    async deleteScene(id: number): Promise<Result<null, string>> {
+      const existingSceneResult = await sceneRepo.getById(id);
+      if (!existingSceneResult.ok || !existingSceneResult.data) {
+        return err("Scene not found");
+      }
+
+      const deletionResult = await sceneRepo.delete(id);
+      if (!deletionResult.ok) {
+        return err(`Failed to delete scene: ${deletionResult.error}`);
+      }
+      return ok(null);
     },
 
     // --- Image Methods ---
-
-    // Create a new image
-    async createImage(data: {
-      url: string;
-      alt_text?: string;
-      caption?: string;
-    }): Promise<Result<Image, string>> {
-      throw new Error("Not implemented");
-    },
-
-    // Update image details
-    async updateImage(
-      id: string,
-      updates: {
-        url?: string;
-        alt_text?: string;
-        caption?: string;
+    async createImage(data: { url: string; alt_text?: string; caption?: string; }): Promise<Result<Image, string>> {
+      if (!data.url || data.url.trim().length === 0) {
+        return err("Image URL is required");
       }
-    ): Promise<Result<Image, string>> {
-      throw new Error("Not implemented");
+
+      const newImage: ImageInsert = {
+        url: data.url,
+        alt_text: data.alt_text || "",
+      }
+      const imageCreationResult = await imageRepo.create(newImage);
+      if (!imageCreationResult.ok) {
+        return err(`Failed to create image: ${imageCreationResult.error}`);
+      }
+      return ok(imageCreationResult.data);
     },
 
-    // Delete an image
-    async deleteImage(id: string): Promise<Result<null, string>> {
-      throw new Error("Not implemented");
+    async updateImage( id: number, updates: { url?: string; alt_text?: string; caption?: string;}): Promise<Result<Image, string>> {
+      const existingImageResult = await imageRepo.getById(id);
+      if (!existingImageResult.ok || !existingImageResult.data) {
+        return err("Image not found");
+      }
+
+      const updatedImageResult = await imageRepo.update(id, updates);
+      if (!updatedImageResult.ok) {
+        return err(`Failed to update image: ${updatedImageResult.error}`);
+      }
+      return ok(updatedImageResult.data);
+    },
+
+    async deleteImage(id: number): Promise<Result<null, string>> {
+      const existingImageResult = await imageRepo.getById(id);
+      if (!existingImageResult.ok || !existingImageResult.data) {
+        return err("Image not found");
+      }
+
+      const deletionResult = await imageRepo.delete(id);
+      if (!deletionResult.ok) {
+        return err(`Failed to delete image: ${deletionResult.error}`);
+      }
+      return ok(null);
     },
   };
 }

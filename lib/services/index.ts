@@ -1,3 +1,4 @@
+"use client"
 import createSupabaseRepositories from "../repositories";
 import { createManuscriptService } from "./manuscript.service";
 
