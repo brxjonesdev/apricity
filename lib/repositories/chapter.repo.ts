@@ -14,14 +14,12 @@ export interface ChapterRepository {
   create(chapter: Omit<ChapterInsert, 'id' | 'created_at' | 'updated_at'>): Promise<Result<Chapter, string>>;
   update(id: number, updates: ChapterUpdate): Promise<Result<Chapter, string>>;
   delete(id: number): Promise<Result<null, string>>;
-  reorder(id: number, newPosition: number): Promise<Result<null, string>>;
   getById(id: number): Promise<Result<Chapter, string>>;
 
   // content management methods <3
   addContent(chapterId: number, content: Omit<ChapterContentInsert, 'id' | 'created_at' | 'updated_at'>): Promise<Result<ChapterContent, string>>;
   updateContent(id: number, updates: ChapterContentUpdate, type: 'scene' | 'image'): Promise<Result<ChapterContent, string>>;
   deleteContent(id: number): Promise<Result<null, string>>;
-  reorderContent(chapterId: number, newPosition: number): Promise<Result<null, string>>;
   getContentById(id: number): Promise<Result<ChapterContent, string>>;
 
 }
@@ -64,29 +62,7 @@ export function createSupabaseChapterRepo(supabase: SupabaseClient): ChapterRepo
       }
       return ok(null);
     },
-    async reorder(id, newPosition): Promise<Result<null, string>> {
-      const existingChapterResult = await this.getById(id);
-      if (!existingChapterResult.ok) {
-        return err(existingChapterResult.error);
-      }
-      const existingChapter = existingChapterResult.data
-      const { error } = await supabase.rpc('shift_chapter_positions', {
-        manuscript_id: existingChapter.manuscript_id,
-        start_position: existingChapter.position,
-        shift: 1
-      })
-      if (error) {
-        return err(error.message);
-      }
-      const { error: updateError } = await supabase
-        .from('chapter')
-        .update({ position: newPosition })
-        .eq('id', id);
-      if (updateError) {
-        return err(updateError.message);
-      }
-      return ok(null);
-    },
+
 
     async getById(id): Promise<Result<Chapter, string>> {
       const { data, error } = await supabase
@@ -150,30 +126,6 @@ export function createSupabaseChapterRepo(supabase: SupabaseClient): ChapterRepo
         return err(error.message);
       }
       return ok(data);
-    },
-    async reorderContent(chapterId, newPosition): Promise<Result<null, string>> {
-      const exitingContentResult = await this.getContentById(chapterId);
-      if (!exitingContentResult.ok) {
-        return err(exitingContentResult.error);
-      }
-      const existingContent = exitingContentResult.data
-      const { error } = await supabase.rpc('shift_chapter_content_positions', {
-        chapter_id: existingContent.chapter_id,
-        start_position: existingContent.position,
-        shift: 1
-      })
-      if (error) {
-        return err(error.message);
-      }
-      const { error: updateError } = await supabase
-        .from('chapter_content')
-        .update({ position: newPosition })
-        .eq('id', chapterId);
-      if (updateError) {
-        return err(updateError.message);
-      }
-      return ok(null);
-
     },
   }
 }

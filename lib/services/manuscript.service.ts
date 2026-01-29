@@ -5,6 +5,7 @@ import { SceneRepository } from "@/lib/repositories/scene.repo";
 import { ImageRepository } from "@/lib/repositories/image.repo";
 import { ProjectsRepository } from "../repositories/projects.repo";
 import type { Database } from "@/lib/supabase/types";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 type Manuscript = Database['public']['Tables']['manuscript']['Row'];
 type ManuscriptInsert = Database['public']['Tables']['manuscript']['Insert'];
@@ -24,12 +25,10 @@ type SceneInsert = Database['public']['Tables']['scene']['Insert'];
 type SceneUpdate = Database['public']['Tables']['scene']['Update'];
 type Image = Database['public']['Tables']['image']['Row'];
 type ImageInsert = Database['public']['Tables']['image']['Insert'];
-type ImageUpdate = Database['public']['Tables']['image']['Update'];
 type ChapterContent = Database['public']['Tables']['chapter_content']['Row'];
-type ChapterContentInsert = Database['public']['Tables']['chapter_content']['Insert'];
-type ChapterContentUpdate = Database['public']['Tables']['chapter_content']['Update'];
 
 export function createManuscriptService(
+  supabase: SupabaseClient,
   manuscriptRepo: ManuscriptRepository,
   chapterRepo: ChapterRepository,
   sceneRepo: SceneRepository,
@@ -71,7 +70,7 @@ export function createManuscriptService(
       if (!id) {
         return err("Manuscript ID is required");
       }
-      if (!updates.title && !updates.description) {
+      if (!updates.title) {
         return err("No updates provided");
       }
       if (updates.title.length === 0) {
@@ -110,19 +109,26 @@ export function createManuscriptService(
       return ok(null);
     },
 
-    async reorderManuscripts(targetPosition: number,manuscriptId: number): Promise<Result<null, string>> {
+    async reorderManuscripts(targetPosition: number, manuscriptId: number): Promise<Result<null, string>> {
       if (targetPosition === undefined || targetPosition === null) {
         return err("Target position is required");
       }
       if (!manuscriptId) {
         return err("Manuscript ID is required");
       }
+      try {
+        const { error } = await supabase.rpc('reorder_manuscripts', {
+          p_target_position: targetPosition,
+          p_manuscript_id: manuscriptId
+        });
+        if (error) {
+          return err(`Failed to reorder manuscripts: ${error.message}`);
+        }
+        return ok(null);
 
-      const reorderResult = await manuscriptRepo.reorder(manuscriptId, targetPosition);
-      if (!reorderResult.ok) {
-        return err(`Failed to reorder manuscripts: ${reorderResult.error}`);
+      } catch (error) {
+        return err(`Failed to reorder manuscripts: ${error}`);
       }
-      return ok(null);
     },
 
     async getManuscriptsWithChaptersAndContent( manuscriptId: string ): Promise<Result<ManuscriptWithChapters[], string>> {
@@ -203,51 +209,61 @@ export function createManuscriptService(
       if (targetPosition === undefined || targetPosition === null) {
         return err("Target position is required");
       }
+      try {
+        const { error } = await supabase.rpc('reorder_chapters', {
+          p_manuscript_id: manuscriptId,
+          p_target_position: targetPosition
+        });
+        if (error) {
+          return err(`Failed to reorder chapters: ${error.message}`);
+        }
+        return ok(null);
 
-      const reorderResult = await chapterRepo.reorder(manuscriptId, targetPosition);
-      if (!reorderResult.ok) {
-        return err(`Failed to reorder chapters: ${reorderResult.error}`);
+      } catch (error) {
+        return err(`Failed to reorder chapters: ${error}`);
       }
-      return ok(null);
     },
 
     // --- Manage chapter contents (add, update, delete, reorder) ---
+    //
+    async addContentToChapter(chapterID: number, type: 'scene' | 'image', position?: number): Promise<Result<ChapterContent, string>> {
+      try {
+        const { data, error } = await supabase.rpc('add_content_to_chapter', {
+          p_chapter_id: chapterID,
+          p_content_type: type,
+          p_content_position: position ?? null
+        })
 
-    // Add content (scene or image) to chapter
-    async addContentToChapter(data:ChapterContentInsert): Promise<Result<ChapterContent, string>> {
+        if (error) {
+          return err(`Failed to add content to chapter: ${error.message}`);
+        }
+        return ok(data as ChapterContent);
 
+      } catch (error) {
+        return err(`Failed to add content to chapter: ${error}`);
+      }
     },
 
-    // Update content (scene or image) in chapter
-    async updateChapterContent(
-      id: string,
-      updates: {
-        scene_id?: string;
-        image_id?: string;
+    async reorderChapterContents(chapterID: number, targetPosition: number): Promise<Result<null, string>> {
+      if (!chapterID) {
+        return err("Chapter ID is required");
       }
-    ): Promise<Result<ChapterContent, string>> {
-      throw new Error("Not implemented");
-    },
-
-    async deleteChapterContent(id: number): Promise<Result<null, string>> {
-      const existingChapterResult = await chapterRepo.getContentById(id);
-      if (!existingChapterResult.ok || !existingChapterResult.data) {
-        return err("Chapter content not found");
+      if (targetPosition === undefined || targetPosition === null) {
+        return err("Target position is required");
       }
+      try {
+        const { error } = await supabase.rpc('reorder_chapter_contents', {
+          p_chapter_id: chapterID,
+          p_target_position: targetPosition
+        });
+        if (error) {
+          return err(`Failed to reorder chapter contents: ${error.message}`);
+        }
+        return ok(null);
 
-      const deletionResult = await chapterRepo.deleteContent(id);
-      if (!deletionResult.ok) {
-        return err(`Failed to delete chapter content: ${deletionResult.error}`);
+      } catch (error) {
+        return err(`Failed to reorder chapter contents: ${error}`);
       }
-      return ok(null);
-    },
-
-    // Reorder contents within chapter
-    async reorderChapterContents(
-      chapterId: string,
-      contentIds: string[]
-    ): Promise<Result<null, string>> {
-      throw new Error("Not implemented");
     },
 
     // --- Scene Methods ---

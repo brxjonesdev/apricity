@@ -5,6 +5,7 @@ import { ChapterRepository } from '../repositories/chapter.repo';
 import { SceneRepository } from '../repositories/scene.repo';
 import { ImageRepository } from '../repositories/image.repo';
 import { ProjectsRepository } from '../repositories/projects.repo';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 describe("ManuscriptService", () => {
   // mock repositories
@@ -13,6 +14,7 @@ describe("ManuscriptService", () => {
   let mockSceneRepo: SceneRepository;
   let mockImageRepo: ImageRepository;
   let mockProjectsRepo: ProjectsRepository;
+  let mockSupabaseClient: SupabaseClient;
   let manuscriptService: ReturnType<typeof createManuscriptService>
 
   beforeEach(() => {
@@ -20,7 +22,6 @@ describe("ManuscriptService", () => {
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      reorder: vi.fn(),
       getById: vi.fn(),
       getAllManuscriptsWithChapters: vi.fn(),
     }
@@ -28,22 +29,23 @@ describe("ManuscriptService", () => {
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      reorder: vi.fn(),
       getById: vi.fn(),
       addContent: vi.fn(),
+      getContentById: vi.fn(),
       updateContent: vi.fn(),
-      reorderContent: vi.fn(),
       deleteContent: vi.fn(),
     }
     mockSceneRepo = {
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      getById : vi.fn(),
     }
     mockImageRepo = {
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      getById : vi.fn(),
     }
     mockProjectsRepo = {
       create: vi.fn(),
@@ -53,8 +55,13 @@ describe("ManuscriptService", () => {
       getByID: vi.fn(),
     }
 
+    mockSupabaseClient = {
+      rpc: vi.fn(),
+      } as unknown as SupabaseClient;
+
 
     manuscriptService = createManuscriptService(
+      mockSupabaseClient,
       mockManuscriptRepo,
       mockChapterRepo,
       mockSceneRepo,
