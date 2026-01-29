@@ -15,6 +15,7 @@ export interface ChapterRepository {
   update(id: number, updates: ChapterUpdate): Promise<Result<Chapter, string>>;
   delete(id: number): Promise<Result<null, string>>;
   reorder(id: number, newPosition: number): Promise<Result<null, string>>;
+  getById(id: number): Promise<Result<Chapter, string>>;
 
   // content management methods <3
   addContent(chapterId: number, content: Omit<ChapterContentInsert, 'id' | 'created_at' | 'updated_at'>): Promise<Result<ChapterContent, string>>;
@@ -65,6 +66,19 @@ export function createSupabaseChapterRepo(): ChapterRepository {
     },
     async reorder(id, newPosition): Promise<Result<null, string>> {
       return err("Not implemented");
+    },
+
+    async getById(id): Promise<Result<Chapter, string>> {
+      const { data, error } = await supabase
+        .from('chapter')
+        .select()
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
     },
 
     // content management methods, these are for adding/updating/deleting/reordering chapter content only.

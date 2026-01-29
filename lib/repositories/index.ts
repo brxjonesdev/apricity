@@ -4,7 +4,6 @@ import {createSupabaseImageRepo} from './image.repo';
 import {createSupabaseManuscriptRepo} from './manuscript.repo';
 import {createSupabaseSceneRepo} from './scene.repo';
 import { createSupabaseProjectRepo } from './projects.repo';
-import { createSupabaseUserRepo } from './user.repo';
 
 export default function createSupabaseRepositories() {
   return {
@@ -13,6 +12,5 @@ export default function createSupabaseRepositories() {
     manuscriptRepo: createSupabaseManuscriptRepo(),
     sceneRepo: createSupabaseSceneRepo(),
     projectRepo: createSupabaseProjectRepo(),
-    userRepo: createSupabaseUserRepo()
   };
 }

@@ -8,5 +8,4 @@ export const manuscriptService = createManuscriptService(
   repos.sceneRepo,
   repos.imageRepo,
   repos.projectRepo,
-  repos.userRepo
 )

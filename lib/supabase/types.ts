@@ -218,7 +218,7 @@ export type Database = {
       }
       user: {
         Row: {
-          auth_id: string
+          auth_id: number // uuid
           created_at: string
           display_name: string
           id: number
@@ -226,7 +226,7 @@ export type Database = {
           username: string
         }
         Insert: {
-          auth_id: string
+          auth_id?: number
           created_at?: string
           display_name: string
           id?: number
@@ -234,7 +234,7 @@ export type Database = {
           username: string
         }
         Update: {
-          auth_id?: string
+          auth_id?: number
           created_at?: string
           display_name?: string
           id?: number

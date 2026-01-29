@@ -1,18 +1,16 @@
-import { Database } from "@/lib/supabase/types";
-import { Result, ok, err } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
-import { nanoid } from "nanoid";
-import { Nanum_Gothic_Coding } from "next/font/google";
+import { createClient } from "../supabase/client";
+import { Database } from "../supabase/types";
+import { Result, ok, err } from "../utils";
 
-type User = Database['public']['Tables']['user']['Row'];
-type UserInsert = Database['public']['Tables']['user']['Insert'];
-type UserUpdate = Database['public']['Tables']['user']['Update'];
+export type User = Database['public']['Tables']['user']['Row'];
+export type UserInsert = Database['public']['Tables']['user']['Insert'];
+export type UserUpdate = Database['public']['Tables']['user']['Update'];
 
 export interface UserRepository {
   create(user: Omit<UserInsert, 'id' | 'created_at' | 'updated_at'>): Promise<Result<User, string>>;
-  update(id: string, updates: UserUpdate): Promise<Result<User, string>>;
-  delete(id: string): Promise<Result<null, string>>;
-  getById(id: string): Promise<Result<User, string>>;
+  update(id: number, updates: UserUpdate): Promise<Result<User, string>>;
+  delete(id: number): Promise<Result<null, string>>;
+  getById(authID: number): Promise<Result<User, string>>;
 }
 
 export function createSupabaseUserRepo(): UserRepository {
@@ -22,17 +20,13 @@ export function createSupabaseUserRepo(): UserRepository {
     async create(user): Promise<Result<User, string>> {
       const { data, error } = await supabase
         .from('user')
-        .insert({
-          id: `user_${nanoid(15)}`,
-          ...user,
-        })
+        .insert(user)
         .select()
         .single();
       if (error) {
         return err(error.message);
       }
       return ok(data);
-
     },
     async update(id, updates): Promise<Result<User, string>> {
       const { data, error } = await supabase
@@ -58,11 +52,11 @@ export function createSupabaseUserRepo(): UserRepository {
       }
       return ok(null);
     },
-    async getById(id): Promise<Result<User, string>> {
+    async getById(userID): Promise<Result<User, string>> {
       const { data, error } = await supabase
         .from('user')
         .select()
-        .eq('id', id)
+        .eq('user_id', userID)
         .single();
 
       if (error) {

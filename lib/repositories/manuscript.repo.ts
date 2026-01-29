@@ -21,6 +21,7 @@ export interface ManuscriptRepository {
   delete(id: number): Promise<Result<null, string>>;
   reorder(id:number, newPosition:number): Promise<Result<null, string>>;
   getAllManuscriptsWithChapters(projectId: string): Promise<Result<ManuscriptWithChapters[], string>>;
+  getById(id: number): Promise<Result<Manuscript, string>>;
 }
 
 export function createSupabaseManuscriptRepo(): ManuscriptRepository {
@@ -91,6 +92,19 @@ export function createSupabaseManuscriptRepo(): ManuscriptRepository {
         return err(error.message);
       }
       return ok(data as ManuscriptWithChapters[]);
+    },
+
+    async getById(id): Promise<Result<Manuscript, string>> {
+      const { data, error } = await supabase
+        .from('manuscript')
+        .select()
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
     },
   }
 }

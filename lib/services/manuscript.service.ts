@@ -5,8 +5,6 @@ import { SceneRepository } from "@/lib/repositories/scene.repo";
 import { ImageRepository } from "@/lib/repositories/image.repo";
 import { ProjectsRepository } from "../repositories/projects.repo";
 import type { Database } from "@/lib/supabase/types";
-import { UserRepository } from "../repositories/user.repo";
-import { title } from "node:process";
 
 type Manuscript = Database['public']['Tables']['manuscript']['Row'];
 type ManuscriptInsert = Database['public']['Tables']['manuscript']['Insert'];
@@ -19,9 +17,13 @@ type ManuscriptWithChapters = Database['public']['Tables']['manuscript']['Row'] 
   })[];
 };
 type Chapter = Database['public']['Tables']['chapter']['Row'];
+type ChapterInsert = Database['public']['Tables']['chapter']['Insert'];
+type ChapterUpdate = Database['public']['Tables']['chapter']['Update'];
 type Scene = Database['public']['Tables']['scene']['Row'];
 type Image = Database['public']['Tables']['image']['Row'];
 type ChapterContent = Database['public']['Tables']['chapter_content']['Row'];
+type ChapterContentInsert = Database['public']['Tables']['chapter_content']['Insert'];
+type ChapterContentUpdate = Database['public']['Tables']['chapter_content']['Update'];
 
 export function createManuscriptService(
   manuscriptRepo: ManuscriptRepository,
@@ -29,17 +31,11 @@ export function createManuscriptService(
   sceneRepo: SceneRepository,
   imageRepo: ImageRepository,
   projectsRepo: ProjectsRepository,
-  userRepo: UserRepository
 ) {
   return {
     // --- Manuscript Methods ---
 
-    // Create a new manuscript
-    async createManuscript(data: {
-      project_id: string;
-      title: string;
-      position?: number;
-    }): Promise<Result<Manuscript, string>> {
+    async createManuscript(data:{project_id: string; title: string; position?: number; }): Promise<Result<Manuscript, string>> {
       if (data.title.trim().length === 0) {
         return err("Title cannot be empty");
       }
@@ -67,20 +63,47 @@ export function createManuscriptService(
       return ok(manuscriptCreationResult.data);
     },
 
-    // Update manuscript details
-    async updateManuscript(
-      id: string,
-      updates: {
-        title?: string;
-        description?: string;
+    async updateManuscript(id: number, updates: { title: string }): Promise<Result<Manuscript, string>> {
+      if (!id) {
+        return err("Manuscript ID is required");
       }
-    ): Promise<Result<Manuscript, string>> {
-      throw new Error("Not implemented");
+      if (!updates.title && !updates.description) {
+        return err("No updates provided");
+      }
+      if (updates.title.length === 0) {
+        return err("Title cannot be empty");
+      }
+      if (updates.title && updates.title.length > 255) {
+        return err("Title cannot exceed 255 characters");
+      }
+
+      const existingManuscriptResult = await manuscriptRepo.getById(id);
+      if (!existingManuscriptResult.ok || !existingManuscriptResult.data) {
+        return err("Manuscript not found");
+      }
+
+      const updatedManuscriptResult = await manuscriptRepo.update(id, updates);
+      if (!updatedManuscriptResult.ok) {
+        return err(`Failed to update manuscript: ${updatedManuscriptResult.error}`);
+      }
+      return ok(updatedManuscriptResult.data);
     },
 
-    // Delete a manuscript
-    async deleteManuscript(id: string): Promise<Result<null, string>> {
-      throw new Error("Not implemented");
+    async deleteManuscript(id: number): Promise<Result<null, string>> {
+      if (!id) {
+        return err("Manuscript ID is required");
+      }
+
+      const existingManuscriptResult = await manuscriptRepo.getById(Number(id));
+      if (!existingManuscriptResult.ok || !existingManuscriptResult.data) {
+        return err("Manuscript not found");
+      }
+
+      const deletionResult = await manuscriptRepo.delete(id);
+      if (!deletionResult.ok) {
+        return err(`Failed to delete manuscript: ${deletionResult.error}`);
+      }
+      return ok(null);
     },
 
     // Reorder manuscripts
@@ -91,38 +114,75 @@ export function createManuscriptService(
       throw new Error("Not implemented");
     },
 
-    // Get all manuscripts with chapters with contents
-    async getManuscriptWithChapters(
-      manuscriptId: string
-    ): Promise<Result<ManuscriptWithChapters, string>> {
-      throw new Error("Not implemented");
+    async getManuscriptsWithChaptersAndContent( manuscriptId: string ): Promise<Result<ManuscriptWithChapters[], string>> {
+      if (!manuscriptId) {
+        return err("Manuscript ID is required");
+      }
+
+      const manuscriptResult = await manuscriptRepo.getAllManuscriptsWithChapters(manuscriptId);
+      if (!manuscriptResult.ok) {
+        return err(`Failed to fetch project data: ${manuscriptResult.error}`);
+      }
+      return ok(manuscriptResult.data);
     },
 
     // --- Chapter Methods ---
 
-    // Create a new chapter
-    async createChapter(data: {
-      manuscript_id: string;
-      title: string;
-      description?: string;
-    }): Promise<Result<Chapter, string>> {
-      throw new Error("Not implemented");
-    },
-
-    // Update chapter details
-    async updateChapter(
-      id: string,
-      updates: {
-        title?: string;
-        description?: string;
+    async createChapter(chapter: ChapterInsert): Promise<Result<Chapter, string>> {
+      if (!chapter.manuscript_id) {
+        return err("Manuscript ID is required");
       }
-    ): Promise<Result<Chapter, string>> {
-      throw new Error("Not implemented");
+      if (chapter.title && chapter.title.length > 255) {
+        return err("Chapter title cannot exceed 255 characters");
+      }
+
+      const newChapter: ChapterInsert = {
+        manuscript_id: chapter.manuscript_id,
+        title: chapter.title || "New Chapter",
+        position: chapter.position || 0,
+      };
+      const chapterCreationResult = await chapterRepo.create(newChapter);
+      if (!chapterCreationResult.ok) {
+        return err(`Failed to create chapter: ${chapterCreationResult.error}`);
+      }
+      return ok(chapterCreationResult.data);
     },
 
-    // Delete a chapter
-    async deleteChapter(id: string): Promise<Result<null, string>> {
-      throw new Error("Not implemented");
+    async updateChapter(updates: ChapterUpdate): Promise<Result<Chapter, string>> {
+      if (!updates.id) {
+        return err("Chapter ID is required");
+      }
+      if (updates.title && updates.title.length > 255) {
+        return err("Chapter title cannot exceed 255 characters");
+      }
+
+      const existingChapterResult = await chapterRepo.getById(updates.id);
+      if (!existingChapterResult.ok || !existingChapterResult.data) {
+        return err("Chapter not found");
+      }
+
+      const updatedChapterResult = await chapterRepo.update(updates.id, updates);
+      if (!updatedChapterResult.ok) {
+        return err(`Failed to update chapter: ${updatedChapterResult.error}`);
+      }
+      return ok(updatedChapterResult.data);
+    },
+
+    async deleteChapter(id: number): Promise<Result<null, string>> {
+      if (!id) {
+        return err("Chapter ID is required");
+      }
+
+      const existingChapterResult = await chapterRepo.getById(id);
+      if (!existingChapterResult.ok || !existingChapterResult.data) {
+        return err("Chapter not found");
+      }
+
+      const deletionResult = await chapterRepo.delete(id);
+      if (!deletionResult.ok) {
+        return err(`Failed to delete chapter: ${deletionResult.error}`);
+      }
+      return ok(null);
     },
 
     // Reorder chapters
@@ -136,13 +196,8 @@ export function createManuscriptService(
     // --- Manage chapter contents (add, update, delete, reorder) ---
 
     // Add content (scene or image) to chapter
-    async addContentToChapter(data: {
-      chapter_id: string;
-      content_type: 'scene' | 'image';
-      scene_id?: string;
-      image_id?: string;
-    }): Promise<Result<ChapterContent, string>> {
-      throw new Error("Not implemented");
+    async addContentToChapter(data:ChapterContentInsert): Promise<Result<ChapterContent, string>> {
+
     },
 
     // Update content (scene or image) in chapter
