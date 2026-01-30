@@ -10,13 +10,14 @@ import { redirect } from "next/navigation"
 import { ProjectsListWrapper } from "./_components/projects-list-wrapper"
 import CreateProjectButton from "./_components/create-project"
 import { revalidatePath } from "next/cache"
+import SignOut from "@/lib/components/auth/sign-out"
 
 export default async function StartPage() {
   const supabase = await createClient()
   const { userService } = await getServices()
 
   const user = await getSupabaseUser(supabase)
-  console.log("user:", user)
+  console.log("user like now:", user)
   if (!user) {
     redirect("/")
   }
@@ -72,8 +73,8 @@ export default async function StartPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background">
-      <div className="mx-auto max-w-2xl px-4 py-8">
+    <main className="min-h-screen bg-background flex flex-col items-center justify-center">
+      <div className="mx-auto max-w-2xl px-4 py-8 w-full">
         {/* Header */}
         <header className="mb-8">
           <div className="flex items-center justify-between">
@@ -90,6 +91,7 @@ export default async function StartPage() {
                 <p className="text-sm text-muted-foreground">@{profileData.username}</p>
               </div>
             </div>
+            <SignOut />
           </div>
         </header>
 

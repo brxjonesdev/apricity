@@ -53,14 +53,12 @@ export function createUserRepo(supabase: SupabaseClient): UserRepository {
       }
       return ok(null);
     },
-    async getById(): Promise<Result<User, string>> {
+    async getById(id: string): Promise<Result<User, string>> {
       const { data, error } = await supabase
         .from('profile')
         .select()
-        .single();
-
-      console.log('getById data:', data);
-      console.log('getById error:', error);
+        .eq('auth_id', id)
+        .maybeSingle();
 
       if (error) {
         return err(error.message);
@@ -72,7 +70,7 @@ export function createUserRepo(supabase: SupabaseClient): UserRepository {
         .from('profile')
         .select()
         .eq('username', username)
-        .single();
+        .maybeSingle();
 
       if (error) {
         return err(error.message);

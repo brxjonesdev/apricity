@@ -38,6 +38,15 @@ export const createUserService = (repo: UserRepository) => {
       return ok(!!userResult.data);
     },
 
+    checkUsernameAvailability: async (username: string): Promise<Result<boolean, string>> => {
+      const userResult = await repo.getByUsername(username);
+      if (!userResult.ok) {
+        return err(`Error checking username availability: ${userResult.error}`);
+      }
+      const isTaken = !!userResult.data;
+      console.log(`Username "${username}" is ${isTaken ? 'taken' : 'available'}.`);
+      return ok(isTaken);
+    },
     updateUserProfile: async (updates: UserUpdate): Promise<Result<User, string>> => {
       if (!updates.id) return err("User ID is required for update");
 

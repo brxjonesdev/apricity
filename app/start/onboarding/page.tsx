@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getSupabaseUser } from "@/lib/supabase/utils"
 import { getServices } from "@/lib/services"
 import OnboardingForm from "./_components/onboarding-form"
+import { revalidatePath } from "next/cache"
 
 export default async function OnboardingPage() {
   const supabase = await createClient()
@@ -34,13 +35,14 @@ export default async function OnboardingPage() {
     if (!result.ok) {
       return { success: false, error: result.error }
     }
+    revalidatePath("/start")
     return { success: true }
   }
 
   async function isUsernameTaken(username: string) {
     "use server"
     const { userService } = await getServices()
-    const result = await userService.userExists(username)
+    const result = await userService.checkUsernameAvailability(username)
     if (!result.ok) {
       return { success: false, error: result.error }
     }

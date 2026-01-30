@@ -13,3 +13,14 @@ export function ok<T>(data: T): Result<T, never> {
 export function err<E>(error: E) {
   return { ok: false, error } as const;
 }
+
+export function debounce<T extends (...args: Parameters<T>) => void>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout | null = null
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), wait)
+  }
+}
