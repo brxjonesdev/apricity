@@ -5,11 +5,10 @@ import { SceneRepository } from "@/lib/repositories/scene.repo";
 import { ImageRepository } from "@/lib/repositories/image.repo";
 import { ProjectsRepository } from "../repositories/projects.repo";
 import type { Database } from "@/lib/supabase/types";
-import { SupabaseClient } from "@supabase/supabase-js";
 
-type Manuscript = Database['public']['Tables']['manuscript']['Row'];
-type ManuscriptInsert = Database['public']['Tables']['manuscript']['Insert'];
-type ManuscriptWithChapters = Database['public']['Tables']['manuscript']['Row'] & {
+export type Manuscript = Database['public']['Tables']['manuscript']['Row'];
+export type ManuscriptInsert = Database['public']['Tables']['manuscript']['Insert'];
+export type ManuscriptWithChapters = Database['public']['Tables']['manuscript']['Row'] & {
   chapter: (Database['public']['Tables']['chapter']['Row'] & {
     chapter_content: (Database['public']['Tables']['chapter_content']['Row'] & {
       scene?: Database['public']['Tables']['scene']['Row'] | null;
@@ -26,7 +25,19 @@ type SceneUpdate = Database['public']['Tables']['scene']['Update'];
 type Image = Database['public']['Tables']['image']['Row'];
 type ImageInsert = Database['public']['Tables']['image']['Insert'];
 type ChapterContent = Database['public']['Tables']['chapter_content']['Row'];
-
+export type Project = Database['public']['Tables']['projects']['Row'];
+export type ProjectInsert = Database['public']['Tables']['projects']['Insert'];
+export type ProjectUpdate = Database['public']['Tables']['projects']['Update'];
+type ProjectData = Project & {
+  manuscript: (Manuscript & {
+    chapter: (Chapter & {
+      chapter_content: (ChapterContent & {
+        scene?: Scene | null;
+        image?: Image | null;
+      })[];
+    })[];
+  })[];
+};
 export function createManuscriptService(
   manuscriptRepo: ManuscriptRepository,
   chapterRepo: ChapterRepository,
@@ -35,6 +46,78 @@ export function createManuscriptService(
   projectsRepo: ProjectsRepository,
 ) {
   return {
+    // --- Project Methods ---
+    async createProject(data: {
+      name: string;
+      blurb?: string;
+      user_id: string;
+    }): Promise<Result<Project, string>> {
+      if (!data.name || data.name.trim().length === 0) {
+        return err("Project name is required");
+      }
+      if (data.name.length > 255) {
+        return err("Project name cannot exceed 255 characters");
+      }
+      if (data.blurb && data.blurb.length > 500) {
+        return err("Project blurb cannot exceed 500 characters");
+      }
+      if (!data.user_id) {
+        return err("User ID is required");
+      }
+
+      const newProject = {
+        name: data.name,
+        blurb: data.blurb || "",
+        user_id: data.user_id,
+      };
+      const projectCreationResult = await projectsRepo.create(newProject);
+      if (!projectCreationResult.ok) {
+        return err(`Failed to create project: ${projectCreationResult.error}`);
+      }
+      return ok(projectCreationResult.data);
+    },
+
+    async deleteProject(projectId: string): Promise<Result<null, string>> {
+      if (!projectId) {
+        return err("Project ID is required");
+      }
+
+      const existingProjectResult = await projectsRepo.getByID(projectId);
+      if (!existingProjectResult.ok || !existingProjectResult.data) {
+        return err("Project not found");
+      }
+
+      const deletionResult = await projectsRepo.delete(projectId);
+      if (!deletionResult.ok) {
+        return err(`Failed to delete project: ${deletionResult.error}`);
+      }
+      return ok(null);
+    },
+    async getProjectsByUser(userID: string): Promise<Result<Project[], string>> {
+      if (!userID) {
+        return err("User ID is required");
+      }
+
+      const projectsResult = await projectsRepo.getAllByUser(userID);
+      if (!projectsResult.ok) {
+        return err(`Failed to fetch projects: ${projectsResult.error}`);
+      }
+      return ok(projectsResult.data);
+    },
+
+    async getFullProjectData(projectId: string): Promise<Result<ProjectData, string>> {
+      if (!projectId) {
+        return err("Project ID is required");
+      }
+
+      const projectResult = await projectsRepo.getFullProjectData(projectId);
+      if (!projectResult.ok) {
+        return err(`Failed to fetch project data: ${projectResult.error}`);
+      }
+      return ok(projectResult.data);
+    },
+
+
     // --- Manuscript Methods ---
 
     async createManuscript(data:{project_id: string; title: string; position?: number; }): Promise<Result<Manuscript, string>> {

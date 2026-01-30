@@ -25,7 +25,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          id?: number
+          id?: never
           manuscript_id?: number | null
           position: number
           title: string
@@ -33,7 +33,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          id?: number
+          id?: never
           manuscript_id?: number | null
           position?: number
           title?: string
@@ -52,29 +52,32 @@ export type Database = {
       chapter_content: {
         Row: {
           chapter_id: number
-          content_id: number
           created_at: string
           id: number
+          image_id: number | null
           position: number
-          type: string | null
+          scene_id: number | null
+          type: string
           updated_at: string
         }
         Insert: {
           chapter_id: number
-          content_id: number
           created_at?: string
-          id?: number
+          id?: never
+          image_id?: number | null
           position: number
-          type?: string | null
+          scene_id?: number | null
+          type: string
           updated_at?: string
         }
         Update: {
           chapter_id?: number
-          content_id?: number
           created_at?: string
-          id?: number
+          id?: never
+          image_id?: number | null
           position?: number
-          type?: string | null
+          scene_id?: number | null
+          type?: string
           updated_at?: string
         }
         Relationships: [
@@ -86,15 +89,15 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "chapter_content_content_id_fkey1"
-            columns: ["content_id"]
+            foreignKeyName: "chapter_content_image_id_fkey"
+            columns: ["image_id"]
             isOneToOne: false
             referencedRelation: "image"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "chapter_content_content_id_fkey2"
-            columns: ["content_id"]
+            foreignKeyName: "chapter_content_scene_id_fkey"
+            columns: ["scene_id"]
             isOneToOne: false
             referencedRelation: "scene"
             referencedColumns: ["id"]
@@ -105,6 +108,7 @@ export type Database = {
         Row: {
           alt_text: string
           created_at: string
+          display_title: string | null
           id: number
           updated_at: string
           url: string
@@ -112,14 +116,16 @@ export type Database = {
         Insert: {
           alt_text: string
           created_at?: string
-          id?: number
+          display_title?: string | null
+          id?: never
           updated_at?: string
           url: string
         }
         Update: {
           alt_text?: string
           created_at?: string
-          id?: number
+          display_title?: string | null
+          id?: never
           updated_at?: string
           url?: string
         }
@@ -136,7 +142,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          id?: number
+          id?: never
           position: number
           story_id: string
           title: string
@@ -144,7 +150,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          id?: number
+          id?: never
           position?: number
           story_id?: string
           title?: string
@@ -159,6 +165,33 @@ export type Database = {
             referencedColumns: ["project_id"]
           },
         ]
+      }
+      profile: {
+        Row: {
+          auth_id: string
+          created_at: string
+          display_name: string
+          id: number
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          auth_id: string
+          created_at?: string
+          display_name: string
+          id?: never
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          auth_id: string
+          created_at?: string
+          display_name?: string
+          id?: never
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
       }
       projects: {
         Row: {
@@ -190,7 +223,7 @@ export type Database = {
             foreignKeyName: "projects_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "user"
+            referencedRelation: "profile"
             referencedColumns: ["auth_id"]
           },
         ]
@@ -199,47 +232,23 @@ export type Database = {
         Row: {
           content: string | null
           created_at: string
+          display_title: string | null
           id: number
           updated_at: string
         }
         Insert: {
           content?: string | null
           created_at?: string
-          id?: number
+          display_title?: string | null
+          id?: never
           updated_at?: string
         }
         Update: {
           content?: string | null
           created_at?: string
-          id?: number
+          display_title?: string | null
+          id?: never
           updated_at?: string
-        }
-        Relationships: []
-      }
-      user: {
-        Row: {
-          auth_id: number // uuid
-          created_at: string
-          display_name: string
-          id: number
-          updated_at: string
-          username: string
-        }
-        Insert: {
-          auth_id?: number
-          created_at?: string
-          display_name: string
-          id?: number
-          updated_at?: string
-          username: string
-        }
-        Update: {
-          auth_id?: number
-          created_at?: string
-          display_name?: string
-          id?: number
-          updated_at?: string
-          username?: string
         }
         Relationships: []
       }
@@ -248,39 +257,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      delete_chapter_cascade: {
-        Args: { chapter_id: number }
-        Returns: undefined
-      }
-      delete_manuscript_cascade: {
-        Args: { manuscript_id: number }
-        Returns: undefined
-      }
-      get_chapter_contents: {
-        Args: { chapter_id: number }
-        Returns: {
-          content_id: number
-          id: number
-          position: number
-          type: string
-        }[]
-      }
-      get_manuscript_chapters: {
-        Args: { manuscript_id: number }
-        Returns: {
-          id: number
-          position: number
-          title: string
-        }[]
-      }
-      shift_chapter_content_positions: {
-        Args: { chapter_id: number; shift: number; start_position: number }
-        Returns: undefined
-      }
-      shift_chapter_positions: {
-        Args: { manuscript_id: number; shift: number; start_position: number }
-        Returns: undefined
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never

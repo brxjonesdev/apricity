@@ -6,6 +6,22 @@ import { nanoid } from "nanoid";
 type Project = Database['public']['Tables']['projects']['Row'];
 type ProjectInsert = Database['public']['Tables']['projects']['Insert'];
 type ProjectUpdate = Database['public']['Tables']['projects']['Update'];
+type Manuscript = Database['public']['Tables']['manuscript']['Row'];
+type Chapter = Database['public']['Tables']['chapter']['Row'];
+type ChapterContent = Database['public']['Tables']['chapter_content']['Row'];
+type Scene = Database['public']['Tables']['scene']['Row'];
+type Image = Database['public']['Tables']['image']['Row'];
+type ProjectData = Project & {
+  manuscript: (Manuscript & {
+    chapter: (Chapter & {
+      chapter_content: (ChapterContent & {
+        scene?: Scene | null;
+        image?: Image | null;
+      })[];
+    })[];
+  })[];
+};
+
 
 export interface ProjectsRepository {
   create(project: Omit<ProjectInsert, 'created_at' | 'updated_at' | 'project_id'>): Promise<Result<Project, string>>;
@@ -13,6 +29,7 @@ export interface ProjectsRepository {
   delete(id: string): Promise<Result<null, string>>;
   getAllByUser(userId: string): Promise<Result<Project[], string>>;
   getByID(id: string): Promise<Result<Project, string>>;
+  getFullProjectData(id: string): Promise<Result<ProjectData, string>>;
 }
 
 export function createSupabaseProjectRepo(supabase: SupabaseClient): ProjectsRepository {
@@ -82,5 +99,32 @@ export function createSupabaseProjectRepo(supabase: SupabaseClient): ProjectsRep
       }
       return ok(data);
     },
+
+    async getFullProjectData(id): Promise<Result<ProjectData, string>> {
+      const { data, error } = await supabase
+        .from('projects')
+        .select(`
+          *,
+          manuscript (
+            *,
+            chapter (
+              *,
+              chapter_content (
+                *,
+                scene:scene_id(*),
+                image:image_id(*)
+              )
+            )
+          )
+        `)
+        .eq('project_id', id)
+        .single();
+
+      if (error) {
+        return err(error.message);
+      }
+      return ok(data);
+    },
+
   };
 }
