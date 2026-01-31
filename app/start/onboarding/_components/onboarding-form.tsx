@@ -1,177 +1,180 @@
-"use client"
+"use client";
 
-import React from "react"
+import React from "react";
 
-import { useState, useCallback, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/lib/components/ui/button"
-import { Input } from "@/lib/components/ui/input"
-import { Label } from "@/lib/components/ui/label"
-import { Card, CardContent, CardFooter } from "@/lib/components/ui/card"
-import { Spinner } from "@/lib/components/ui/spinner"
-import { CheckCircle2, XCircle, Loader2 } from "lucide-react"
-import { debounce } from "@/lib/utils"
+import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/lib/components/ui/button";
+import { Input } from "@/lib/components/ui/input";
+import { Label } from "@/lib/components/ui/label";
+import { Card, CardContent, CardFooter } from "@/lib/components/ui/card";
+import { Spinner } from "@/lib/components/ui/spinner";
+import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { debounce } from "@/lib/utils";
 
 interface OnboardingFormProps {
-  authId: string
+  authId: string;
   onSubmit: (data: {
-    authId: string
-    username: string
-    displayName: string
-  }) => Promise<{ success: boolean; error?: string }>
+    authId: string;
+    username: string;
+    displayName: string;
+  }) => Promise<{ success: boolean; error?: string }>;
   checkUsername: (
-    username: string
-  ) => Promise<{ success: boolean; taken?: boolean; error?: string }>
+    username: string,
+  ) => Promise<{ success: boolean; taken?: boolean; error?: string }>;
 }
-
 
 export default function OnboardingForm({
   authId,
   onSubmit,
   checkUsername,
 }: OnboardingFormProps) {
-  const router = useRouter()
-  const [username, setUsername] = useState("")
-  const [displayName, setDisplayName] = useState("")
+  const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [usernameStatus, setUsernameStatus] = useState<
     "idle" | "checking" | "available" | "taken" | "invalid" | "error"
-  >("idle")
-  const [usernameError, setUsernameError] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitError, setSubmitError] = useState<string | null>(null)
+  >("idle");
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const validateUsername = (value: string): { valid: boolean; error?: string } => {
+  const validateUsername = (
+    value: string,
+  ): { valid: boolean; error?: string } => {
     if (value.length === 0) {
-      return { valid: false }
+      return { valid: false };
     }
     if (value.length < 3) {
-      return { valid: false, error: "Username must be at least 3 characters" }
+      return { valid: false, error: "Username must be at least 3 characters" };
     }
     if (value.length > 20) {
-      return { valid: false, error: "Username must be 20 characters or less" }
+      return { valid: false, error: "Username must be 20 characters or less" };
     }
     if (!/^[a-zA-Z0-9_]+$/.test(value)) {
       return {
         valid: false,
         error: "Username can only contain letters, numbers, and underscores",
-      }
+      };
     }
     if (/^[0-9]/.test(value)) {
-      return { valid: false, error: "Username cannot start with a number" }
+      return { valid: false, error: "Username cannot start with a number" };
     }
-    return { valid: true }
-  }
+    return { valid: true };
+  };
 
   const checkUsernameAvailability = useCallback(
     async (value: string) => {
-      const validation = validateUsername(value)
+      const validation = validateUsername(value);
       if (!validation.valid) {
         if (validation.error) {
-          setUsernameStatus("invalid")
-          setUsernameError(validation.error)
+          setUsernameStatus("invalid");
+          setUsernameError(validation.error);
         } else {
-          setUsernameStatus("idle")
-          setUsernameError(null)
+          setUsernameStatus("idle");
+          setUsernameError(null);
         }
-        return
+        return;
       }
 
-      setUsernameStatus("checking")
-      setUsernameError(null)
+      setUsernameStatus("checking");
+      setUsernameError(null);
 
       try {
-        const result = await checkUsername(value.toLowerCase())
+        const result = await checkUsername(value.toLowerCase());
         if (!result.success) {
-          setUsernameStatus("error")
-          setUsernameError(result.error || "Failed to check username")
-          return
+          setUsernameStatus("error");
+          setUsernameError(result.error || "Failed to check username");
+          return;
         }
         if (result.taken) {
-          setUsernameStatus("taken")
-          setUsernameError("This username is already taken")
+          setUsernameStatus("taken");
+          setUsernameError("This username is already taken");
         } else {
-          setUsernameStatus("available")
-          setUsernameError(null)
+          setUsernameStatus("available");
+          setUsernameError(null);
         }
       } catch {
-        setUsernameStatus("error")
-        setUsernameError("Failed to check username availability")
+        setUsernameStatus("error");
+        setUsernameError("Failed to check username availability");
       }
     },
-    [checkUsername]
-  )
+    [checkUsername],
+  );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedCheck = useCallback(
     debounce((value: string) => checkUsernameAvailability(value), 500),
-    [checkUsernameAvailability]
-  )
+    [checkUsernameAvailability],
+  );
 
   useEffect(() => {
     if (username) {
-      const validation = validateUsername(username)
+      const validation = validateUsername(username);
       if (validation.valid) {
-        setUsernameStatus("checking")
+        setUsernameStatus("checking");
       }
-      debouncedCheck(username)
+      debouncedCheck(username);
     } else {
-      setUsernameStatus("idle")
-      setUsernameError(null)
+      setUsernameStatus("idle");
+      setUsernameError(null);
     }
-  }, [username, debouncedCheck])
+  }, [username, debouncedCheck]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitError(null)
+    e.preventDefault();
+    setSubmitError(null);
 
     if (usernameStatus !== "available") {
-      return
+      return;
     }
 
     if (!displayName.trim()) {
-      setSubmitError("Please enter a display name")
-      return
+      setSubmitError("Please enter a display name");
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
       const result = await onSubmit({
         authId,
         username: username.toLowerCase(),
         displayName: displayName.trim(),
-      })
+      });
 
       if (!result.success) {
-        setSubmitError(result.error || "Failed to complete onboarding")
-        setIsSubmitting(false)
-        return
+        setSubmitError(result.error || "Failed to complete onboarding");
+        setIsSubmitting(false);
+        return;
       }
 
-      router.push("/start")
+      router.push("/start");
     } catch {
-      setSubmitError("Something went wrong. Please try again.")
-      setIsSubmitting(false)
+      setSubmitError("Something went wrong. Please try again.");
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const getStatusIcon = () => {
     switch (usernameStatus) {
       case "checking":
-        return <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        return (
+          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        );
       case "available":
-        return <CheckCircle2 className="h-4 w-4 text-green-500" />
+        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
       case "taken":
       case "invalid":
       case "error":
-        return <XCircle className="h-4 w-4 text-destructive" />
+        return <XCircle className="h-4 w-4 text-destructive" />;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   const isFormValid =
-    usernameStatus === "available" && displayName.trim().length > 0
+    usernameStatus === "available" && displayName.trim().length > 0;
 
   return (
     <Card className="border-border/50 shadow-lg p-0">
@@ -260,5 +263,5 @@ export default function OnboardingForm({
         </CardFooter>
       </form>
     </Card>
-  )
+  );
 }

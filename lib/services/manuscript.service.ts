@@ -6,28 +6,30 @@ import { ImageRepository } from "@/lib/repositories/image.repo";
 import { ProjectsRepository } from "../repositories/projects.repo";
 import type { Database } from "@/lib/supabase/types";
 
-export type Manuscript = Database['public']['Tables']['manuscript']['Row'];
-export type ManuscriptInsert = Database['public']['Tables']['manuscript']['Insert'];
-export type ManuscriptWithChapters = Database['public']['Tables']['manuscript']['Row'] & {
-  chapter: (Database['public']['Tables']['chapter']['Row'] & {
-    chapter_content: (Database['public']['Tables']['chapter_content']['Row'] & {
-      scene?: Database['public']['Tables']['scene']['Row'] | null;
-      image?: Database['public']['Tables']['image']['Row'] | null;
+export type Manuscript = Database["public"]["Tables"]["manuscript"]["Row"];
+export type ManuscriptInsert =
+  Database["public"]["Tables"]["manuscript"]["Insert"];
+export type ManuscriptWithChapters =
+  Database["public"]["Tables"]["manuscript"]["Row"] & {
+    chapter: (Database["public"]["Tables"]["chapter"]["Row"] & {
+      chapter_content: (Database["public"]["Tables"]["chapter_content"]["Row"] & {
+        scene?: Database["public"]["Tables"]["scene"]["Row"] | null;
+        image?: Database["public"]["Tables"]["image"]["Row"] | null;
+      })[];
     })[];
-  })[];
-};
-type Chapter = Database['public']['Tables']['chapter']['Row'];
-type ChapterInsert = Database['public']['Tables']['chapter']['Insert'];
-type ChapterUpdate = Database['public']['Tables']['chapter']['Update'];
-type Scene = Database['public']['Tables']['scene']['Row'];
-type SceneInsert = Database['public']['Tables']['scene']['Insert'];
-type SceneUpdate = Database['public']['Tables']['scene']['Update'];
-type Image = Database['public']['Tables']['image']['Row'];
-type ImageInsert = Database['public']['Tables']['image']['Insert'];
-type ChapterContent = Database['public']['Tables']['chapter_content']['Row'];
-export type Project = Database['public']['Tables']['projects']['Row'];
-export type ProjectInsert = Database['public']['Tables']['projects']['Insert'];
-export type ProjectUpdate = Database['public']['Tables']['projects']['Update'];
+  };
+type Chapter = Database["public"]["Tables"]["chapter"]["Row"];
+type ChapterInsert = Database["public"]["Tables"]["chapter"]["Insert"];
+type ChapterUpdate = Database["public"]["Tables"]["chapter"]["Update"];
+type Scene = Database["public"]["Tables"]["scene"]["Row"];
+type SceneInsert = Database["public"]["Tables"]["scene"]["Insert"];
+type SceneUpdate = Database["public"]["Tables"]["scene"]["Update"];
+type Image = Database["public"]["Tables"]["image"]["Row"];
+type ImageInsert = Database["public"]["Tables"]["image"]["Insert"];
+type ChapterContent = Database["public"]["Tables"]["chapter_content"]["Row"];
+export type Project = Database["public"]["Tables"]["projects"]["Row"];
+export type ProjectInsert = Database["public"]["Tables"]["projects"]["Insert"];
+export type ProjectUpdate = Database["public"]["Tables"]["projects"]["Update"];
 type ProjectData = Project & {
   manuscript: (Manuscript & {
     chapter: (Chapter & {
@@ -46,81 +48,13 @@ export function createManuscriptService(
   projectsRepo: ProjectsRepository,
 ) {
   return {
-    // --- Project Methods ---
-    async createProject(data: {
-      name: string;
-      blurb?: string;
-      user_id: string;
-    }): Promise<Result<Project, string>> {
-      if (!data.name || data.name.trim().length === 0) {
-        return err("Project name is required");
-      }
-      if (data.name.length > 255) {
-        return err("Project name cannot exceed 255 characters");
-      }
-      if (data.blurb && data.blurb.length > 500) {
-        return err("Project blurb cannot exceed 500 characters");
-      }
-      if (!data.user_id) {
-        return err("User ID is required");
-      }
-
-      const newProject = {
-        name: data.name,
-        blurb: data.blurb || "",
-        user_id: data.user_id,
-      };
-      const projectCreationResult = await projectsRepo.create(newProject);
-      if (!projectCreationResult.ok) {
-        return err(`Failed to create project: ${projectCreationResult.error}`);
-      }
-      return ok(projectCreationResult.data);
-    },
-
-    async deleteProject(projectId: string): Promise<Result<null, string>> {
-      if (!projectId) {
-        return err("Project ID is required");
-      }
-
-      const existingProjectResult = await projectsRepo.getByID(projectId);
-      if (!existingProjectResult.ok || !existingProjectResult.data) {
-        return err("Project not found");
-      }
-
-      const deletionResult = await projectsRepo.delete(projectId);
-      if (!deletionResult.ok) {
-        return err(`Failed to delete project: ${deletionResult.error}`);
-      }
-      return ok(null);
-    },
-    async getProjectsByUser(userID: string): Promise<Result<Project[], string>> {
-      if (!userID) {
-        return err("User ID is required");
-      }
-
-      const projectsResult = await projectsRepo.getAllByUser(userID);
-      if (!projectsResult.ok) {
-        return err(`Failed to fetch projects: ${projectsResult.error}`);
-      }
-      return ok(projectsResult.data);
-    },
-
-    async getFullProjectData(projectId: string): Promise<Result<ProjectData, string>> {
-      if (!projectId) {
-        return err("Project ID is required");
-      }
-
-      const projectResult = await projectsRepo.getFullProjectData(projectId);
-      if (!projectResult.ok) {
-        return err(`Failed to fetch project data: ${projectResult.error}`);
-      }
-      return ok(projectResult.data);
-    },
-
-
     // --- Manuscript Methods ---
 
-    async createManuscript(data:{project_id: string; title: string; position?: number; }): Promise<Result<Manuscript, string>> {
+    async createManuscript(data: {
+      project_id: string;
+      title: string;
+      position?: number;
+    }): Promise<Result<Manuscript, string>> {
       if (data.title.trim().length === 0) {
         return err("Title cannot be empty");
       }
@@ -140,15 +74,21 @@ export function createManuscriptService(
         story_id: data.project_id,
         title: data.title,
         position: data.position || 0,
-      }
-      const manuscriptCreationResult = await manuscriptRepo.create(newManuscript);
+      };
+      const manuscriptCreationResult =
+        await manuscriptRepo.create(newManuscript);
       if (!manuscriptCreationResult.ok) {
-        return err(`Failed to create manuscript: ${manuscriptCreationResult.error}`);
+        return err(
+          `Failed to create manuscript: ${manuscriptCreationResult.error}`,
+        );
       }
       return ok(manuscriptCreationResult.data);
     },
 
-    async updateManuscript(id: number, updates: { title: string }): Promise<Result<Manuscript, string>> {
+    async updateManuscript(
+      id: number,
+      updates: { title: string },
+    ): Promise<Result<Manuscript, string>> {
       if (!id) {
         return err("Manuscript ID is required");
       }
@@ -169,7 +109,9 @@ export function createManuscriptService(
 
       const updatedManuscriptResult = await manuscriptRepo.update(id, updates);
       if (!updatedManuscriptResult.ok) {
-        return err(`Failed to update manuscript: ${updatedManuscriptResult.error}`);
+        return err(
+          `Failed to update manuscript: ${updatedManuscriptResult.error}`,
+        );
       }
       return ok(updatedManuscriptResult.data);
     },
@@ -191,35 +133,47 @@ export function createManuscriptService(
       return ok(null);
     },
 
-    async reorderManuscripts(targetPosition: number, manuscriptId: number): Promise<Result<null, string>> {
+    async reorderManuscripts(
+      targetPosition: number,
+      manuscriptId: number,
+    ): Promise<Result<null, string>> {
       if (targetPosition === undefined || targetPosition === null) {
         return err("Target position is required");
       }
       if (!manuscriptId) {
         return err("Manuscript ID is required");
       }
-      const reorderResult = await manuscriptRepo.reorderManuscripts(targetPosition, manuscriptId);
+      const reorderResult = await manuscriptRepo.reorderManuscripts(
+        targetPosition,
+        manuscriptId,
+      );
       if (!reorderResult.ok) {
         return err(`Failed to reorder manuscripts: ${reorderResult.error}`);
       }
       return ok(null);
     },
 
-    async getManuscriptsWithChaptersAndContent( manuscriptId: string ): Promise<Result<ManuscriptWithChapters[], string>> {
-      if (!manuscriptId) {
-        return err("Manuscript ID is required");
+    // Fetch full manuscripts with chapters and content by project ID
+    async getFullManuscriptsByID(
+      projectId: string,
+    ): Promise<Result<ManuscriptWithChapters[], string>> {
+      if (!projectId) {
+        return err("Project ID is required");
       }
 
-      const manuscriptResult = await manuscriptRepo.getAllManuscriptsWithChapters(manuscriptId);
-      if (!manuscriptResult.ok) {
-        return err(`Failed to fetch project data: ${manuscriptResult.error}`);
+      const manuscriptsResult =
+        await manuscriptRepo.getFullManuscriptsByProject(projectId);
+      if (!manuscriptsResult.ok) {
+        return err(`Failed to fetch manuscripts: ${manuscriptsResult.error}`);
       }
-      return ok(manuscriptResult.data);
+      return ok(manuscriptsResult.data);
     },
 
     // --- Chapter Methods ---
 
-    async createChapter(chapter: ChapterInsert): Promise<Result<Chapter, string>> {
+    async createChapter(
+      chapter: ChapterInsert,
+    ): Promise<Result<Chapter, string>> {
       if (!chapter.manuscript_id) {
         return err("Manuscript ID is required");
       }
@@ -239,7 +193,9 @@ export function createManuscriptService(
       return ok(chapterCreationResult.data);
     },
 
-    async updateChapter(updates: ChapterUpdate): Promise<Result<Chapter, string>> {
+    async updateChapter(
+      updates: ChapterUpdate,
+    ): Promise<Result<Chapter, string>> {
       if (!updates.id) {
         return err("Chapter ID is required");
       }
@@ -252,7 +208,10 @@ export function createManuscriptService(
         return err("Chapter not found");
       }
 
-      const updatedChapterResult = await chapterRepo.update(updates.id, updates);
+      const updatedChapterResult = await chapterRepo.update(
+        updates.id,
+        updates,
+      );
       if (!updatedChapterResult.ok) {
         return err(`Failed to update chapter: ${updatedChapterResult.error}`);
       }
@@ -276,14 +235,20 @@ export function createManuscriptService(
       return ok(null);
     },
 
-    async reorderChapters( chapterId: number, targetPosition: number): Promise<Result<null, string>> {
+    async reorderChapters(
+      chapterId: number,
+      targetPosition: number,
+    ): Promise<Result<null, string>> {
       if (!chapterId) {
         return err("Manuscript ID is required");
       }
       if (targetPosition === undefined || targetPosition === null) {
         return err("Target position is required");
       }
-      const reorderResult = await chapterRepo.reorderChapter(chapterId, targetPosition);
+      const reorderResult = await chapterRepo.reorderChapter(
+        chapterId,
+        targetPosition,
+      );
       if (!reorderResult.ok) {
         return err(`Failed to reorder chapters: ${reorderResult.error}`);
       }
@@ -292,31 +257,49 @@ export function createManuscriptService(
 
     // --- Manage chapter contents (add, update, delete, reorder) ---
     //
-    async addContentToChapter(chapterID: number, type: 'scene' | 'image', position?: number): Promise<Result<ChapterContent, string>> {
-     if (!chapterID) {
+    async addContentToChapter(
+      chapterID: number,
+      type: "scene" | "image",
+      position?: number,
+    ): Promise<Result<ChapterContent, string>> {
+      if (!chapterID) {
         return err("Chapter ID is required");
       }
-      if (type !== 'scene' && type !== 'image') {
+      if (type !== "scene" && type !== "image") {
         return err("Invalid content type");
       }
 
-      const addContentResult = await chapterRepo.addContent(chapterID, type, position);
+      const addContentResult = await chapterRepo.addContent(
+        chapterID,
+        type,
+        position,
+      );
       if (!addContentResult.ok) {
-        return err(`Failed to add content to chapter: ${addContentResult.error}`);
+        return err(
+          `Failed to add content to chapter: ${addContentResult.error}`,
+        );
       }
       return ok(addContentResult.data);
     },
 
-    async reorderChapterContents(chapterID: number, targetPosition: number): Promise<Result<null, string>> {
+    async reorderChapterContents(
+      chapterID: number,
+      targetPosition: number,
+    ): Promise<Result<null, string>> {
       if (!chapterID) {
         return err("Chapter ID is required");
       }
       if (targetPosition === undefined || targetPosition === null) {
         return err("Target position is required");
       }
-      const reorderResult = await chapterRepo.reorderContent(chapterID, targetPosition);
+      const reorderResult = await chapterRepo.reorderContent(
+        chapterID,
+        targetPosition,
+      );
       if (!reorderResult.ok) {
-        return err(`Failed to reorder chapter contents: ${reorderResult.error}`);
+        return err(
+          `Failed to reorder chapter contents: ${reorderResult.error}`,
+        );
       }
       return ok(null);
     },
@@ -336,7 +319,10 @@ export function createManuscriptService(
       return ok(sceneCreationResult.data);
     },
 
-    async updateScene( id: number, updates: SceneUpdate): Promise<Result<Scene, string>> {
+    async updateScene(
+      id: number,
+      updates: SceneUpdate,
+    ): Promise<Result<Scene, string>> {
       const existingSceneResult = await sceneRepo.getById(id);
       if (!existingSceneResult.ok || !existingSceneResult.data) {
         return err("Scene not found");
@@ -363,7 +349,11 @@ export function createManuscriptService(
     },
 
     // --- Image Methods ---
-    async createImage(data: { url: string; alt_text?: string; caption?: string; }): Promise<Result<Image, string>> {
+    async createImage(data: {
+      url: string;
+      alt_text?: string;
+      caption?: string;
+    }): Promise<Result<Image, string>> {
       if (!data.url || data.url.trim().length === 0) {
         return err("Image URL is required");
       }
@@ -371,7 +361,7 @@ export function createManuscriptService(
       const newImage: ImageInsert = {
         url: data.url,
         alt_text: data.alt_text || "",
-      }
+      };
       const imageCreationResult = await imageRepo.create(newImage);
       if (!imageCreationResult.ok) {
         return err(`Failed to create image: ${imageCreationResult.error}`);
@@ -379,7 +369,10 @@ export function createManuscriptService(
       return ok(imageCreationResult.data);
     },
 
-    async updateImage( id: number, updates: { url?: string; alt_text?: string; caption?: string;}): Promise<Result<Image, string>> {
+    async updateImage(
+      id: number,
+      updates: { url?: string; alt_text?: string; caption?: string },
+    ): Promise<Result<Image, string>> {
       const existingImageResult = await imageRepo.getById(id);
       if (!existingImageResult.ok || !existingImageResult.data) {
         return err("Image not found");

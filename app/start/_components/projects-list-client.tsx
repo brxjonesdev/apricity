@@ -1,8 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/lib/components/ui/card"
-import { Button } from "@/lib/components/ui/button"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/lib/components/ui/card";
+import { Button } from "@/lib/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,64 +19,76 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/lib/components/ui/alert-dialog"
-import { MoreHorizontal, Trash2, Edit, FolderOpen, Calendar, FileText } from "lucide-react"
+} from "@/lib/components/ui/alert-dialog";
+import {
+  MoreHorizontal,
+  Trash2,
+  Edit,
+  FolderOpen,
+  Calendar,
+  FileText,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/lib/components/ui/dropdown-menu"
-import { Badge } from "@/lib/components/ui/badge"
-import { Database } from "@/lib/supabase/types"
-import { useRouter } from "next/navigation"
+} from "@/lib/components/ui/dropdown-menu";
+import { Badge } from "@/lib/components/ui/badge";
+import { Database } from "@/lib/supabase/types";
+import { useRouter } from "next/navigation";
 
-type Project = Database["public"]["Tables"]["projects"]["Row"]
+type Project = Database["public"]["Tables"]["projects"]["Row"];
 
 interface ProjectsListClientProps {
-  projects: Project[]
-  onDelete: (projectId: string) => Promise<void>
+  projects: Project[];
+  onDelete: (projectId: string) => Promise<void>;
 }
 
-export function ProjectsListClient({ projects, onDelete }: ProjectsListClientProps) {
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const router = useRouter()
+export function ProjectsListClient({
+  projects,
+  onDelete,
+}: ProjectsListClientProps) {
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
 
   const handleDeleteClick = (project: Project) => {
-    setProjectToDelete(project)
-    setDeleteDialogOpen(true)
-  }
+    setProjectToDelete(project);
+    setDeleteDialogOpen(true);
+  };
 
   const handleConfirmDelete = async () => {
-    if (!projectToDelete) return
+    if (!projectToDelete) return;
 
-    setIsDeleting(true)
+    setIsDeleting(true);
     try {
-      await onDelete(projectToDelete.project_id)
+      await onDelete(projectToDelete.project_id);
     } finally {
-      setIsDeleting(false)
-      setDeleteDialogOpen(false)
-      setProjectToDelete(null)
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+      setProjectToDelete(null);
     }
-  }
+  };
 
   const handleProjectClick = (projectId: string) => {
-    const slug = projects.find(p => p.project_id === projectId)?.name.toLowerCase().replace(/\s+/g, '-')
-    router.push(`/nook/${projectId}`)
-
-  }
+    const slug = projects
+      .find((p) => p.project_id === projectId)
+      ?.name.toLowerCase()
+      .replace(/\s+/g, "-");
+    router.push(`/nook/${projectId}`);
+  };
 
   const formatDate = (dateString?: string) => {
-    if (!dateString) return "Unknown"
+    if (!dateString) return "Unknown";
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
-    })
-  }
+    });
+  };
 
   if (projects.length === 0) {
     return (
@@ -77,12 +96,14 @@ export function ProjectsListClient({ projects, onDelete }: ProjectsListClientPro
         <div className="rounded-full bg-muted p-4 mb-4">
           <FolderOpen className="h-8 w-8 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-semibold text-foreground mb-2">No projects yet</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">
+          No projects yet
+        </h3>
         <p className="text-sm text-muted-foreground max-w-xs">
           Start by creating your first project to begin writing your manuscript.
         </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -108,11 +129,12 @@ export function ProjectsListClient({ projects, onDelete }: ProjectsListClientPro
                     <Calendar className="h-3 w-3" />
                     <span>Created {formatDate(project.created_at)}</span>
                   </div>
-                  {project.updated_at && project.updated_at !== project.created_at && (
-                    <Badge variant="secondary" className="text-xs">
-                      Updated {formatDate(project.updated_at)}
-                    </Badge>
-                  )}
+                  {project.updated_at &&
+                    project.updated_at !== project.created_at && (
+                      <Badge variant="secondary" className="text-xs">
+                        Updated {formatDate(project.updated_at)}
+                      </Badge>
+                    )}
                 </div>
 
                 {project.blurb && (
@@ -122,14 +144,13 @@ export function ProjectsListClient({ projects, onDelete }: ProjectsListClientPro
                 )}
               </div>
 
-
               <Button
                 size="sm"
                 variant="destructive"
                 className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition"
                 onClick={(e) => {
-                  e.stopPropagation()
-                  handleDeleteClick(project)
+                  e.stopPropagation();
+                  handleDeleteClick(project);
                 }}
               >
                 <Trash2 className="h-4 w-4" />
@@ -137,7 +158,6 @@ export function ProjectsListClient({ projects, onDelete }: ProjectsListClientPro
             </CardHeader>
           </Card>
         ))}
-
       </div>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
@@ -149,7 +169,8 @@ export function ProjectsListClient({ projects, onDelete }: ProjectsListClientPro
               <span className="font-semibold text-foreground">
                 &ldquo;{projectToDelete?.name}&rdquo;
               </span>
-              ? This action cannot be undone and all associated content will be permanently removed.
+              ? This action cannot be undone and all associated content will be
+              permanently removed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -165,5 +186,5 @@ export function ProjectsListClient({ projects, onDelete }: ProjectsListClientPro
         </AlertDialogContent>
       </AlertDialog>
     </>
-  )
+  );
 }

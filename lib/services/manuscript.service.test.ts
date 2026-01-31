@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { createManuscriptService } from './manuscript.service';
-import { ManuscriptRepository } from '../repositories/manuscript.repo';
-import { ChapterRepository } from '../repositories/chapter.repo';
-import { SceneRepository } from '../repositories/scene.repo';
-import { ImageRepository } from '../repositories/image.repo';
-import { ProjectsRepository } from '../repositories/projects.repo';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
+import { createManuscriptService } from "./manuscript.service";
+import { ManuscriptRepository } from "../repositories/manuscript.repo";
+import { ChapterRepository } from "../repositories/chapter.repo";
+import { SceneRepository } from "../repositories/scene.repo";
+import { ImageRepository } from "../repositories/image.repo";
+import { ProjectsRepository } from "../repositories/projects.repo";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 describe("ManuscriptService", () => {
   // mock repositories
@@ -15,7 +15,7 @@ describe("ManuscriptService", () => {
   let mockImageRepo: ImageRepository;
   let mockProjectsRepo: ProjectsRepository;
   let mockSupabaseClient: SupabaseClient;
-  let manuscriptService: ReturnType<typeof createManuscriptService>
+  let manuscriptService: ReturnType<typeof createManuscriptService>;
 
   beforeEach(() => {
     mockManuscriptRepo = {
@@ -25,7 +25,7 @@ describe("ManuscriptService", () => {
       getById: vi.fn(),
       reorderManuscripts: vi.fn(),
       getAllManuscriptsWithChapters: vi.fn(),
-    }
+    };
     mockChapterRepo = {
       create: vi.fn(),
       update: vi.fn(),
@@ -37,31 +37,30 @@ describe("ManuscriptService", () => {
       updateContent: vi.fn(),
       deleteContent: vi.fn(),
       reorderChapter: vi.fn(),
-    }
+    };
     mockSceneRepo = {
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      getById : vi.fn(),
-    }
+      getById: vi.fn(),
+    };
     mockImageRepo = {
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      getById : vi.fn(),
-    }
+      getById: vi.fn(),
+    };
     mockProjectsRepo = {
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
       getAllByUser: vi.fn(),
       getByID: vi.fn(),
-    }
+    };
 
     mockSupabaseClient = {
       rpc: vi.fn(),
-      } as unknown as SupabaseClient;
-
+    } as unknown as SupabaseClient;
 
     manuscriptService = createManuscriptService(
       mockManuscriptRepo,
@@ -69,9 +68,9 @@ describe("ManuscriptService", () => {
       mockSceneRepo,
       mockImageRepo,
       mockProjectsRepo,
-    )
-  })
+    );
+  });
   afterEach(() => {
     vi.clearAllMocks();
   });
-})
+});

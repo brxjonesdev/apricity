@@ -1,9 +1,17 @@
-import type React from "react"
-import { Button } from "@/lib/components/ui/button"
-import { Input } from "@/lib/components/ui/input"
-import { Badge } from "@/lib/components/ui/badge"
-import { BookOpen, Github, Twitter, Feather, Globe, Users, ChevronRight } from "lucide-react"
-import AuthButton from "@/lib/components/auth/auth-button"
+import type React from "react";
+import { Button } from "@/lib/components/ui/button";
+import { Input } from "@/lib/components/ui/input";
+import { Badge } from "@/lib/components/ui/badge";
+import {
+  BookOpen,
+  Github,
+  Twitter,
+  Feather,
+  Globe,
+  Users,
+  ChevronRight,
+} from "lucide-react";
+import AuthButton from "@/lib/components/auth/auth-button";
 
 export default function LandingPage() {
   return (
@@ -16,16 +24,21 @@ export default function LandingPage() {
               <span className="text-xl font-bold tracking-tight">Apricity</span>
             </div>
             <nav className="hidden md:flex items-center gap-6">
-              <a href="#features" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+              <a
+                href="#features"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
                 Features
               </a>
-              <a href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+              <a
+                href="#"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
                 Roadmap
               </a>
             </nav>
           </div>
           <div className="flex items-center gap-4">
-
             <Button
               variant="outline"
               size="sm"
@@ -34,7 +47,7 @@ export default function LandingPage() {
               <Github className="h-4 w-4" />
               Star on GitHub
             </Button>
-            <AuthButton text="Start Writing"/>
+            <AuthButton text="Start Writing" />
           </div>
         </div>
       </header>
@@ -61,12 +74,17 @@ export default function LandingPage() {
               </h1>
 
               <p className="mx-auto mt-8 max-w-2xl text-pretty text-lg font-medium text-muted-foreground sm:text-xl">
-                The complete worldbuilding and writing tool for authors who craft intricate universes. Build
-                <span className="text-foreground"> deep characters</span>, map complex plots, and bring your creative vision to life.
+                The complete worldbuilding and writing tool for authors who
+                craft intricate universes. Build
+                <span className="text-foreground"> deep characters</span>, map
+                complex plots, and bring your creative vision to life.
               </p>
 
               <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                <AuthButton text="Start Writing Free" classname="h-12 px-8 text-base bg-white text-black hover:bg-white/90"/>
+                <AuthButton
+                  text="Start Writing Free"
+                  classname="h-12 px-8 text-base bg-white text-black hover:bg-white/90"
+                />
                 <Button
                   size="lg"
                   variant="outline"
@@ -85,7 +103,10 @@ export default function LandingPage() {
         </section>
 
         {/* Feature Grid */}
-        <section id="features" className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+        <section
+          id="features"
+          className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8"
+        >
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
             <FeatureCard
               icon={<Users className="h-5 w-5" />}
@@ -135,19 +156,29 @@ export default function LandingPage() {
               </a>
             </div>
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-white/5">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 hover:bg-white/5"
+              >
                 <Twitter className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-white/5">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 hover:bg-white/5"
+              >
                 <Github className="h-4 w-4" />
               </Button>
             </div>
           </div>
-          <p className="mt-8 text-center text-xs text-muted-foreground">© 2026 Apricity. Empowering authors to build intricate universes.</p>
+          <p className="mt-8 text-center text-xs text-muted-foreground">
+            © 2026 Apricity. Empowering authors to build intricate universes.
+          </p>
         </div>
       </footer>
     </div>
-  )
+  );
 }
 
 function FeatureCard({
@@ -155,15 +186,24 @@ function FeatureCard({
   title,
   description,
   metric,
-}: { icon: React.ReactNode; title: string; description: string; metric: string }) {
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  metric: string;
+}) {
   return (
     <div className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-6 transition-colors hover:bg-white/10">
       <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 text-white transition-colors group-hover:bg-white group-hover:text-black">
         {icon}
       </div>
       <div className="mb-1 text-2xl font-bold">{title}</div>
-      <div className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{metric}</div>
-      <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+      <div className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {metric}
+      </div>
+      <p className="text-sm text-muted-foreground leading-relaxed">
+        {description}
+      </p>
     </div>
-  )
+  );
 }

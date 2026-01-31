@@ -2,12 +2,14 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "../supabase/types";
 import { Result, ok, err } from "../utils";
 
-export type User = Database['public']['Tables']['profile']['Row'];
-export type UserInsert = Database['public']['Tables']['profile']['Insert'];
-export type UserUpdate = Database['public']['Tables']['profile']['Update'];
+export type User = Database["public"]["Tables"]["profile"]["Row"];
+export type UserInsert = Database["public"]["Tables"]["profile"]["Insert"];
+export type UserUpdate = Database["public"]["Tables"]["profile"]["Update"];
 
 export interface UserRepository {
-  create(user: Omit<UserInsert, 'id' | 'created_at' | 'updated_at'>): Promise<Result<User, string>>;
+  create(
+    user: Omit<UserInsert, "id" | "created_at" | "updated_at">,
+  ): Promise<Result<User, string>>;
   update(id: string, updates: UserUpdate): Promise<Result<User, string>>;
   delete(id: string): Promise<Result<null, string>>;
   getById(authID: string): Promise<Result<User, string>>;
@@ -15,12 +17,10 @@ export interface UserRepository {
 }
 
 export function createUserRepo(supabase: SupabaseClient): UserRepository {
-
-
   return {
     async create(user): Promise<Result<User, string>> {
       const { data, error } = await supabase
-        .from('profile')
+        .from("profile")
         .insert(user)
         .select()
         .single();
@@ -31,9 +31,9 @@ export function createUserRepo(supabase: SupabaseClient): UserRepository {
     },
     async update(id, updates): Promise<Result<User, string>> {
       const { data, error } = await supabase
-        .from('profile')
+        .from("profile")
         .update(updates)
-        .eq('id', id)
+        .eq("id", id)
         .select()
         .single();
 
@@ -43,10 +43,7 @@ export function createUserRepo(supabase: SupabaseClient): UserRepository {
       return ok(data);
     },
     async delete(id): Promise<Result<null, string>> {
-      const { error } = await supabase
-        .from('profile')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from("profile").delete().eq("id", id);
 
       if (error) {
         return err(error.message);
@@ -55,9 +52,9 @@ export function createUserRepo(supabase: SupabaseClient): UserRepository {
     },
     async getById(id: string): Promise<Result<User, string>> {
       const { data, error } = await supabase
-        .from('profile')
+        .from("profile")
         .select()
-        .eq('auth_id', id)
+        .eq("auth_id", id)
         .maybeSingle();
 
       if (error) {
@@ -67,9 +64,9 @@ export function createUserRepo(supabase: SupabaseClient): UserRepository {
     },
     async getByUsername(username): Promise<Result<User, string>> {
       const { data, error } = await supabase
-        .from('profile')
+        .from("profile")
         .select()
-        .eq('username', username)
+        .eq("username", username)
         .maybeSingle();
 
       if (error) {
@@ -77,5 +74,5 @@ export function createUserRepo(supabase: SupabaseClient): UserRepository {
       }
       return ok(data);
     },
-  }
+  };
 }

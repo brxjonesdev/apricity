@@ -1,18 +1,44 @@
-import { getServices } from "@/lib/services/index"
-import WorkspaceWrapper from "./_components/workspace-wrapper";
+import { getServices } from "@/lib/services/index";
+import { SidebarProvider, SidebarInset } from "@/lib/components/ui/sidebar";
+import { ProjectProvider } from "@/lib/contexts/projectsContext";
+import FileNavigation from "./_components/file-navigation/file-navigation";
+import AppHeader from "./_components/app-header";
+import ContentEditor from "./_components/editor/content-editor";
 
-export default async function ProjectPage({params}: {params: {projectID: string}}) {
-  const {
-    manuscriptService,
-  } = await getServices();
+export default async function ProjectPage({
+  params,
+}: {
+  params: { projectID: string };
+}) {
   const { projectID } = await params;
+  const { projectService, manuscriptService } = await getServices();
 
-  const projectsData = await manuscriptService.getFullProjectData(projectID);
+  // Fetch project and manuscripts in parallel
+  const [projectResult, manuscriptsResult] = await Promise.all([
+    projectService.getById(projectID),
+    manuscriptService.getFullManuscriptsByID(projectID),
+  ]);
 
-  if (!projectsData.ok) {
-    return <div>Error loading project: {projectsData.error}</div>;
+  if (!projectResult.ok || !manuscriptsResult.ok) {
+    return <div>Failed to load project data.</div>;
   }
-  const project = projectsData.data;
-  console.log("Project Data:", project);
-  return <WorkspaceWrapper initialProjectData={project} />;
+
+  return (
+    <ProjectProvider
+      initialData={{
+        project: projectResult.data,
+        manuscripts: manuscriptsResult.data,
+      }}
+    >
+      <SidebarProvider
+        style={{ "--sidebar-width": "300px" } as React.CSSProperties}
+      >
+        <FileNavigation />
+        <SidebarInset>
+          <AppHeader />
+          <ContentEditor />
+        </SidebarInset>
+      </SidebarProvider>
+    </ProjectProvider>
+  );
 }

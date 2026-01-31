@@ -1,5 +1,5 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@import "tailwindcss";
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -46,7 +46,6 @@
   --app-primary: var(--app-primary);
   --app-secondary: var(--app-secondary);
   --app-accent: var(--accent);
-
 }
 
 :root {
@@ -84,7 +83,7 @@
   --sidebar-ring: oklch(0.708 0 0);
   --app-primary: oklch(78.86% 0.139 214.02);
   --app-secondary: oklch(48.09% 0.034 215.49);
-  --accent: oklch(25.14% 0.120 302.07);
+  --accent: oklch(25.14% 0.12 302.07);
 }
 
 .dark {

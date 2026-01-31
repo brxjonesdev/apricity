@@ -4,290 +4,293 @@ export type Json =
   | boolean
   | null
   | { [key: string]: Json | undefined }
-  | Json[]
+  | Json[];
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
-  }
+    PostgrestVersion: "13.0.5";
+  };
   public: {
     Tables: {
       chapter: {
         Row: {
-          created_at: string
-          id: number
-          manuscript_id: number | null
-          position: number
-          title: string
-          updated_at: string
-        }
+          created_at: string;
+          id: number;
+          manuscript_id: number | null;
+          position: number;
+          title: string;
+          updated_at: string;
+        };
         Insert: {
-          created_at?: string
-          id?: never
-          manuscript_id?: number | null
-          position: number
-          title: string
-          updated_at?: string
-        }
+          created_at?: string;
+          id?: never;
+          manuscript_id?: number | null;
+          position: number;
+          title: string;
+          updated_at?: string;
+        };
         Update: {
-          created_at?: string
-          id?: never
-          manuscript_id?: number | null
-          position?: number
-          title?: string
-          updated_at?: string
-        }
+          created_at?: string;
+          id?: never;
+          manuscript_id?: number | null;
+          position?: number;
+          title?: string;
+          updated_at?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "chapter_manuscript_id_fkey"
-            columns: ["manuscript_id"]
-            isOneToOne: false
-            referencedRelation: "manuscript"
-            referencedColumns: ["id"]
+            foreignKeyName: "chapter_manuscript_id_fkey";
+            columns: ["manuscript_id"];
+            isOneToOne: false;
+            referencedRelation: "manuscript";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       chapter_content: {
         Row: {
-          chapter_id: number
-          created_at: string
-          id: number
-          image_id: number | null
-          position: number
-          scene_id: number | null
-          type: string
-          updated_at: string
-        }
+          chapter_id: number;
+          created_at: string;
+          id: number;
+          image_id: number | null;
+          position: number;
+          scene_id: number | null;
+          type: string;
+          updated_at: string;
+        };
         Insert: {
-          chapter_id: number
-          created_at?: string
-          id?: never
-          image_id?: number | null
-          position: number
-          scene_id?: number | null
-          type: string
-          updated_at?: string
-        }
+          chapter_id: number;
+          created_at?: string;
+          id?: never;
+          image_id?: number | null;
+          position: number;
+          scene_id?: number | null;
+          type: string;
+          updated_at?: string;
+        };
         Update: {
-          chapter_id?: number
-          created_at?: string
-          id?: never
-          image_id?: number | null
-          position?: number
-          scene_id?: number | null
-          type?: string
-          updated_at?: string
-        }
+          chapter_id?: number;
+          created_at?: string;
+          id?: never;
+          image_id?: number | null;
+          position?: number;
+          scene_id?: number | null;
+          type?: string;
+          updated_at?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "chapter_content_chapter_id_fkey"
-            columns: ["chapter_id"]
-            isOneToOne: false
-            referencedRelation: "chapter"
-            referencedColumns: ["id"]
+            foreignKeyName: "chapter_content_chapter_id_fkey";
+            columns: ["chapter_id"];
+            isOneToOne: false;
+            referencedRelation: "chapter";
+            referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "chapter_content_image_id_fkey"
-            columns: ["image_id"]
-            isOneToOne: false
-            referencedRelation: "image"
-            referencedColumns: ["id"]
+            foreignKeyName: "chapter_content_image_id_fkey";
+            columns: ["image_id"];
+            isOneToOne: false;
+            referencedRelation: "image";
+            referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "chapter_content_scene_id_fkey"
-            columns: ["scene_id"]
-            isOneToOne: false
-            referencedRelation: "scene"
-            referencedColumns: ["id"]
+            foreignKeyName: "chapter_content_scene_id_fkey";
+            columns: ["scene_id"];
+            isOneToOne: false;
+            referencedRelation: "scene";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       image: {
         Row: {
-          alt_text: string
-          created_at: string
-          display_title: string | null
-          id: number
-          updated_at: string
-          url: string
-        }
+          alt_text: string;
+          created_at: string;
+          display_title: string | null;
+          id: number;
+          updated_at: string;
+          url: string;
+        };
         Insert: {
-          alt_text: string
-          created_at?: string
-          display_title?: string | null
-          id?: never
-          updated_at?: string
-          url: string
-        }
+          alt_text: string;
+          created_at?: string;
+          display_title?: string | null;
+          id?: never;
+          updated_at?: string;
+          url: string;
+        };
         Update: {
-          alt_text?: string
-          created_at?: string
-          display_title?: string | null
-          id?: never
-          updated_at?: string
-          url?: string
-        }
-        Relationships: []
-      }
+          alt_text?: string;
+          created_at?: string;
+          display_title?: string | null;
+          id?: never;
+          updated_at?: string;
+          url?: string;
+        };
+        Relationships: [];
+      };
       manuscript: {
         Row: {
-          created_at: string
-          id: number
-          position: number
-          story_id: string
-          title: string
-          updated_at: string
-        }
+          created_at: string;
+          id: number;
+          position: number;
+          story_id: string;
+          title: string;
+          updated_at: string;
+        };
         Insert: {
-          created_at?: string
-          id?: never
-          position: number
-          story_id: string
-          title: string
-          updated_at?: string
-        }
+          created_at?: string;
+          id?: never;
+          position: number;
+          story_id: string;
+          title: string;
+          updated_at?: string;
+        };
         Update: {
-          created_at?: string
-          id?: never
-          position?: number
-          story_id?: string
-          title?: string
-          updated_at?: string
-        }
+          created_at?: string;
+          id?: never;
+          position?: number;
+          story_id?: string;
+          title?: string;
+          updated_at?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "manuscript_story_id_fkey"
-            columns: ["story_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["project_id"]
+            foreignKeyName: "manuscript_story_id_fkey";
+            columns: ["story_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["project_id"];
           },
-        ]
-      }
+        ];
+      };
       profile: {
         Row: {
-          auth_id: string
-          created_at: string
-          display_name: string
-          id: number
-          updated_at: string
-          username: string
-        }
+          auth_id: string;
+          created_at: string;
+          display_name: string;
+          id: number;
+          updated_at: string;
+          username: string;
+        };
         Insert: {
-          auth_id: string
-          created_at?: string
-          display_name: string
-          id?: never
-          updated_at?: string
-          username: string
-        }
+          auth_id: string;
+          created_at?: string;
+          display_name: string;
+          id?: never;
+          updated_at?: string;
+          username: string;
+        };
         Update: {
-          auth_id: string
-          created_at?: string
-          display_name?: string
-          id?: never
-          updated_at?: string
-          username?: string
-        }
-        Relationships: []
-      }
+          auth_id: string;
+          created_at?: string;
+          display_name?: string;
+          id?: never;
+          updated_at?: string;
+          username?: string;
+        };
+        Relationships: [];
+      };
       projects: {
         Row: {
-          blurb: string | null
-          created_at: string
-          name: string
-          project_id: string
-          updated_at: string | null
-          user_id: string | null
-        }
+          blurb: string | null;
+          created_at: string;
+          name: string;
+          project_id: string;
+          updated_at: string | null;
+          user_id: string | null;
+        };
         Insert: {
-          blurb?: string | null
-          created_at?: string
-          name: string
-          project_id: string
-          updated_at?: string | null
-          user_id?: string | null
-        }
+          blurb?: string | null;
+          created_at?: string;
+          name: string;
+          project_id: string;
+          updated_at?: string | null;
+          user_id?: string | null;
+        };
         Update: {
-          blurb?: string | null
-          created_at?: string
-          name?: string
-          project_id?: string
-          updated_at?: string | null
-          user_id?: string | null
-        }
+          blurb?: string | null;
+          created_at?: string;
+          name?: string;
+          project_id?: string;
+          updated_at?: string | null;
+          user_id?: string | null;
+        };
         Relationships: [
           {
-            foreignKeyName: "projects_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profile"
-            referencedColumns: ["auth_id"]
+            foreignKeyName: "projects_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profile";
+            referencedColumns: ["auth_id"];
           },
-        ]
-      }
+        ];
+      };
       scene: {
         Row: {
-          content: string | null
-          created_at: string
-          display_title: string | null
-          id: number
-          updated_at: string
-        }
+          content: string | null;
+          created_at: string;
+          display_title: string | null;
+          id: number;
+          updated_at: string;
+        };
         Insert: {
-          content?: string | null
-          created_at?: string
-          display_title?: string | null
-          id?: never
-          updated_at?: string
-        }
+          content?: string | null;
+          created_at?: string;
+          display_title?: string | null;
+          id?: never;
+          updated_at?: string;
+        };
         Update: {
-          content?: string | null
-          created_at?: string
-          display_title?: string | null
-          id?: never
-          updated_at?: string
-        }
-        Relationships: []
-      }
-    }
+          content?: string | null;
+          created_at?: string;
+          display_title?: string | null;
+          id?: never;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+    };
     Views: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     Functions: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     Enums: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-}
+      [_ in never]: never;
+    };
+  };
+};
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = DatabaseWithoutInternals[Extract<
+  keyof Database,
+  "public"
+>];
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
+      Row: infer R;
     }
     ? R
     : never
@@ -295,98 +298,98 @@ export type Tables<
         DefaultSchema["Views"])
     ? (DefaultSchema["Tables"] &
         DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
+        Row: infer R;
       }
       ? R
       : never
-    : never
+    : never;
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
+      Insert: infer I;
     }
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
+        Insert: infer I;
       }
       ? I
       : never
-    : never
+    : never;
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
+      Update: infer U;
     }
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
+        Update: infer U;
       }
       ? U
       : never
-    : never
+    : never;
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
+    : never;
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
+    : never;
 
 export const Constants = {
   public: {
     Enums: {},
   },
-} as const
+} as const;

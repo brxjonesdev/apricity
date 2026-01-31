@@ -1,52 +1,55 @@
-
-import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
-import { getSupabaseUser } from "@/lib/supabase/utils"
-import { getServices } from "@/lib/services"
-import OnboardingForm from "./_components/onboarding-form"
-import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { getSupabaseUser } from "@/lib/supabase/utils";
+import { getServices } from "@/lib/services";
+import OnboardingForm from "./_components/onboarding-form";
+import { revalidatePath } from "next/cache";
 
 export default async function OnboardingPage() {
-  const supabase = await createClient()
-  const { userService } = await getServices()
+  const supabase = await createClient();
+  const { userService } = await getServices();
 
-  const user = await getSupabaseUser(supabase)
+  const user = await getSupabaseUser(supabase);
   if (!user) {
-    redirect("/")
-    return
+    redirect("/");
+    return;
   }
 
   // Check if user is already onboarded
-  const profileResult = await userService.getUserProfile(user.id)
+  const profileResult = await userService.getUserProfile(user.id);
   if (profileResult.ok && profileResult.data) {
-    redirect("/start")
+    redirect("/start");
   }
 
-  async function onboardUser(data: { authId: string; displayName: string; username: string }) {
-    "use server"
-    const { userService } = await getServices()
+  async function onboardUser(data: {
+    authId: string;
+    displayName: string;
+    username: string;
+  }) {
+    "use server";
+    const { userService } = await getServices();
 
     const result = await userService.onboardUserProfile({
       auth_id: data.authId,
       display_name: data.displayName,
       username: data.username,
-    } as Parameters<typeof userService.onboardUserProfile>[0])
+    } as Parameters<typeof userService.onboardUserProfile>[0]);
 
     if (!result.ok) {
-      return { success: false, error: result.error }
+      return { success: false, error: result.error };
     }
-    revalidatePath("/start")
-    return { success: true }
+    revalidatePath("/start");
+    return { success: true };
   }
 
   async function isUsernameTaken(username: string) {
-    "use server"
-    const { userService } = await getServices()
-    const result = await userService.checkUsernameAvailability(username)
+    "use server";
+    const { userService } = await getServices();
+    const result = await userService.checkUsernameAvailability(username);
     if (!result.ok) {
-      return { success: false, error: result.error }
+      return { success: false, error: result.error };
     }
-    return { success: true, taken: result.data }
+    return { success: true, taken: result.data };
   }
 
   return (
@@ -65,5 +68,5 @@ export default async function OnboardingPage() {
         />
       </div>
     </main>
-  )
+  );
 }

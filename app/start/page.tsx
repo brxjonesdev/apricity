@@ -1,40 +1,44 @@
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/lib/components/ui/card"
-import { Button } from "@/lib/components/ui/button"
-import { Avatar, AvatarFallback } from "@/lib/components/ui/avatar"
-import { Plus, BookOpen } from "lucide-react"
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/lib/components/ui/card";
+import { Button } from "@/lib/components/ui/button";
+import { Avatar, AvatarFallback } from "@/lib/components/ui/avatar";
+import { Plus, BookOpen } from "lucide-react";
 
-import { getServices } from "@/lib/services"
-import { getSupabaseUser } from "@/lib/supabase/utils"
-import { createClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
-import { ProjectsListWrapper } from "./_components/projects-list-wrapper"
-import CreateProjectButton from "./_components/create-project"
-import { revalidatePath } from "next/cache"
-import SignOut from "@/lib/components/auth/sign-out"
+import { getServices } from "@/lib/services";
+import { getSupabaseUser } from "@/lib/supabase/utils";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { ProjectsListWrapper } from "./_components/projects-list-wrapper";
+import CreateProjectButton from "./_components/create-project";
+import { revalidatePath } from "next/cache";
+import SignOut from "@/lib/components/auth/sign-out";
 
 export default async function StartPage() {
-  const supabase = await createClient()
-  const { userService } = await getServices()
+  const supabase = await createClient();
+  const { userService } = await getServices();
 
-  const user = await getSupabaseUser(supabase)
-  console.log("user like now:", user)
+  const user = await getSupabaseUser(supabase);
   if (!user) {
-    redirect("/")
+    redirect("/");
   }
 
-  const isOnboardedResult = await userService.userExists(user.id)
-  console.log("isOnboardedResult:", isOnboardedResult)
+  const isOnboardedResult = await userService.userExists(user.id);
   if (!isOnboardedResult.ok) {
-    redirect("/start/onboarding")
+    redirect("/start/onboarding");
   }
 
-  const profileResult = await userService.getUserProfile(user.id)
-  console.log("profileResult:", profileResult)
+  const profileResult = await userService.getUserProfile(user.id);
   if (!profileResult.ok) {
-    redirect("/start/onboarding")
+    redirect("/start/onboarding");
   }
 
-  const profileData = profileResult.data
+  const profileData = profileResult.data;
 
   const getInitials = (name: string) => {
     return name
@@ -42,34 +46,34 @@ export default async function StartPage() {
       .map((n) => n[0])
       .join("")
       .toUpperCase()
-      .slice(0, 2)
-  }
+      .slice(0, 2);
+  };
 
   async function handleCreateProject({
     userId,
     name,
     blurb,
   }: {
-    userId: string
-    name: string
-    blurb?: string
+    userId: string;
+    name: string;
+    blurb?: string;
   }) {
-    "use server"
+    "use server";
 
-    const { manuscriptService } = await getServices()
+    const { projectService } = await getServices();
 
-    const result = await manuscriptService.createProject({
+    const result = await projectService.createProject({
       user_id: userId,
       name,
       blurb,
-    })
+    });
 
     if (!result.ok) {
-      return { success: false, error: result.error }
+      return { success: false, error: result.error };
     }
-    revalidatePath("/start")
+    revalidatePath("/start");
 
-    return { success: true }
+    return { success: true };
   }
 
   return (
@@ -88,7 +92,9 @@ export default async function StartPage() {
                 <h1 className="text-lg font-semibold text-foreground">
                   Welcome back, {profileData.display_name}
                 </h1>
-                <p className="text-sm text-muted-foreground">@{profileData.username}</p>
+                <p className="text-sm text-muted-foreground">
+                  @{profileData.username}
+                </p>
               </div>
             </div>
             <SignOut />
@@ -106,7 +112,8 @@ export default async function StartPage() {
             <CardAction>
               <CreateProjectButton
                 userId={profileData.auth_id}
-                onCreate={handleCreateProject} />
+                onCreate={handleCreateProject}
+              />
             </CardAction>
           </CardHeader>
           <CardContent>
@@ -115,5 +122,5 @@ export default async function StartPage() {
         </Card>
       </div>
     </main>
-  )
+  );
 }

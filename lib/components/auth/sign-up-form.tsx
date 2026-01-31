@@ -1,15 +1,15 @@
-import { cn } from "@/lib/utils"
-import { Button } from "@/lib/components/ui/button"
-import { Card, CardContent } from "@/lib/components/ui/card"
+import { cn } from "@/lib/utils";
+import { Button } from "@/lib/components/ui/button";
+import { Card, CardContent } from "@/lib/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from "@/lib/components/ui/field"
-import { Input } from "@/lib/components/ui/input"
-import GoogleSignIn from "./signInWithGoogle"
+} from "@/lib/components/ui/field";
+import { Input } from "@/lib/components/ui/input";
+import GoogleSignIn from "./signInWithGoogle";
 
 export function SignUpForm({
   className,
@@ -49,13 +49,14 @@ export function SignUpForm({
                 Or continue with
               </FieldSeparator>
               <Field className="grid grid-cols-3 gap-4">
-
-                <GoogleSignIn/>
-
+                <GoogleSignIn />
               </Field>
               <FieldDescription className="text-center">
                 Already have an account?{" "}
-                <a href="/auth/signin" className="underline underline-offset-2 hover:text-primary">
+                <a
+                  href="/auth/signin"
+                  className="underline underline-offset-2 hover:text-primary"
+                >
                   Sign in here.
                 </a>
               </FieldDescription>
@@ -75,5 +76,5 @@ export function SignUpForm({
         and <a href="#">Privacy Policy</a>.
       </FieldDescription>*/}
     </div>
-  )
+  );
 }
