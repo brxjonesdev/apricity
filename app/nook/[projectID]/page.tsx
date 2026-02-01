@@ -21,6 +21,7 @@ export default async function ProjectPage({
   if (!projectResult.ok || !manuscriptsResult.ok) {
     return <div>Failed to load project data.</div>;
   }
+  console.log("manuscriptsResult.data", manuscriptsResult.data);
 
   return (
     <ProjectProvider

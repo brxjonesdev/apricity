@@ -5,7 +5,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/lib/components/ui/sidebar";
-import { ArrowLeft, FileText, Image as ImageIcon, Plus } from "lucide-react"; // Optional icons
+import { ArrowLeft, FileText, Image as ImageIcon, Plus, X } from "lucide-react"; // Optional icons
 import { Button } from "@/lib/components/ui/button";
 import { Separator } from "@/lib/components/ui/separator";
 import Link from "next/link";
@@ -14,6 +14,7 @@ import { useManuscriptUI } from "@/lib/contexts/manuscript";
 import { useProject } from "@/lib/contexts/projectsContext";
 import AddResource from "../add-resource";
 import ManuscriptSection from "./sections/manuscript";
+import Settings from "../settings/settings";
 
 export default function AppSidebar({
   ...props
@@ -35,16 +36,27 @@ export default function AppSidebar({
             </>
           )}
         </div>
-        <Link href={`/nook/${project.project_id}/settings`}>
-          <Button className="w-full">Project Settings</Button>
-        </Link>
+        <Settings />
         <div className="flex items-center space-x-2  w-full">
-          <Input
-            placeholder="Search..."
-            className="w-full"
-            value={searchQuery || ""}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          <div className="relative w-full">
+            <Input
+              placeholder="Search..."
+              className="w-full pr-10"
+              value={searchQuery || ""}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery ? (
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                className="absolute right-1 top-1/2 -translate-y-1/2"
+                onClick={() => setSearchQuery("")}
+                aria-label="Clear search"
+              >
+                <X />
+              </Button>
+            ) : null}
+          </div>
           <Separator orientation="vertical" />
           <AddResource />
         </div>

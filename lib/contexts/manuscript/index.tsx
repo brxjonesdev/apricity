@@ -9,16 +9,17 @@ import {
 } from "react";
 
 type ManuscriptContextType = {
-  isPending: boolean;
   filteredManuscripts: ManuscriptWithChapters[];
-  activeManuscriptId: number | null;
-  setActiveManuscriptId: (id: number | null) => void;
 
-  // navigation functions
-  scrollToChapter: (chapterId: string) => void;
-  scrollToScene: (sceneId: string) => void;
-  scrollToImage: (imageId: string) => void;
-  scrollToTop: () => void;
+  // selection methods
+  activeManuscriptId?: number | null;
+  setActiveManuscriptId: (id: number | null) => void;
+  activeChapterId?: number | null;
+  setActiveChapterId: (id: number | null) => void;
+  activeSceneId?: number | null;
+  setActiveSceneId: (id: number | null) => void;
+  activeImageId?: number | null;
+  setActiveImageId: (id: number | null) => void;
 
   // sidebar filtering
   searchQuery: string;
@@ -39,44 +40,73 @@ export function ManuscriptProvider({
   const [activeManuscriptId, setActiveManuscriptId] = useState<number | null>(
     initialData[0]?.id ?? null,
   );
+  const [activeChapterId, setActiveChapterId] = useState<number | null>(null);
+  const [activeSceneId, setActiveSceneId] = useState<number | null>(null);
+  const [activeImageId, setActiveImageId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [isPending, startTransition] = useTransition();
 
-  const filterManuscripts = (
+  function searchManuscript(
     manuscripts: ManuscriptWithChapters[],
     query: string,
-  ) => {
-    if (!query || query.trim() === "") return manuscripts;
+  ) {
     const lowerQuery = query.toLowerCase();
-    return manuscripts.filter((manuscript) =>
-      manuscript.title.toLowerCase().includes(lowerQuery),
-    );
-  };
 
-  const scrollToChapter = (chapterId: string) => {
-    return;
-  };
-  const scrollToScene = (sceneId: string) => {
-    return;
-  };
-  const scrollToImage = (imageId: string) => {
-    return;
-  };
-  const scrollToTop = () => {
-    return;
-  };
+    const results = manuscripts
+      .map((manuscript) => {
+        // Filter chapters that contain matching content
+        const matchingChapters = manuscript.chapter.filter((chapter) => {
+          return chapter.chapter_content.some((content) => {
+            if (!content) return false;
+
+            // Check scene content and title
+            if (content.type === "scene" && content.scene) {
+              const sceneMatch =
+                content.scene.content?.toLowerCase().includes(lowerQuery) ||
+                content.scene.display_title?.toLowerCase().includes(lowerQuery);
+              return sceneMatch;
+            }
+
+            // Check image alt_text
+            if (content.type === "image" && content.image) {
+              const imageMatch =
+                content.image.alt_text?.toLowerCase().includes(lowerQuery) ||
+                content.image.display_title?.toLowerCase().includes(lowerQuery);
+              return imageMatch;
+            }
+
+            return false;
+          });
+        });
+
+        // Return manuscript with only matching chapters
+        return {
+          ...manuscript,
+          chapter: matchingChapters,
+        };
+      })
+      .filter((manuscript) => manuscript.chapter.length > 0);
+
+    return results.length > 0 ? results : null;
+  }
 
   const value: ManuscriptContextType = {
-    filteredManuscripts: filterManuscripts(manuscripts, searchQuery),
+    filteredManuscripts: useMemo(() => {
+      if (searchQuery.trim() === "") {
+        return manuscripts;
+      }
+      const results = searchManuscript(manuscripts, searchQuery);
+      return results ?? [];
+    }, [manuscripts, searchQuery]),
     activeManuscriptId,
     setActiveManuscriptId,
-    isPending,
     searchQuery,
     setSearchQuery,
-    scrollToChapter,
-    scrollToScene,
-    scrollToImage,
-    scrollToTop,
+    activeChapterId,
+    setActiveChapterId,
+    activeSceneId,
+    setActiveSceneId,
+    activeImageId,
+    setActiveImageId,
   };
   return (
     <ManuscriptContext.Provider value={value}>

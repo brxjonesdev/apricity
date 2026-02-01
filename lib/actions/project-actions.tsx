@@ -13,6 +13,8 @@ export async function updateProjectData(
 
   try {
     const result = await projectService.updateProject(projectId, updates);
+    console.log("updateProjectData result:", result);
+    console.log("Updates:", updates);
 
     if (!result.ok) {
       return err(result.error);

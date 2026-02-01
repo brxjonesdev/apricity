@@ -7,7 +7,6 @@ import {
   ManuscriptWithChapters,
   Project,
 } from "../services/manuscript.service";
-import { set } from "react-hook-form";
 import {
   deleteProjectData,
   updateProjectData,
@@ -53,7 +52,7 @@ export function ProjectProvider({
     });
 
     const result = await updateProjectData(project.project_id, updates);
-
+    console.log("updateProject result:", result);
     if (!result.ok) {
       setProject((prev) => ({
         ...prev,
