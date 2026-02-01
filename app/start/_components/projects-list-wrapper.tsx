@@ -1,6 +1,7 @@
 import { getServices } from "@/lib/services";
 import { ProjectsListClient } from "./projects-list-client";
 import { revalidatePath } from "next/cache";
+import { err, ok, Result } from "@/lib/utils";
 
 interface ProjectsListWrapperProps {
   userId: string;
@@ -24,12 +25,17 @@ export async function ProjectsListWrapper({
 
   const projects = projectsData.data;
 
-  async function deleteProject(projectId: string) {
+  async function deleteProject(
+    projectId: string,
+  ): Promise<Result<null, string>> {
     "use server";
     const { projectService } = await getServices();
     const result = await projectService.deleteProject(projectId);
     if (result.ok) {
       revalidatePath("/start");
+      return ok(null);
+    } else {
+      return err(result.error);
     }
   }
 

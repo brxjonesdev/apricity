@@ -2,11 +2,12 @@ import { Database } from "@/lib/supabase/types";
 import { Result, ok, err } from "@/lib/utils";
 import { SupabaseClient } from "@supabase/supabase-js";
 
-type Chapter = Database["public"]["Tables"]["chapter"]["Row"];
+export type Chapter = Database["public"]["Tables"]["chapter"]["Row"];
 type ChapterInsert = Database["public"]["Tables"]["chapter"]["Insert"];
 type ChapterUpdate = Database["public"]["Tables"]["chapter"]["Update"];
 
-type ChapterContent = Database["public"]["Tables"]["chapter_content"]["Row"];
+export type ChapterContent =
+  Database["public"]["Tables"]["chapter_content"]["Row"];
 type ChapterContentUpdate =
   Database["public"]["Tables"]["chapter_content"]["Update"];
 

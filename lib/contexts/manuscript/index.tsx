@@ -10,7 +10,6 @@ import {
 
 type ManuscriptContextType = {
   isPending: boolean;
-  manuscripts: ManuscriptWithChapters[];
   filteredManuscripts: ManuscriptWithChapters[];
   activeManuscriptId: number | null;
   setActiveManuscriptId: (id: number | null) => void;
@@ -42,7 +41,6 @@ export function ManuscriptProvider({
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isPending, startTransition] = useTransition();
-  console.log(manuscripts, "irene");
 
   const filterManuscripts = (
     manuscripts: ManuscriptWithChapters[],
@@ -69,7 +67,6 @@ export function ManuscriptProvider({
   };
 
   const value: ManuscriptContextType = {
-    manuscripts,
     filteredManuscripts: filterManuscripts(manuscripts, searchQuery),
     activeManuscriptId,
     setActiveManuscriptId,

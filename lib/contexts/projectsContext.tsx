@@ -7,6 +7,11 @@ import {
   ManuscriptWithChapters,
   Project,
 } from "../services/manuscript.service";
+import { set } from "react-hook-form";
+import {
+  deleteProjectData,
+  updateProjectData,
+} from "../actions/project-actions";
 
 interface ProjectFullData {
   project: Database["public"]["Tables"]["projects"]["Row"];
@@ -41,15 +46,37 @@ export function ProjectProvider({
   const updateProject = async (
     updates: Partial<Database["public"]["Tables"]["projects"]["Row"]>,
   ) => {
-    startTransition(async () => {
-      // call server action to update project
+    const snapshot = project;
+
+    startTransition(() => {
+      setProject((prev) => ({ ...prev, ...updates }));
     });
+
+    const result = await updateProjectData(project.project_id, updates);
+
+    if (!result.ok) {
+      setProject((prev) => ({
+        ...prev,
+        ...Object.fromEntries(
+          Object.keys(updates).map((key) => [
+            key,
+            snapshot[key as keyof typeof snapshot],
+          ]),
+        ),
+      }));
+      console.error("Failed to update project:", result.error);
+    }
   };
 
   const deleteProject = async () => {
-    startTransition(async () => {
-      // call server action to delete project
+    startTransition(() => {
+      setProject((prev) => ({ ...prev }));
     });
+    const result = await deleteProjectData(project.project_id);
+
+    if (!result.ok) {
+      console.error("Failed to delete project:", result.error);
+    }
   };
 
   const value: ProjectContextType = {

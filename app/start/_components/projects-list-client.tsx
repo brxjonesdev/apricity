@@ -38,12 +38,14 @@ import {
 import { Badge } from "@/lib/components/ui/badge";
 import { Database } from "@/lib/supabase/types";
 import { useRouter } from "next/navigation";
+import { useProject } from "@/lib/contexts/projectsContext";
+import { Result } from "@/lib/utils";
 
 type Project = Database["public"]["Tables"]["projects"]["Row"];
 
 interface ProjectsListClientProps {
   projects: Project[];
-  onDelete: (projectId: string) => Promise<void>;
+  onDelete: (projectId: string) => Promise<Result<null, string>>;
 }
 
 export function ProjectsListClient({
@@ -65,7 +67,11 @@ export function ProjectsListClient({
 
     setIsDeleting(true);
     try {
-      await onDelete(projectToDelete.project_id);
+      const result = await onDelete(projectToDelete.project_id);
+      if (!result.ok) {
+        console.error("Failed to delete project:", result.error);
+        return;
+      }
     } finally {
       setIsDeleting(false);
       setDeleteDialogOpen(false);

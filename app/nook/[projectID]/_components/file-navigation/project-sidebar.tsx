@@ -11,19 +11,31 @@ import { Separator } from "@/lib/components/ui/separator";
 import Link from "next/link";
 import { Input } from "@/lib/components/ui/input";
 import { useManuscriptUI } from "@/lib/contexts/manuscript";
+import { useProject } from "@/lib/contexts/projectsContext";
+import AddResource from "../add-resource";
+import ManuscriptSection from "./sections/manuscript";
 
 export default function AppSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const { searchQuery, setSearchQuery } = useManuscriptUI();
+  const { project } = useProject();
 
   return (
     <Sidebar className="border-r-0" {...props} variant="floating">
       <SidebarHeader className="flex">
-        <div className="w-full bg-white/5 rounded-md border border-white/10 flex items-center space-x-2 p-2 mb-2">
-          <p className="p-2">get name</p>
+        <div className="w-full bg-white/5 rounded-md border border-white/10 flex flex-col  space-x-2 p-2 mb-2">
+          <p className="p-2">{project.name}</p>
+          {project.blurb && (
+            <>
+              <Separator />
+              <p className="p-2 text-xs text-muted-foreground">
+                {project.blurb}
+              </p>
+            </>
+          )}
         </div>
-        <Link href={`/nook//settings`}>
+        <Link href={`/nook/${project.project_id}/settings`}>
           <Button className="w-full">Project Settings</Button>
         </Link>
         <div className="flex items-center space-x-2  w-full">
@@ -34,13 +46,13 @@ export default function AppSidebar({
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           <Separator orientation="vertical" />
-          <Button size={"icon-sm"}>
-            <Plus />
-          </Button>
+          <AddResource />
         </div>
       </SidebarHeader>
       <Separator />
-      <SidebarContent></SidebarContent>
+      <SidebarContent>
+        <ManuscriptSection />
+      </SidebarContent>
       <SidebarRail />
     </Sidebar>
   );

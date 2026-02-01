@@ -53,6 +53,37 @@ export function createProjectsService(projectsRepo: ProjectsRepository) {
       }
       return ok(null);
     },
+
+    async updateProject(
+      projectID: string,
+      updates: Partial<Omit<Project, "project_id" | "user_id">>,
+    ) {
+      if (!projectID) {
+        return err("Project ID is required");
+      }
+      const existingProjectResult = await projectsRepo.getByID(projectID);
+      if (!existingProjectResult.ok || !existingProjectResult.data) {
+        return err("Project not found");
+      }
+
+      if (updates.name !== undefined) {
+        if (updates.name.trim().length === 0) {
+          return err("Project name cannot be empty");
+        }
+        if (updates.name.length > 255) {
+          return err("Project name cannot exceed 255 characters");
+        }
+      }
+      if ((updates.blurb?.length ?? 0) > 500) {
+        return err("Project blurb cannot exceed 500 characters");
+      }
+
+      const updateResult = await projectsRepo.update(projectID, updates);
+      if (!updateResult.ok) {
+        return err(`Failed to update project: ${updateResult.error}`);
+      }
+      return ok(updateResult.data);
+    },
     async getProjectsByUser(
       userID: string,
     ): Promise<Result<Project[], string>> {
