@@ -17,7 +17,9 @@ export function createLocation(input: LocationCreateInput) {
   return call<Location>("create_new_location", { input });
 }
 // Update a location
-export function updateLocation(id: string, updates: LocationUpdateInput) {
+export function updateLocation(input: LocationUpdateInput) {
+  const id = input.id;
+  const updates = input.updates;
   return call<Location>("update_location", { id, updates });
 }
 // Delete a location

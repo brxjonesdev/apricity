@@ -35,6 +35,9 @@ export type LocationCreateInput = Omit<
   "id" | "createdAt" | "updatedAt"
 >;
 
-export type LocationUpdateInput = Partial<
-  Omit<Location, "id" | "storyId" | "createdAt" | "updatedAt">
->;
+export type LocationUpdateInput = {
+  id: string;
+  updates: Partial<
+    Omit<Location, "id" | "storyId" | "createdAt" | "updatedAt">
+  >;
+};

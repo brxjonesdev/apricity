@@ -1,6 +1,16 @@
 import { Note } from "@/features/notes";
 import { call } from "@/shared/api/tauriClient";
 
+// Get all Notes
+export function getAllNotes(storyId: string) {
+  return call<Note[]>("get_story_notes", { storyId });
+}
+
+// Get a note
+export function getNoteById(id: string) {
+  return call<Note[]>("get_note", { id });
+}
+
 // Create a Note
 export function createNote(input: {
   storyId: string;

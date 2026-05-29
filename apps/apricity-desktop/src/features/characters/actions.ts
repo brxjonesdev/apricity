@@ -12,8 +12,14 @@ import {
   GroupMembershipCreateInput,
   GroupMembershipUpdateInput,
 } from "@/features/characters";
-
 import { call } from "@/shared/api/tauriClient";
+import {
+  mockCharacters,
+  mockGroupMemberships,
+  mockGroups,
+  mockRelationships,
+} from "./mockdata";
+import { USE_MOCKS } from "@/shared/config/env";
 
 // --------------------------------- //
 // Characters
@@ -21,6 +27,9 @@ import { call } from "@/shared/api/tauriClient";
 
 // Get all characters in the story
 export function getAllCharacters(storyId: string) {
+  if (USE_MOCKS) {
+    return Promise.resolve(mockCharacters.filter((c) => c.storyId === storyId));
+  }
   return call<Character[]>("get_all_characters", { storyId });
 }
 
