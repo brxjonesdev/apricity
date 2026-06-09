@@ -8,56 +8,160 @@ import {
 } from "@/features/outline";
 
 import { call } from "@/shared/api/tauriClient";
+import { USE_MOCKS } from "@/shared/config/env";
+import { mockActs, mockPlotPoints } from "./mockdata";
+import { success } from "@/shared/types";
 
-// Get all acts for a story
 export function getAllActs(storyId: string) {
+  if (USE_MOCKS) {
+    const acts = mockActs.filter((a) => a.storyId === storyId);
+    return Promise.resolve(success(acts));
+  }
+
   return call<Act[]>("get_all_acts", { storyId });
 }
 
-// Get act by ID
 export function getActById(id: string) {
+  if (USE_MOCKS) {
+    const act = mockActs.find((a) => a.id === id);
+
+    if (!act) {
+      throw new Error("Act not found");
+    }
+
+    return Promise.resolve(success(act));
+  }
+
   return call<Act>("get_act_by_id", { id });
 }
 
-// Create act
 export function createAct(input: ActCreateInput) {
+  if (USE_MOCKS) {
+    const newAct: Act = {
+      ...input,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    mockActs.push(newAct);
+
+    return Promise.resolve(success(newAct));
+  }
+
   return call<Act>("create_act", { input });
 }
 
-// Update act
 export function updateAct(id: string, updates: ActUpdateInput) {
+  if (USE_MOCKS) {
+    const act = mockActs.find((a) => a.id === id);
+
+    if (!act) {
+      throw new Error("Act not found");
+    }
+
+    Object.assign(act, updates, {
+      updatedAt: new Date().toISOString(),
+    });
+
+    return Promise.resolve(success(act));
+  }
+
   return call<Act>("update_act", { id, updates });
 }
 
-// Delete act
 export function deleteAct(id: string) {
+  if (USE_MOCKS) {
+    const index = mockActs.findIndex((a) => a.id === id);
+
+    if (index === -1) {
+      throw new Error("Act not found");
+    }
+
+    mockActs.splice(index, 1);
+
+    return Promise.resolve(success(true));
+  }
+
   return call<boolean>("delete_act", { id });
 }
 
-// Get all plot points for a story
-export function getAllPlotPoints(storyId: string) {
-  return call<PlotPoint[]>("get_all_plot_points", { storyId });
+export function getActPlotPoints(actId: string) {
+  if (USE_MOCKS) {
+    const plotPoints = mockPlotPoints.filter((p) => p.actId === actId);
+
+    return Promise.resolve(success(plotPoints));
+  }
+
+  return call<PlotPoint[]>("get_all_plot_points", { actId });
 }
 
-// Get plot point by ID
 export function getPlotPointById(id: string) {
+  if (USE_MOCKS) {
+    const plotPoint = mockPlotPoints.find((p) => p.id === id);
+
+    if (!plotPoint) {
+      throw new Error("Plot point not found");
+    }
+
+    return Promise.resolve(success(plotPoint));
+  }
+
   return call<PlotPoint>("get_plot_point_by_id", { id });
 }
 
-// Create plot point
 export function createPlotPoint(input: PlotPointCreateInput) {
-  return call<PlotPoint>("create_plot_point", { input });
+  if (USE_MOCKS) {
+    const newPlotPoint: PlotPoint = {
+      ...input,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    mockPlotPoints.push(newPlotPoint);
+
+    return Promise.resolve(success(newPlotPoint));
+  }
+
+  return call<PlotPoint>("create_plot_point", {
+    input,
+  });
 }
 
-// Update plot point
 export function updatePlotPoint(id: string, updates: PlotPointUpdateInput) {
+  if (USE_MOCKS) {
+    const plotPoint = mockPlotPoints.find((p) => p.id === id);
+
+    if (!plotPoint) {
+      throw new Error("Plot point not found");
+    }
+
+    Object.assign(plotPoint, updates, {
+      updatedAt: new Date().toISOString(),
+    });
+
+    return Promise.resolve(success(plotPoint));
+  }
+
   return call<PlotPoint>("update_plot_point", {
     id,
     updates,
   });
 }
 
-// Delete plot point
 export function deletePlotPoint(id: string) {
+  if (USE_MOCKS) {
+    const index = mockPlotPoints.findIndex((p) => p.id === id);
+
+    if (index === -1) {
+      throw new Error("Plot point not found");
+    }
+
+    mockPlotPoints.splice(index, 1);
+
+    return Promise.resolve(success(true));
+  }
+
   return call<boolean>("delete_plot_point", { id });
 }

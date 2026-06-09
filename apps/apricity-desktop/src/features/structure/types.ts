@@ -19,6 +19,10 @@ export type Scene = {
   updatedAt: string;
 };
 
+export type ChapterWithScenes = Chapter & {
+  scenes: Scene[];
+};
+
 export type ChapterCreateInput = Omit<
   Chapter,
   "id" | "createdAt" | "updatedAt"

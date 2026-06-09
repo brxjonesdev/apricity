@@ -4,7 +4,6 @@ import { useActiveEntity } from "./ActiveEntityContext";
 type ActiveStoryContextType = {
   activeStoryId: string | null;
   setActiveStoryId: (storyId: string | null) => void;
-  clearActiveStory: () => void;
 };
 
 const ActiveStoryContext = createContext<ActiveStoryContextType | null>(null);
@@ -14,20 +13,13 @@ type ActiveStoryProviderProps = {
 };
 
 export function ActiveStoryProvider({ children }: ActiveStoryProviderProps) {
-  const { clearActiveEntity } = useActiveEntity();
   const [activeStoryId, setActiveStoryId] = useState<string | null>(null);
-
-  function clearActiveStory() {
-    clearActiveEntity();
-    setActiveStoryId(null);
-  }
 
   return (
     <ActiveStoryContext.Provider
       value={{
         activeStoryId,
         setActiveStoryId,
-        clearActiveStory,
       }}
     >
       {children}

@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllCharacters } from "@/features/characters";
+import { queryKeys } from "@/lib/querykeys";
 
 export function useCharacters(storyId?: string | null) {
   return useQuery({
-    queryKey: ["characters", storyId],
+    queryKey: queryKeys.characters.list(storyId ?? ""),
     queryFn: () => getAllCharacters(storyId as string),
     enabled: !!storyId,
   });

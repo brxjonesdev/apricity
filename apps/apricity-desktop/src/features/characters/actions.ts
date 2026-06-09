@@ -20,26 +20,46 @@ import {
   mockRelationships,
 } from "./mockdata";
 import { USE_MOCKS } from "@/shared/config/env";
+import { Result, success } from "@/shared/types";
 
 // --------------------------------- //
 // Characters
 // --------------------------------- //
 
 // Get all characters in the story
-export function getAllCharacters(storyId: string) {
+export function getAllCharacters(
+  storyId: string,
+): Promise<Result<Character[]>> {
   if (USE_MOCKS) {
-    return Promise.resolve(mockCharacters.filter((c) => c.storyId === storyId));
+    return Promise.resolve(
+      success(mockCharacters.filter((c) => c.storyId === storyId)),
+    );
   }
+
   return call<Character[]>("get_all_characters", { storyId });
 }
 
 // Get one character by ID
 export function getCharacterById(characterId: string) {
+  if (USE_MOCKS) {
+    return Promise.resolve(
+      success(mockCharacters.find((c) => c.id === characterId)),
+    );
+  }
   return call<Character>("get_character", { characterId });
 }
 
 // Create character
 export function createCharacter(input: CharacterCreateInput) {
+  if (USE_MOCKS) {
+    return Promise.resolve(
+      success({
+        ...mockCharacters[0],
+        id: crypto.randomUUID(),
+        storyId: input.storyId,
+      }),
+    );
+  }
   return call<Character>("add_character", { input });
 }
 
@@ -47,6 +67,17 @@ export function createCharacter(input: CharacterCreateInput) {
 export function updateCharacter(updates: CharacterUpdateInput) {
   const characterId = updates.characterId;
   const changes = updates.updates;
+
+  if (USE_MOCKS) {
+    const character = mockCharacters.find((c) => c.id === characterId);
+    if (!character) throw new Error("Character not found");
+    const updatedCharacter = {
+      ...character,
+      ...changes,
+      updatedAt: new Date().toISOString(),
+    };
+    return Promise.resolve(success(updatedCharacter));
+  }
   return call<Character>("update_character", {
     characterId,
     changes,

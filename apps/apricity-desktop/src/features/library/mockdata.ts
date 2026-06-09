@@ -1,6 +1,6 @@
 import type { Story, Series } from "@/features/library";
 
-const mockStories: Story[] = [
+export let mockStories: Story[] = [
   {
     id: "book_1",
     userId: null,
@@ -8,7 +8,8 @@ const mockStories: Story[] = [
     seriesId: null,
     synopsis:
       "A dying empire searches for a machine hidden beneath a desert that can restart the sun.",
-    coverUrl: null,
+    coverUrl:
+      "https://thebiaslist.com/wp-content/uploads/2026/03/irene-biggest-fan.jpg",
     genre: "Horror",
     status: "in-progress",
     syncStatus: "local",

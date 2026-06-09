@@ -62,3 +62,8 @@ export type PlotPointCreateInput = Omit<
 export type PlotPointUpdateInput = Partial<
   Omit<PlotPoint, "id" | "storyId" | "createdAt" | "updatedAt">
 >;
+
+export type ActWithPlotPoints = {
+  act: Act;
+  plotPoints: PlotPoint[];
+};

@@ -5,13 +5,18 @@ import "./App.css";
 import ApricityApp from "./App";
 import { ActiveStoryProvider } from "./shared/context/ActiveStoryContext";
 import { ActiveEntityProvider } from "./shared/context/ActiveEntityContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <ActiveStoryProvider>
+    <QueryClientProvider client={queryClient}>
       <ActiveEntityProvider>
-        <ApricityApp />
+        <ActiveStoryProvider>
+          <ApricityApp />
+        </ActiveStoryProvider>
       </ActiveEntityProvider>
-    </ActiveStoryProvider>
+    </QueryClientProvider>
   </React.StrictMode>,
 );
