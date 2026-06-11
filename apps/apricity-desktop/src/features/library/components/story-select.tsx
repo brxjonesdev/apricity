@@ -8,18 +8,18 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/components/shadcn/dropdown-menu";
 import { useActiveStory } from "@/shared/context/ActiveStoryContext";
-import { Story } from "../types";
 import { useCreateStory } from "../hooks/useCreateStory";
 import { Separator } from "@/shared/components/shadcn/separator";
 import CreateStory from "./create-story";
 import CreateSeries from "./create-series";
 import StorySelectButton from "./story-select-button";
 import { useState } from "react";
+import { StoryDTO } from "../story.dto";
 export default function StorySelect({
   stories,
   children,
 }: {
-  stories: Story[];
+  stories: StoryDTO[];
   children: React.ReactNode;
 }) {
   const { activeStoryId, setActiveStoryId } = useActiveStory();

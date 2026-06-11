@@ -1,59 +1,72 @@
-import {
-  mockStories,
-  type Story,
-  type StoryCreate,
-  type StoryUpdate,
-} from "@/features/library";
+import { mockStories } from "@/features/library";
+import { StoryCreateInput, StoryDTO } from "./story.dto";
 import { call } from "@/shared/api/tauriClient";
 import { USE_MOCKS } from "@/shared/config/env";
 import { success } from "@/shared/types";
+import { StoryDB } from "./story.db";
+import { storyEntity } from "./story.entity";
 
 // Read/Get all stories
 export function getUserLibrary() {
-  console.log("meow");
   if (USE_MOCKS) {
-    return Promise.resolve(success(mockStories));
+    return Promise.resolve(
+      success(mockStories.map((story) => storyEntity.mapDbToDTO(story))),
+    );
   }
-  return call<Story[]>("get_user_library");
+  return call<StoryDTO[]>("get_user_library");
 }
 
 // Get story by ID
 export function getStoryById(id: string) {
   if (USE_MOCKS) {
-    return Promise.resolve(success(mockStories.find((s) => s.id === id)));
+    const story = mockStories.find((s) => s.id === id);
+    if (!story) throw Error("Story not found");
+    return Promise.resolve(success(storyEntity.mapDbToDTO(story)));
   }
-  return call<Story>("get_story_by_id", { id });
+  return call<StoryDTO>("get_story_by_id", { id });
 }
 
 // Add a new story to library
-export function addStory(input: StoryCreate) {
+export function addStory(input: StoryCreateInput) {
   if (USE_MOCKS) {
-    const newStory: Story = {
-      ...input,
+    const newStory: StoryDB = {
       id: crypto.randomUUID(),
+      userId: null,
+      ...input,
+      status: "draft",
+      seriesId: null,
+      coverImage: null,
       syncStatus: "local",
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      lastUpdated: new Date().toISOString(),
       deletedAt: null,
     };
     if (mockStories.find((s) => s.id === newStory.id)) {
       throw Error("Duplicate story ID");
     }
     mockStories.push(newStory);
-    return Promise.resolve(success(newStory));
+    return Promise.resolve(success(storyEntity.mapDbToDTO(newStory)));
   }
-  return call<Story>("add_new_story", { input });
+  return call<StoryDTO>("add_new_story", { input });
 }
 
 // Update story details
-export function updateStory(updates: StoryUpdate) {
+export function updateStory(updates: StoryDTO) {
   if (USE_MOCKS) {
     const index = mockStories.findIndex((s) => s.id === updates.id);
     if (index < 0) throw Error("Story not found");
-    mockStories[index] = { ...mockStories[index], ...updates };
-    return Promise.resolve(success(mockStories[index]));
+    mockStories[index] = {
+      ...mockStories[index],
+      title: updates.title,
+      synopsis: updates.synopsis,
+      genre: updates.genre,
+      status: updates.status,
+      lastUpdated: new Date().toISOString(),
+    };
+
+    return Promise.resolve(success(storyEntity.mapDbToDTO(mockStories[index])));
   }
-  return call<Story>("update_story_details", { updates });
+  return call<StoryDTO>("update_story_details", { updates });
 }
 
 // Archive story
@@ -73,7 +86,7 @@ export function deleteStory(id: string) {
   if (USE_MOCKS) {
     const index = mockStories.findIndex((s) => s.id === id);
     if (index < 0) throw Error("Story not found");
-    mockStories.splice(index, 1); // Remove story from array
+    mockStories.splice(index, 1);
     return Promise.resolve(success(true));
   }
   return call<boolean>("delete_story", { id });

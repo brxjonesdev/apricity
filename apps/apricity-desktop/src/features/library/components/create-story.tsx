@@ -5,17 +5,18 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/shared/components/shadcn/dialog";
+import StoryCreateForm from "./forms/create-story/story-create-form";
 export default function CreateStory() {
   const { mutate, isPending, isError } = useCreateStory();
 
-  function handleStoryCreate(input: StoryCreate): any {
-    // TODO: Implement story creation logic
-    return null;
-  }
+  const handleStoryCreate = (story: StoryCreate) => {
+    mutate(story);
+  };
 
   return (
     <Dialog>
@@ -26,12 +27,20 @@ export default function CreateStory() {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Are you absolutely sure?</DialogTitle>
+          <DialogTitle>Create A New Story</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
+            Create a new story or add to a series. In the future you will be
+            able to import from other sources and use templates.
           </DialogDescription>
+          <section>
+            <StoryCreateForm onSubmit={handleStoryCreate} />
+            {/*<StoryTransmutationRitual />*/}
+            {/*<ApricityTemplates/>*/}
+          </section>
         </DialogHeader>
+        <DialogFooter>
+          <Button disabled={isPending || isError}>Create Story</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

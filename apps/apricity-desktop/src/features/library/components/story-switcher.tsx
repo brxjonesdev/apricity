@@ -29,9 +29,9 @@ export default function StorySwitcher() {
     <StorySelect stories={stories ?? []}>
       <section className="hover:bg-black/10 flex flex-col gap-2 hover:cursor-pointer p-2 max-w-[16rem] w-full border-r-1">
         <div className="flex gap-2 items-center">
-          {story?.coverUrl ? (
+          {story?.coverImage ? (
             <img
-              src={story.coverUrl}
+              src={story.coverImage}
               alt={story.title}
               className="h-12 w-8 shrink-0 rounded object-cover"
             />
