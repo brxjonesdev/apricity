@@ -1,5 +1,5 @@
 import { Button } from "@/shared/components/shadcn/button";
-import { useActiveStory } from "@/shared/context/ActiveStoryContext";
+import { useActiveStory } from "@/shared/lib/context/ActiveStoryContext";
 import {
   Popover,
   PopoverContent,

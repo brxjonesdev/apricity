@@ -1,7 +1,7 @@
-import { useActiveStory } from "@/shared/context/ActiveStoryContext";
+import { useActiveStory } from "@/shared/lib/context/ActiveStoryContext";
 import { useStories } from "../hooks/useStories";
 import { useStory } from "../hooks/useStory";
-import { formatDate } from "@/lib/utils";
+import { formatDate } from "@/features/structure/lib/utils";
 import { BookOpen } from "lucide-react";
 import StorySelect from "./story-select";
 import { useEffect } from "react";

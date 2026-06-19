@@ -1,5 +1,5 @@
 import { Event, EventCreateInput, EventUpdateInput } from "@/features/events";
-import { call } from "@/shared/api/tauriClient";
+import { call } from "@/shared/lib/api/tauriClient";
 
 // Get all events
 export function getAllEvents(storyId: string) {

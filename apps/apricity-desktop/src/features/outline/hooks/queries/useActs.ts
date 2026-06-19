@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllActs } from "@/features/outline";
-import { queryKeys } from "@/lib/querykeys";
+import { queryKeys } from "@/features/structure/lib/querykeys";
 export function useActs(storyId?: string | null) {
   return useQuery({
     queryKey: queryKeys.outline.acts.list(storyId ?? ""),

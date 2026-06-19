@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getPlotPointById } from "@/features/outline";
-import { queryKeys } from "@/lib/querykeys";
+import { queryKeys } from "@/features/structure/lib/querykeys";
 
 export function usePlotPoint(plotId?: string | null) {
   return useQuery({

@@ -1,7 +1,7 @@
 import { StoryDB } from "@/features/library/story.db";
 import { StoryDTO } from "@/features/library/story.dto";
 import { StoryForm } from "@/features/library/components/forms/create-story/story-form-types";
-import { defineEntity } from "@/shared/entity/defineApricityEntity";
+import { defineEntity } from "@/shared/lib/entity/defineApricityEntity";
 
 export const storyEntity = defineEntity<StoryDB, StoryDTO, StoryForm>({
   dbToDTO(db) {

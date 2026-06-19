@@ -1,51 +1,75 @@
-import { Note } from "@/features/notes";
-import { call } from "@/shared/api/tauriClient";
+import { NoteDTO, NoteDB, NoteForm } from "@/features/notes";
+import { call } from "@/shared/lib/api/tauriClient";
+import { USE_MOCKS } from "@/shared/config/env";
+import { mockNotes } from "./mockdata";
+import { noteEntity } from "@/features/notes";
+import { success } from "@/shared/types";
 
-// Get all Notes
 export function getAllNotes(storyId: string) {
-  return call<Note[]>("get_story_notes", { storyId });
+  if (USE_MOCKS) {
+    const notes = mockNotes.filter((note) => note.storyId === storyId);
+    return Promise.resolve(success(notes.map((n) => noteEntity.dbToDTO(n))));
+  }
+  return call<NoteDTO[]>("get_story_notes", { storyId });
 }
 
-// Get a note
 export function getNoteById(id: string) {
-  return call<Note[]>("get_note", { id });
+  if (USE_MOCKS) {
+    const note = mockNotes.find((note) => note.id === id);
+    if (!note) throw new Error("Note not found");
+    return Promise.resolve(success(noteEntity.dbToDTO(note)));
+  }
+  return call<NoteDTO>("get_note", { id });
 }
 
-// Create a Note
-export function createNote(input: {
+export function createNote({
+  input,
+  storyId,
+}: {
+  input: NoteForm;
   storyId: string;
-  title?: string;
-  content: string;
 }) {
-  return call<Note>("create_note", { input });
+  if (USE_MOCKS) {
+    const newNote: NoteDB = {
+      ...input,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      lastEditedAt: new Date().toISOString(),
+      isArchived: false,
+      storyId: storyId,
+    };
+    mockNotes.push(newNote);
+    return Promise.resolve(success(noteEntity.dbToDTO(newNote)));
+  }
+  return call<NoteDTO>("create_note", { input });
 }
 
-// Update a Note
-export function updateNote(input: {
-  id: string;
-  title?: string;
-  content?: string;
-}) {
-  return call<Note>("update_note", { input });
-}
-
-// Delete a Note
-export function deleteNote(id: string) {
-  return call<boolean>("delete_note", { id });
-}
-
-// Link Note to graph entity
-export function linkNoteToEntity(input: {
+export function updateNote({
+  input,
+  noteId,
+}: {
+  input: NoteForm;
   noteId: string;
-  entityType: "character" | "event" | "location" | "group";
-  entityId: string;
-  type: string;
 }) {
-  return call<boolean>("create_entity_link", {
-    fromType: "note",
-    fromId: input.noteId,
-    toType: input.entityType,
-    toId: input.entityId,
-    relationship: input.type,
-  });
+  if (USE_MOCKS) {
+    const index = mockNotes.findIndex((n) => n.id === noteId);
+    if (index < 0) throw Error("Note not found");
+    mockNotes[index] = {
+      ...mockNotes[index],
+      ...input,
+      lastEditedAt: new Date().toISOString(),
+    };
+    return Promise.resolve(success(noteEntity.dbToDTO(mockNotes[index])));
+  }
+  return call<NoteDTO>("update_note", { input });
+}
+
+export function deleteNote(id: string) {
+  if (USE_MOCKS) {
+    const index = mockNotes.findIndex((n) => n.id === id);
+    if (index < 0) throw Error("Note not found");
+    mockNotes.splice(index, 1);
+    return Promise.resolve(success(true));
+  }
+  return call<boolean>("delete_note", { id });
 }

@@ -1,5 +1,4 @@
-import { useActiveStory } from "@/shared/context/ActiveStoryContext";
-import { Chapter, ChapterWithScenes, Scene } from "../types";
+import { useActiveStory } from "@/shared/lib/context/ActiveStoryContext";
 import { useChaptersWithScenes } from "../hooks/queries/useChaptersWithScenes";
 import {
   SidebarGroup,

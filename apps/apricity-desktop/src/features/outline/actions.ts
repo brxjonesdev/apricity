@@ -7,7 +7,7 @@ import {
   PlotPointUpdateInput,
 } from "@/features/outline";
 
-import { call } from "@/shared/api/tauriClient";
+import { call } from "@/shared/lib/api/tauriClient";
 import { USE_MOCKS } from "@/shared/config/env";
 import { mockActs, mockPlotPoints } from "./mockdata";
 import { success } from "@/shared/types";

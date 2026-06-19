@@ -7,7 +7,7 @@ export type StoryDTO = {
   seriesId: string | null;
   synopsis: string;
   coverImage: string | null;
-  genre: StoryGenre[];
+  genre: StoryDB["genre"];
   status: "draft" | "in-progress" | "complete" | "archived";
   lastUpdated?: string;
 };

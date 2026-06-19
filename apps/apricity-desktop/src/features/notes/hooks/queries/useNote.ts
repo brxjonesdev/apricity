@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getNoteById } from "@/features/notes";
-import { queryKeys } from "@/lib/querykeys";
+import { queryKeys } from "@/features/structure/lib/querykeys";
 
 export function useNote(noteId?: string | null) {
   return useQuery({

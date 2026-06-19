@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllEvents } from "..";
-import { queryKeys } from "@/lib/querykeys";
+import { queryKeys } from "@/features/structure/lib/querykeys";
 
 export function useEvents(storyId?: string | null) {
   return useQuery({

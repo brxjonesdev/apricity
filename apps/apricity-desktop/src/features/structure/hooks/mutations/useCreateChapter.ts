@@ -1,5 +1,5 @@
 import { createChapter } from "@/features/structure";
-import { queryKeys } from "@/lib/querykeys";
+import { queryKeys } from "@/features/structure/lib/querykeys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useCreateChapter(storyId: string | null) {

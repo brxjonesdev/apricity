@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllChapters } from "@/features/structure";
-import { queryKeys } from "@/lib/querykeys";
+import { queryKeys } from "@/features/structure/lib/querykeys";
 
 export function useChapters(storyId?: string | null) {
   return useQuery({

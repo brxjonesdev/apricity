@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCharacterById } from "@/features/characters";
-import { queryKeys } from "@/lib/querykeys";
+import { queryKeys } from "@/features/structure/lib/querykeys";
 
 export function useCharacter(characterId?: string | null) {
   return useQuery({

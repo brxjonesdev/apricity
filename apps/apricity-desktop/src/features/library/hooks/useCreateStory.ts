@@ -1,5 +1,5 @@
 import { addStory } from "@/features/library";
-import { queryKeys } from "@/lib/querykeys";
+import { queryKeys } from "@/features/structure/lib/querykeys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useCreateStory() {

@@ -1,6 +1,6 @@
 import { mockStories } from "@/features/library";
 import { StoryCreateInput, StoryDTO } from "./story.dto";
-import { call } from "@/shared/api/tauriClient";
+import { call } from "@/shared/lib/api/tauriClient";
 import { USE_MOCKS } from "@/shared/config/env";
 import { success } from "@/shared/types";
 import { StoryDB } from "./story.db";

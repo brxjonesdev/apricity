@@ -6,6 +6,6 @@ export type StoryForm = {
   synopsis: string;
   seriesID: string | null;
   coverImage: string;
-  genre: StoryGenre[];
+  genre: StoryGenre[] | null;
   status?: "draft" | "in-progress" | "complete" | "archived"; // won't be in create form, but will be in update form
 };

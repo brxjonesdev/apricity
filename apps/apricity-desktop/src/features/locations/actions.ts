@@ -3,7 +3,7 @@ import {
   LocationCreateInput,
   LocationUpdateInput,
 } from "@/features/locations";
-import { call } from "@/shared/api/tauriClient";
+import { call } from "@/shared/lib/api/tauriClient";
 // Get all locations
 export function getAllLocations(storyId: string) {
   return call<Location[]>("get_all_locations", { storyId });

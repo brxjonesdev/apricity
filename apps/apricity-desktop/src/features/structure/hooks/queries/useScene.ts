@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getSceneById } from "@/features/structure";
-import { queryKeys } from "@/lib/querykeys";
+import { queryKeys } from "@/features/structure/lib/querykeys";
 
 export function useScene(sceneId?: string | null) {
   return useQuery({

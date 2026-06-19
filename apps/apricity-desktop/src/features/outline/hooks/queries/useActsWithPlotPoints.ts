@@ -1,5 +1,5 @@
 import { useQueries } from "@tanstack/react-query";
-import { queryKeys } from "@/lib/querykeys";
+import { queryKeys } from "@/features/structure/lib/querykeys";
 import { UseQueryOptions } from "@tanstack/react-query";
 import { Result } from "@/shared/types";
 import { useActs } from "./useActs";

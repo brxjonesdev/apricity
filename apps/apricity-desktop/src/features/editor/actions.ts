@@ -1,5 +1,5 @@
 import type { JSONContent } from "@tiptap/core";
-import { call } from "@/shared/api/tauriClient";
+import { call } from "@/shared/lib/api/tauriClient";
 import { Scene } from "@/features/structure";
 import { EntityMention, EditorSyncMentionsInput } from "@/features/editor";
 

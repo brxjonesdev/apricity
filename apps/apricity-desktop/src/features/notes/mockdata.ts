@@ -1,32 +1,37 @@
-import type { Note } from "./types";
+import { NoteDB } from "@/features/notes";
 
-export const mockNotes: Note[] = [
+export const mockNotes: NoteDB[] = [
   {
-    id: "note_1",
+    id: "1",
     storyId: "book_1",
-    content:
-      "The mirror system should visually crack whenever magic is overused.",
-    color: "#A5D8FF",
-    entityId: "char_1",
+    text: "This is a note for book 1.",
+    color: "#FF0000",
+    createdAt: new Date("2023-08-15T14:30:00Z").toISOString(),
+    lastEditedAt: new Date("2023-08-16T10:45:00Z").toISOString(),
+    linkedEntityIds: [], // link some later on
+    tags: ["tag1", "tag2"],
+    isArchived: false,
   },
   {
-    id: "note_2",
-    storyId: "book_1",
-    content: "Need stronger motivation for the antagonist before Act 2.",
-    color: "#FFD6A5",
-    entityId: "plot_3",
+    id: "2",
+    storyId: "book_2",
+    text: "This is a note for book 2.",
+    color: "#00FF00",
+    createdAt: new Date("2023-08-16T15:45:00Z").toISOString(),
+    lastEditedAt: null,
+    linkedEntityIds: ["chapter_1", "character_1"],
+    tags: [],
+    isArchived: false,
   },
   {
-    id: "note_3",
-    storyId: "book_1",
-    content: "The cathedral should feel ancient and submerged in silence.",
-    color: "#CAFFBF",
-    entityId: "loc_2",
-  },
-  {
-    id: "note_4",
-    storyId: "book_1",
-    content: "Add a recurring raven motif tied to prophecy scenes.",
-    color: "#FFADAD",
+    id: "3",
+    storyId: "book_3",
+    text: "This is a note for book 3.",
+    color: "#0000FF",
+    createdAt: new Date("2023-08-17T16:15:00Z").toISOString(),
+    lastEditedAt: null,
+    linkedEntityIds: [],
+    tags: ["tag3"],
+    isArchived: true, // archived note
   },
 ];

@@ -1,4 +1,4 @@
-import { call } from "@/shared/api/tauriClient";
+import { call } from "@/shared/lib/api/tauriClient";
 import { ReorderInput } from "@/shared/ordering";
 
 export function reorderEntities(input: ReorderInput) {

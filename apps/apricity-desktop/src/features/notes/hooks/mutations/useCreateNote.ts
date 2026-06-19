@@ -1,4 +1,5 @@
 import { createNote } from "@/features/notes";
+import { queryKeys } from "@/features/structure/lib/querykeys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useCreateNote(storyId: string) {
@@ -6,6 +7,10 @@ export function useCreateNote(storyId: string) {
 
   return useMutation({
     mutationFn: createNote,
-    onSuccess: () => {},
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.notes.list(storyId),
+      });
+    },
   });
 }

@@ -12,7 +12,7 @@ import {
   GroupMembershipCreateInput,
   GroupMembershipUpdateInput,
 } from "@/features/characters";
-import { call } from "@/shared/api/tauriClient";
+import { call } from "@/shared/lib/api/tauriClient";
 import {
   mockCharacters,
   mockGroupMemberships,

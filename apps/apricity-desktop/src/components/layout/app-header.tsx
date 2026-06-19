@@ -1,6 +1,5 @@
-import { SettingsIcon, SidebarIcon } from "lucide-react";
+import { SettingsIcon } from "lucide-react";
 import { Button } from "@/shared/components/shadcn/button";
-import { Separator } from "@/shared/components/shadcn/separator";
 import { useSidebar } from "@/shared/components/shadcn/sidebar";
 import { StorySwitcher } from "@/features/library";
 

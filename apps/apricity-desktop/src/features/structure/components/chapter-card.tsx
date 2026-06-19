@@ -5,14 +5,11 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/shared/components/shadcn/sidebar";
-import { ChapterWithScenes } from "../types";
-import { useNavigationStore } from "@/shared/context/NavigationStore";
 
-export default function ChapterCard({
-  chapter,
-}: {
-  chapter: ChapterWithScenes;
-}) {
+import { useNavigationStore } from "@/shared/lib/context/NavigationStore";
+import { ChapterDTO } from "../structure.dto";
+
+export default function ChapterCard({ chapter }: { chapter: ChapterDTO }) {
   const { navigateTo } = useNavigationStore();
 
   return (
@@ -22,7 +19,7 @@ export default function ChapterCard({
       </SidebarMenuButton>
 
       <SidebarMenuSub>
-        {chapter.scenes.map((scene) => (
+        {(chapter.scenes ?? []).map((scene) => (
           <SidebarMenuSubItem key={scene.id}>
             <SidebarMenuSubButton>{scene.title}</SidebarMenuSubButton>
           </SidebarMenuSubItem>

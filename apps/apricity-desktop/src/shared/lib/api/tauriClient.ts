@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { Result } from "../types";
+import { Result } from "../../types";
 
 export async function call<T>(
   command: string,

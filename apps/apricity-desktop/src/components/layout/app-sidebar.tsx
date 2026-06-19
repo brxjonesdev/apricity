@@ -12,7 +12,7 @@ import {
 } from "@/shared/components/shadcn/sidebar";
 import { Separator } from "@/shared/components/shadcn/separator";
 import { StorySwitcher } from "@/features/library/index";
-import { useNavigationStore, View } from "@/shared/context/NavigationStore";
+import { useNavigationStore, View } from "@/shared/lib/context/NavigationStore";
 import { BookOpen, List, Users, Globe } from "lucide-react";
 import { Button } from "@/shared/components/shadcn/button";
 import Manuscript from "@/features/structure/components/manuscript";

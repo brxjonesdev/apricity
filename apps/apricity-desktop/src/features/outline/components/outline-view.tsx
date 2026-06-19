@@ -1,4 +1,4 @@
-import { useActiveStory } from "@/shared/context/ActiveStoryContext";
+import { useActiveStory } from "@/shared/lib/context/ActiveStoryContext";
 import { useActsWithPlotPoints } from "../hooks/queries/useActsWithPlotPoints";
 import { useActs } from "../hooks/queries/useActs";
 import ActCard from "./act-card";
@@ -8,6 +8,8 @@ export default function OutlineView() {
   const { data: acts, isLoading: actsLoading } = useActs(activeStoryId);
   const { data: actsWithPlotPoints, isLoading: actsWithPlotPointsLoading } =
     useActsWithPlotPoints(activeStoryId);
+  console.log(actsWithPlotPoints);
+  console.log("loading", actsLoading, actsWithPlotPointsLoading);
   return (
     <section className="flex">
       <aside className="flex flex-col w-[14rem] shrink-0 border-r p-2">

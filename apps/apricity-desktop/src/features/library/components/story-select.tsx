@@ -7,7 +7,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/shared/components/shadcn/dropdown-menu";
-import { useActiveStory } from "@/shared/context/ActiveStoryContext";
+import { useActiveStory } from "@/shared/lib/context/ActiveStoryContext";
 import { useCreateStory } from "../hooks/useCreateStory";
 import { Separator } from "@/shared/components/shadcn/separator";
 import CreateStory from "./create-story";

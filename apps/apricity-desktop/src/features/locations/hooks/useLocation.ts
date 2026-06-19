@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getLocationByID } from "@/features/locations";
-import { queryKeys } from "@/lib/querykeys";
+import { queryKeys } from "@/features/structure/lib/querykeys";
 
 export function useLocation(locationId?: string | null) {
   return useQuery({

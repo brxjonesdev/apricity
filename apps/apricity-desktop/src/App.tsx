@@ -11,7 +11,7 @@ import {
   SidebarHeader,
   SidebarInset,
 } from "@/shared/components/shadcn/sidebar";
-import { useNavigationStore } from "./shared/context/NavigationStore";
+import { useNavigationStore } from "./shared/lib/context/NavigationStore";
 import OutlineView from "./features/outline/components/outline-view";
 const VIEWS = {
   editor: <div>Editor</div>,

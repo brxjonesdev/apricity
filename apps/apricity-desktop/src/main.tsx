@@ -3,8 +3,8 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./App.css";
 import ApricityApp from "./App";
-import { ActiveStoryProvider } from "./shared/context/ActiveStoryContext";
-import { ActiveEntityProvider } from "./shared/context/ActiveEntityContext";
+import { ActiveStoryProvider } from "./shared/lib/context/ActiveStoryContext";
+import { ActiveEntityProvider } from "./shared/lib/context/ActiveEntityContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
