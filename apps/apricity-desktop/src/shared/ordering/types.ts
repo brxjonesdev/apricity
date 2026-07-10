@@ -1,11 +1,11 @@
 export type OrderScope =
-  | "chapter"
-  | "scene"
-  | "act"
-  | "plot_point"
-  | "group"
-  | "location"
-  | "event";
+  | 'chapter'
+  | 'scene'
+  | 'act'
+  | 'plot_point'
+  | 'group'
+  | 'location'
+  | 'event';
 
 export type ReorderInput = {
   storyId: string;

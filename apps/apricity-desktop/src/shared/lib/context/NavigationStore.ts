@@ -1,7 +1,7 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-export type View = "editor" | "outline" | "characters" | "world";
+export type View = 'editor' | 'outline' | 'characters' | 'world';
 
 interface NavigationStore {
   view: View;
@@ -11,9 +11,9 @@ interface NavigationStore {
 export const useNavigationStore = create<NavigationStore>()(
   persist(
     (set) => ({
-      view: "editor",
+      view: 'editor',
       navigateTo: (view) => set({ view }),
     }),
-    { name: "apricity-navigation" },
+    { name: 'apricity-navigation' },
   ),
 );

@@ -1,5 +1,5 @@
-import { invoke } from "@tauri-apps/api/core";
-import { Result } from "../../types";
+import { invoke } from '@tauri-apps/api/core';
+import { Result } from '../../types';
 
 export async function call<T>(
   command: string,
@@ -11,7 +11,7 @@ export async function call<T>(
   } catch (e: any) {
     return {
       ok: false,
-      error: e?.message ?? "Unknown error",
+      error: e?.message ?? 'Unknown error',
     };
   }
 }

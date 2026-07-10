@@ -1,16 +1,16 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from 'react';
 
 type EntityType =
-  | "character"
-  | "relationship"
-  | "group"
-  | "location"
-  | "event"
-  | "act"
-  | "plot_point"
-  | "chapter"
-  | "scene"
-  | "note";
+  | 'character'
+  | 'relationship'
+  | 'group'
+  | 'location'
+  | 'event'
+  | 'act'
+  | 'plot_point'
+  | 'chapter'
+  | 'scene'
+  | 'note';
 
 type ActiveEntityContextType = {
   activeEntity: {
@@ -61,7 +61,7 @@ export function useActiveEntity() {
   const context = useContext(ActiveEntityContext);
 
   if (!context) {
-    throw new Error("useActiveStory must be used inside ActiveStoryProvider");
+    throw new Error('useActiveStory must be used inside ActiveStoryProvider');
   }
 
   return context;

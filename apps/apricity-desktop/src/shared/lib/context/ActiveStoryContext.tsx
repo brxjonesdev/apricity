@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, ReactNode } from "react";
-import { useActiveEntity } from "./ActiveEntityContext";
+import { createContext, useContext, useState, ReactNode } from 'react';
+import { useActiveEntity } from './ActiveEntityContext';
 
 type ActiveStoryContextType = {
   activeStoryId: string | null;
@@ -31,7 +31,7 @@ export function useActiveStory() {
   const context = useContext(ActiveStoryContext);
 
   if (!context) {
-    throw new Error("useActiveStory must be used inside ActiveStoryProvider");
+    throw new Error('useActiveStory must be used inside ActiveStoryProvider');
   }
 
   return context;
