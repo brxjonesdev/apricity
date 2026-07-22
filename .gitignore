@@ -27,6 +27,9 @@ out/
 build
 dist
 
+apps/apricity-desktop/src/templates
+
+
 
 # Debug
 npm-debug.log*

@@ -1,0 +1,34 @@
+# Build and production outputs
+dist/
+build/
+out/
+coverage/
+
+# Dependency directories (ignored by default, but good to make explicit)
+node_modules/
+
+# Cache directories
+.cache/
+.npm/
+.eslintcache/
+.parcel-cache/
+.turbo/
+
+# Lockfiles (prevents unnecessary reformatting churn)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# Local environment variables
+.env
+.env.*
+!.env.example
+
+# IDEs and system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+src-tauri/
