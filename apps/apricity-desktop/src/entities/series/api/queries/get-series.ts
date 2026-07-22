@@ -5,7 +5,7 @@ import { mockSeries } from '../../mockdata';
 import { SeriesDTO } from '../dto/series.dto';
 import { seriesMapper } from '../mappers/series.mapper';
 
-export async function getSeries(): Promise<Series[]> {
+export async function getAllSeries(): Promise<Series[]> {
   if (USE_MOCKS) {
     return mockSeries.map((s) => seriesMapper.mapSeries(s));
   }
