@@ -4,4 +4,4 @@ export type Act = {
   order: number;
   title: string;
   lastModifiedAt: Date | null;
-}
+};

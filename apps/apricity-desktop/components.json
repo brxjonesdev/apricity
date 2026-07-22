@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "radix-mira",
+  "style": "base-rhea",
   "rsc": false,
   "tsx": true,
   "tailwind": {
     "config": "",
     "css": "src/App.css",
-    "baseColor": "mist",
+    "baseColor": "neutral",
     "cssVariables": true,
     "prefix": ""
   },
@@ -19,7 +19,7 @@
     "lib": "@/lib",
     "hooks": "@/shared/hooks/shadcn"
   },
-  "menuColor": "default-translucent",
+  "menuColor": "default",
   "menuAccent": "subtle",
   "registries": {}
 }

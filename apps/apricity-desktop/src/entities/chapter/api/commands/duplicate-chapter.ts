@@ -1,7 +1,7 @@
-import { call } from "@/shared/lib/api/tauriClient";
-import { ChapterDTO } from "../dto/chapter.dto";
-import { USE_MOCKS } from "@/shared/config/env";
-import { mockChapters } from "../../mockdata";
+import { call } from '@/shared/lib/api/tauriClient';
+import { ChapterDTO } from '../dto/chapter.dto';
+import { USE_MOCKS } from '@/shared/config/env';
+import { mockChapters } from '../../mockdata';
 
 export async function duplicateChapter(
   chapterId: string,
@@ -13,7 +13,7 @@ export async function duplicateChapter(
     );
 
     if (chapterIndex === -1) {
-      throw new Error("Chapter not found");
+      throw new Error('Chapter not found');
     }
 
     const duplicatedChapter: ChapterDTO = {
@@ -31,7 +31,7 @@ export async function duplicateChapter(
     return;
   }
 
-  const res = await call<void>("duplicate_chapter", {
+  const res = await call<void>('duplicate_chapter', {
     chapterId,
     index,
   });

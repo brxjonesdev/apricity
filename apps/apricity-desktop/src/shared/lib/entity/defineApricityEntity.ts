@@ -1,7 +1,7 @@
 export type EntityConfig<DB, DTO, Form = never> = {
   dbToDTO: (db: DB) => DTO;
   dtoToForm: (dto: DTO) => Form;
-  formToDTO: (form: Form) => Omit<DTO, "id">;
+  formToDTO: (form: Form) => Omit<DTO, 'id'>;
 };
 
 export function defineEntity<DB, DTO, Form = never>(

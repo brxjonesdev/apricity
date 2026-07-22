@@ -4,4 +4,4 @@ export type ActDTO = {
   order: number;
   title: string;
   last_modified_at: string | null;
-}
+};

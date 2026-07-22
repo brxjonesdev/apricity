@@ -1,11 +1,11 @@
-import { JSONContent } from "@tiptap/core";
+import { JSONContent } from '@tiptap/core';
 
 export type Scene = {
   sceneId: string;
   chapterId: string;
   title: string;
   synopsis: string;
-  content: JSONContent
+  content: JSONContent;
   order: number;
-  lastUpdatedAt: Date | null ;
-}
+  lastUpdatedAt: Date | null;
+};
