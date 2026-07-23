@@ -5,6 +5,7 @@ function mapScene(dto: SceneDTO): Scene {
   return {
     sceneId: dto.scene_id,
     chapterId: dto.chapter_id,
+    storyId: dto.story_id,
     title: dto.title,
     synopsis: dto.synopsis,
     order: dto.order,

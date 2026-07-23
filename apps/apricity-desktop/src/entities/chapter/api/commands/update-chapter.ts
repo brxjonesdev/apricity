@@ -14,17 +14,27 @@ export async function updateChapter(
       (chapter) => chapter.id === updates.id,
     );
 
-    mockChapters[chapterIndex] = {
+    if (chapterIndex === -1) {
+      throw new Error('Chapter not found');
+    }
+
+    const updatedChapter = {
       ...mockChapters[chapterIndex],
       ...updates,
     };
 
-    return chapterMapper.mapChapter(mockChapters[chapterIndex]);
+    mockChapters[chapterIndex] = updatedChapter;
+
+    return chapterMapper.mapChapter(updatedChapter);
   }
 
-  const res = await call<ChapterDTO>('update_chapter', { updates: updates });
+  const res = await call<ChapterDTO>('update_chapter', { 
+    updates 
+  });
+
   if (!res.ok) {
     throw new Error(res.error);
   }
+
   return chapterMapper.mapChapter(res.data);
 }

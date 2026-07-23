@@ -1,6 +1,5 @@
 import { Routes, Route } from 'react-router';
 import ApricityAppShell from './layouts/AppShell';
-import DashboardPage from '@/pages/dashboard';
 
 export default function ApricityApp() {
   return (

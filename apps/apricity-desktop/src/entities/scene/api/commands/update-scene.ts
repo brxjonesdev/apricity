@@ -5,7 +5,7 @@ import { call } from '@/shared/lib/api/tauriClient';
 
 export async function updateScene(
   sceneId: string,
-  dto: UpdateSceneDTO,
+  updates: UpdateSceneDTO,
 ): Promise<void> {
   if (USE_MOCKS) {
     const index = mockScenes.findIndex((s) => s.scene_id === sceneId);
@@ -14,7 +14,7 @@ export async function updateScene(
     }
     mockScenes[index] = {
       ...mockScenes[index],
-      ...dto,
+      ...updates,
       last_updated_at: new Date().toISOString(),
     };
     return;
@@ -22,7 +22,7 @@ export async function updateScene(
 
   const res = await call<void>('update_scene', {
     scene_id: sceneId,
-    updates: dto,
+    updates: updates,
   });
   if (!res.ok) {
     throw new Error(res.error);

@@ -2,11 +2,13 @@ import { call } from '@/shared/lib/api/tauriClient';
 import { ChapterDTO } from '../dto/chapter.dto';
 import { USE_MOCKS } from '@/shared/config/env';
 import { mockChapters } from '../../mockdata';
+import { Chapter } from '../../model/chapter.model';
+import { chapterMapper } from '../mappers/chapter.mapper';
 
 export async function duplicateChapter(
   chapterId: string,
   index: number,
-): Promise<void> {
+): Promise<Chapter> {
   if (USE_MOCKS) {
     const chapterIndex = mockChapters.findIndex(
       (chapter) => chapter.id === chapterId,
@@ -23,15 +25,15 @@ export async function duplicateChapter(
     };
 
     mockChapters.splice(index, 0, duplicatedChapter);
-
+    
     mockChapters.forEach((chapter, i) => {
       chapter.order = i;
     });
-
-    return;
+    
+    return chapterMapper.mapChapter(duplicatedChapter);
   }
 
-  const res = await call<void>('duplicate_chapter', {
+  const res = await call<ChapterDTO>('duplicate_chapter', {
     chapterId,
     index,
   });
@@ -39,4 +41,6 @@ export async function duplicateChapter(
   if (!res.ok) {
     throw new Error(res.error);
   }
+
+  return chapterMapper.mapChapter(res.data);
 }

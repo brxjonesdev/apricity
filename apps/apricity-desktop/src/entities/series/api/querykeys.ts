@@ -1,4 +1,8 @@
 export const seriesQueries = {
   all: ['series'] as const,
-  detail: (seriesId: string) => ['series', 'detail', seriesId] as const,
+
+  lists: () => [...seriesQueries.all, 'list'] as const,
+
+  detail: (seriesId: string) =>
+    [...seriesQueries.all, 'detail', seriesId] as const,
 };
