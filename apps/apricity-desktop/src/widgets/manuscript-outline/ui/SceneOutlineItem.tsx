@@ -1,9 +1,9 @@
 import { SidebarMenuSub, SidebarMenuSubItem, SidebarMenuSubButton } from "@/shared/components/shadcn/sidebar";
-import { Scene } from "@/entities/scene";
+import { Scene, SceneOutline } from "@/entities/scene";
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/shared/components/shadcn/context-menu";
 
 type SceneOutlineItemProps = {
-  scene: Scene;
+  scene: SceneOutline;
 };
 
 export function SceneOutlineItem({ scene }: SceneOutlineItemProps) {

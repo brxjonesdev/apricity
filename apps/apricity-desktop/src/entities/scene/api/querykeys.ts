@@ -10,5 +10,8 @@ export const sceneQueries = {
     [...sceneQueries.lists(), 'chapter', chapterId] as const,
 
   byStory: (storyId: string) => 
-    [...sceneQueries.lists(), 'story', storyId] as const
+    [...sceneQueries.lists(), 'story', storyId] as const,
+
+  outline: (storyId: string) => 
+    [...sceneQueries.lists(), 'outline', storyId] as const
 };

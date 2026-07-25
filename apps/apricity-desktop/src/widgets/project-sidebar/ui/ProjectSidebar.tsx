@@ -14,7 +14,7 @@ export default function ProjectSidebar() {
         <p className='text-xl'>Apricity</p>
       </section>
       <ProjectSelect/>
-      <SidebarContent>
+      <SidebarContent className='gap-0'>
         <ManuscriptOutline storyId={'story_1'}/>
       </SidebarContent>
     </Sidebar>

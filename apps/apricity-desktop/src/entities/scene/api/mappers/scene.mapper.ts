@@ -1,5 +1,6 @@
-import { Scene } from '../../model/types';
+import { Scene, SceneOutline } from '../../model/types';
 import { SceneDTO } from '../dto/scene.dto';
+import { SceneOutlineDTO } from '../dto/scene.outline.dto';
 
 function mapScene(dto: SceneDTO): Scene {
   return {
@@ -14,6 +15,17 @@ function mapScene(dto: SceneDTO): Scene {
   };
 }
 
+function mapSceneOutline(dto: SceneOutlineDTO): SceneOutline {
+  return {
+    sceneId: dto.scene_id,
+    chapterId: dto.chapter_id,
+    storyId: dto.story_id,
+    order: dto.order,
+    title: dto.title,
+  };
+}
+
 export const sceneMapper = {
   mapScene,
+  mapSceneOutline,
 };

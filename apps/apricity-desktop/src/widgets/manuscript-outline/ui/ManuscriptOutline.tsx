@@ -26,12 +26,13 @@ export default function ManuscriptOutline({ storyId }: ManuscriptOutlineProps) {
   const [open, setOpen] = useState(true);
 
   if (isLoading) return null;
+  console.log(outline)
 
   return (
     <>
     <Collapsible open={open} onOpenChange={setOpen}>
-      <SidebarGroup className="pb-0">
-        <CollapsibleTrigger >
+      <SidebarGroup className={`${open ? "" : "hover:bg-black/20 transition-all duration-200 ease-in-out"}`}>
+        <CollapsibleTrigger>
           <SidebarGroupLabel className='cursor-pointer gap-3 px-0 items-center '>
             {!open ? (
               <Book

@@ -1,17 +1,17 @@
 import { Chapter } from "@/entities/chapter";
-import { Scene } from "@/entities/scene";
+import { SceneOutline } from "@/entities/scene";
 
 // A chapter with its scenes
 export type Outline = {
   chapter: Chapter;
-  scenes: Scene[];
+  scenes: SceneOutline[];
 };
 
 export function composeOutline(
   chapters: Chapter[],
-  scenes: Scene[],
+  scenes: SceneOutline[],
 ): Outline[] {
-  const scenesByChapter = new Map<string, Scene[]>();
+  const scenesByChapter = new Map<string, SceneOutline[]>();
 
   // Group scenes by chapter
   for (const scene of scenes) {

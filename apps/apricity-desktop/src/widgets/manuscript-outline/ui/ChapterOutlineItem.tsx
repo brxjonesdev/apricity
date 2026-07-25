@@ -17,12 +17,12 @@ import {
 } from "@/shared/components/shadcn/context-menu";
 
 import { Chapter } from "@/entities/chapter";
-import { Scene } from "@/entities/scene";
+import { SceneOutline } from "@/entities/scene";
 import { SceneOutlineItem } from "./SceneOutlineItem";
 
 type ChapterOutlineItemProps = {
   chapter: Chapter;
-  scenes: Scene[];
+  scenes: SceneOutline[];
 };
 
 export function ChapterOutlineItem({
