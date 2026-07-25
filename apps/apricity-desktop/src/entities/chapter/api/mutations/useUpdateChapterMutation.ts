@@ -3,7 +3,7 @@ import { updateChapter } from "../commands/update-chapter";
 import { UpdateChapterDTO } from "../dto/update-chapter.dto";
 import { chapterQueries } from "../querykeys";
 
-export default function useUpdateChapterMutation() {
+export function useUpdateChapterMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({

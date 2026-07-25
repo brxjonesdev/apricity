@@ -15,7 +15,7 @@ export default function ProjectSidebar() {
       </section>
       <ProjectSelect/>
       <SidebarContent>
-        <ManuscriptOutline/>
+        <ManuscriptOutline storyId={'story_1'}/>
       </SidebarContent>
     </Sidebar>
   );

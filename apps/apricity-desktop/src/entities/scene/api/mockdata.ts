@@ -26,6 +26,7 @@ for (let chapter = 1; chapter <= 20; chapter++) {
     mockScenes.push({
       scene_id: `scene_${chapter}_${scene}`,
       chapter_id: `chapter-${chapter}`,
+      story_id: "story_1",
       title: `Scene ${scene} in Chapter ${chapter}`,
       synopsis: `Synopsis for Scene ${scene} in Chapter ${chapter}`,
       content,

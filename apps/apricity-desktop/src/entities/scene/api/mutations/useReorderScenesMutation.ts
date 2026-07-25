@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { reorderScenes } from "../commands/reorder-scenes";
 import { sceneQueries } from "../querykeys";
 
-export default function useReorderSceneMutation() {
+export function useReorderSceneMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({

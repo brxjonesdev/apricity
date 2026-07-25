@@ -4,7 +4,7 @@ import { CreateSceneDTO } from "../dto/scene.create.dto";
 import { sceneQueries } from "../querykeys";
 
 
-export default function useCreateSceneMutation() {
+export function useCreateSceneMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({

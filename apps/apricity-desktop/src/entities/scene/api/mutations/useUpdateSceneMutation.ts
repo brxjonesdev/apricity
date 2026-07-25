@@ -3,7 +3,7 @@ import { updateScene } from "../commands/update-scene";
 import { UpdateSceneDTO } from "../dto/scene.update.dto";
 import { sceneQueries } from "../querykeys";
 
-export default function useUpdateSceneMutation() {
+export function useUpdateSceneMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { reorderChapter } from "../commands/reorder-chapter";
 import { chapterQueries } from "../querykeys";
 
-export default function useReorderChapterMutation() {
+export function useReorderChapterMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({

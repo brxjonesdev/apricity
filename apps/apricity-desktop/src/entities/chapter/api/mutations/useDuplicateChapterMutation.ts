@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { chapterQueries } from "../querykeys";
 import { duplicateChapter } from "../commands/duplicate-chapter";
 
-export default function useDuplicateChapterMutation() {
+export function useDuplicateChapterMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({

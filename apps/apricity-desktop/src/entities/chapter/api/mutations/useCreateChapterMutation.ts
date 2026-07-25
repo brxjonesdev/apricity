@@ -3,7 +3,7 @@ import { createChapter } from "../commands/create-chapter";
 import { CreateChapterDTO } from "../dto/create-chapter.dto";
 import { chapterQueries } from "../querykeys";
 
-export default function useCreateChapterMutation() {
+export function useCreateChapterMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({

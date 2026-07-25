@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteChapter } from "../commands/delete-chapter";
 import { chapterQueries } from "../querykeys";
 
-export default function useDeleteChapterMutation() {
+export function useDeleteChapterMutation() {
   const queryClient = useQueryClient()
 
   return useMutation({
