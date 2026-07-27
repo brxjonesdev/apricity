@@ -15,7 +15,7 @@ function mapStatus(status: number) {
 
 function mapChapter(dto: ChapterDTO): Chapter {
   return {
-    id: dto.id,
+    chapterId: dto.id,
     storyId: dto.story_id,
     title: dto.title,
     order: dto.order,

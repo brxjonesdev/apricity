@@ -23,6 +23,6 @@ export function composeOutline(
   // Compose the outline
   return chapters.map((chapter) => ({
     chapter,
-    scenes: scenesByChapter.get(chapter.id) ?? [],
+    scenes: scenesByChapter.get(chapter.chapterId) ?? [],
   }));
 }

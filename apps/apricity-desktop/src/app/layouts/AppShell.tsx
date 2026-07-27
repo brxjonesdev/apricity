@@ -4,6 +4,7 @@ import ProjectSidebar from '@/widgets/project-sidebar/ui/ProjectSidebar';
 import AppHeader from '@/widgets/project-header/ui/ApricityHeader';
 
 export default function ApricityAppShell() {
+  // get ProjectSidebar
   return (<>
     <SidebarProvider>
           <div className="flex h-screen flex-col w-full">

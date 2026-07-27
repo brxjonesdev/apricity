@@ -52,7 +52,7 @@ export default function ManuscriptOutline({ storyId }: ManuscriptOutlineProps) {
             <SidebarMenu>
               {outline.map(({ chapter, scenes }) => (
                 <ChapterOutlineItem
-                  key={chapter.id}
+                  key={chapter.chapterId}
                   chapter={chapter}
                   scenes={scenes}
                 />

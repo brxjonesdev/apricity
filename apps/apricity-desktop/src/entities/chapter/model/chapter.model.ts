@@ -1,5 +1,5 @@
 export type Chapter = {
-  id: string;
+  chapterId: string;
   storyId: string;
   order: number;
   title: string;

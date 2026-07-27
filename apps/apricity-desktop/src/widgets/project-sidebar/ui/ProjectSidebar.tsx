@@ -13,7 +13,9 @@ export default function ProjectSidebar() {
       <section className='max-h-16 h-full border-b text-center flex items-center justify-center'>
         <p className='text-xl'>Apricity</p>
       </section>
-      <ProjectSelect/>
+      <SidebarHeader>
+        <ProjectSelect/>
+      </SidebarHeader>
       <SidebarContent className='gap-0'>
         <ManuscriptOutline storyId={'story_1'}/>
       </SidebarContent>
