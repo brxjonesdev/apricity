@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useStoriesQuery } from "@/entities/story";
-import StartModal from "./StartModal";
+import {StartModal} from "./StartModal";
 
 export default function StoryOnboardingGate({ children }: { children: React.ReactNode }) {
   const { data: stories, isLoading } = useStoriesQuery();
@@ -15,7 +15,6 @@ export default function StoryOnboardingGate({ children }: { children: React.Reac
   return (
     <>
       {children}
-
       <StartModal open={open} onOpenChange={setOpen}/>
     </>
   );

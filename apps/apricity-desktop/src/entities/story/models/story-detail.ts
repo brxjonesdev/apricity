@@ -1,5 +1,5 @@
 // What the App uses
-import { StoryGenre } from '../constants';
+
 export type StoryDetails = {
   storyId: string;
   seriesId: string | null;
@@ -8,7 +8,7 @@ export type StoryDetails = {
   title: string;
   synopsis: string;
   coverImage: string | null;
-  genre: StoryGenre[] | null;
+  genre: string[] | null;
   status: 'draft' | 'in-progress' | 'complete' | 'archived';
   lastUpdated: Date;
   createdAt: Date;

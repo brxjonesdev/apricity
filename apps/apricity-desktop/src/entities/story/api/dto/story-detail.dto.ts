@@ -8,7 +8,7 @@ export type StoryDetailDTO = {
   order: number | null;
   synopsis: string | null;
   cover_image: string | null;
-  genre: StoryGenre[] | null;
+  genre: string[] | null;
   is_archived: boolean;
   status: 0 | 1 | 2 | 3;
   sync_status: 0 | 1 | 2 | 3;
