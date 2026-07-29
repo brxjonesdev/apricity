@@ -1,42 +1,32 @@
 import { SceneDTO } from './dto/scene.dto';
 import { JSONContent } from '@tiptap/core';
-const mockScenes: SceneDTO[] = [];
+import { mockChapters } from '@/entities/chapter';
 
-for (let chapter = 1; chapter <= 20; chapter++) {
-  for (let scene = 1; scene <= 70; scene++) {
-    const lastUpdated = new Date(
-      Date.now() - Math.floor(Math.random() * 60 * 24 * 60 * 60 * 1000),
-    ).toISOString();
+const now = new Date().toISOString();
 
-    const content: JSONContent = {
-      type: 'doc',
+export const mockScenes: SceneDTO[] = mockChapters.flatMap((chapter) =>
+  Array.from({ length: 3 }, (_, index) => ({
+    scene_id: `${chapter.id}-scene-${index + 1}`,
+    chapter_id: chapter.id,
+    story_id: chapter.story_id,
+    title: `Scene ${index + 1}`,
+    synopsis: `Scene synopsis for ${chapter.title}`,
+    content: {
+      type: "doc",
       content: [
         {
-          type: 'paragraph',
+          type: "paragraph",
           content: [
             {
-              type: 'text',
-              text: `This is Scene ${scene}.`,
+              type: "text",
+              text: `Content for ${chapter.title}, Scene ${index + 1}`,
             },
           ],
         },
       ],
-    };
-
-    mockScenes.push({
-      scene_id: `scene_${chapter}_${scene}`,
-      chapter_id: `chapter-${chapter}`,
-      story_id: "story_1",
-      title: `Scene ${scene} in Chapter ${chapter}`,
-      synopsis: `Synopsis for Scene ${scene} in Chapter ${chapter}`,
-      content,
-      order: scene,
-      last_updated_at: Math.random() > 0.5 ? lastUpdated : null,
-      created_at: new Date(
-        Date.now() - Math.floor(Math.random() * 180 * 24 * 60 * 60 * 1000),
-      ).toISOString(),
-    });
-  }
-}
-
-export default mockScenes;
+    },
+    order: index + 1,
+    last_updated_at: now,
+    created_at: now,
+  })),
+);

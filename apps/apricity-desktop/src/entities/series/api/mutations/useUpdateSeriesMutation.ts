@@ -3,7 +3,7 @@ import { seriesQueries } from "../querykeys";
 import { updateSeries } from "../commands/update-series";
 import { UpdateSeriesDTO } from "../dto/series.dto";
 
-export default function useUpdateSeriesMutation() {
+export function useUpdateSeriesMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({

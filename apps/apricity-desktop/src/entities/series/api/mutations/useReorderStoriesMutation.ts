@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { reorderStoriesInSeries } from "../commands/reorder-stories";
 import { seriesQueries } from "../querykeys";
 
-export default function useReorderStoriesMutation() {
+export function useReorderStoriesMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({

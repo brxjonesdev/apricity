@@ -3,7 +3,7 @@ import { createStory } from "../commands";
 import { CreateStoryDTO } from "../dto/create-story.dto";
 import { storyQueries } from "../querykeys";
 
-export default function useCreateStoryMutation() {
+export function useCreateStoryMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({

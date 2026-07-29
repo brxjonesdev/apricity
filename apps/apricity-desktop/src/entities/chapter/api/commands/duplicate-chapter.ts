@@ -1,7 +1,7 @@
 import { call } from '@/shared/lib/api/tauriClient';
 import { ChapterDTO } from '../dto/chapter.dto';
 import { USE_MOCKS } from '@/shared/config/env';
-import { mockChapters } from '../../mockdata';
+import { mockChapters } from '../mockdata';
 import { Chapter } from '../../model/chapter.model';
 import { chapterMapper } from '../mappers/chapter.mapper';
 

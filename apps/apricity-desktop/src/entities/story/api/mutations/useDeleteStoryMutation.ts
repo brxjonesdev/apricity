@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteStory } from "../commands";
 import { storyQueries } from "../querykeys";
 
-export default function useDeleteStoryMutation() {
+export function useDeleteStoryMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({

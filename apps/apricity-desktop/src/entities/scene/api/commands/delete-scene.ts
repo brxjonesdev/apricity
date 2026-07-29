@@ -1,5 +1,5 @@
 import { USE_MOCKS } from '@/shared/config/env';
-import mockScenes from '../mockdata';
+import {mockScenes} from '../mockdata';
 import { call } from '@/shared/lib/api/tauriClient';
 
 export async function deleteScene(sceneId: string): Promise<void> {

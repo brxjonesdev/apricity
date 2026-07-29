@@ -19,7 +19,7 @@ export async function createStory(
       series_id: input.seriesId || null,
       user_id: input.userId || null,
       title: input.title,
-      synopsis: input.synopsis || '',
+      synopsis: input.synopsis || null,
       cover_image: input.coverImage || null,
       genre: input.genre || null,
       status: 0,

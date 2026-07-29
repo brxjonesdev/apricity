@@ -1,2 +1,2 @@
-export * from './models/story';
-export type { StoryDetails } from './models/story-detail';
+export * from "./models/story";
+export type { StoryDetails } from "./models/story-detail";

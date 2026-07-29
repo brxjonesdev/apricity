@@ -3,7 +3,7 @@ import { call } from '@/shared/lib/api/tauriClient';
 import { ChapterDTO } from '../dto/chapter.dto';
 import { chapterMapper } from '../mappers/chapter.mapper';
 import { USE_MOCKS } from '@/shared/config/env';
-import { mockChapters } from '../../mockdata';
+import { mockChapters } from '../mockdata';
 
 export async function reorderChapter(
   storyId: string,

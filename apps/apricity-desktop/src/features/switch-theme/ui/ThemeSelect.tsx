@@ -1,3 +1,4 @@
+import { Button } from "@/shared/components/shadcn/button";
 export default function ThemeSelect() {
-  return <div></div>
+  return <Button>Theme Select</Button>;
 }

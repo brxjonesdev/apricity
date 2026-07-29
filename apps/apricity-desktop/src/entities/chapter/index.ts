@@ -5,4 +5,5 @@ export { useCreateChapterMutation } from "./api/mutations/useCreateChapterMutati
 export { useDeleteChapterMutation } from "./api/mutations/useDeleteChapterMutation"
 export { useDuplicateChapterMutation } from "./api/mutations/useDuplicateChapterMutation"
 export { useReorderChapterMutation } from "./api/mutations/useReorderChapterMutation"
-export {useUpdateChapterMutation} from "./api/mutations/useUpdateChapterMutation"
+export { useUpdateChapterMutation } from "./api/mutations/useUpdateChapterMutation"
+export {mockChapters} from "./api/mockdata"

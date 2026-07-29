@@ -1,5 +1,5 @@
 import { USE_MOCKS } from '@/shared/config/env';
-import { mockChapters } from '../../mockdata';
+import { mockChapters } from '../mockdata';
 import { call } from '@/shared/lib/api/tauriClient';
 export async function deleteChapter(chapterId: string): Promise<boolean> {
   if (USE_MOCKS) {

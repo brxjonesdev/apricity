@@ -1,5 +1,6 @@
 export const storyQueries = {
   all: ['stories'] as const,
+  lastOpened: ['stories', 'lastOpened'] as const,
 
   lists: () => [...storyQueries.all, 'list'] as const,
 

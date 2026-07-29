@@ -3,7 +3,7 @@ import { createSeries } from "../commands/create-series";
 import { CreateSeriesDTO } from "../dto/series.dto";
 import { seriesQueries } from "../querykeys";
 
-export default function useCreateSeriesMutation() {
+export function useCreateSeriesMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({

@@ -3,7 +3,7 @@ import { assignStoryToSeries } from "../commands";
 import { storyQueries } from "../querykeys";
 
 
-export default function useAssignSeriesMutation() {
+export function useAssignSeriesMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({

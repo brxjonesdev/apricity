@@ -1,6 +1,6 @@
 import { USE_MOCKS } from '@/shared/config/env';
 import { UpdateSceneDTO } from '../dto/scene.update.dto';
-import mockScenes from '../mockdata';
+import {mockScenes} from '../mockdata';
 import { call } from '@/shared/lib/api/tauriClient';
 
 export async function updateScene(

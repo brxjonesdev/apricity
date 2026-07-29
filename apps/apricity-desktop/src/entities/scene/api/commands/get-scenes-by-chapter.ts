@@ -1,6 +1,6 @@
 import { USE_MOCKS } from '@/shared/config/env';
 import { Scene } from '../../model/types';
-import mockScenes from '../mockdata';
+import {mockScenes} from '../mockdata';
 import { sceneMapper } from '../mappers/scene.mapper';
 import { call } from '@/shared/lib/api/tauriClient';
 import { SceneDTO } from '../dto/scene.dto';

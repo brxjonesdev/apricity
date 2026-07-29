@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { restoreStory } from "../commands";
 import { storyQueries } from "../querykeys";
 
-export default function useRestoreStoryMutation() {
+export function useRestoreStoryMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({

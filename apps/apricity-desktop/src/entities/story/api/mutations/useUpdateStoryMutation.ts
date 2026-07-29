@@ -3,7 +3,7 @@ import { updateStory } from "../commands";
 import { UpdateStoryDTO } from "../dto/update-story.dto";
 import { storyQueries } from "../querykeys";
 
-export default function useUpdateStoryMutation() {
+export function useUpdateStoryMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({

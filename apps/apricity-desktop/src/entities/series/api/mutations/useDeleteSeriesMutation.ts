@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteSeries } from "../commands/delete-series";
 import { seriesQueries } from "../querykeys";
 
-export default function useDeleteSeriesMutation() {
+export function useDeleteSeriesMutation() {
   const queryClient = useQueryClient();
  
   return useMutation({

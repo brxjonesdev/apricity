@@ -1,3 +1,7 @@
+import { Button } from "@/shared/components/shadcn/button";
+
 export default function ModeSwitch() {
-  return <div></div>
+  return <Button>
+    Mode Switch
+  </Button>
 }

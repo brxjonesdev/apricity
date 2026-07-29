@@ -4,7 +4,7 @@ import { CreateChapterDTO } from '../dto/create-chapter.dto';
 import { ChapterDTO } from '../dto/chapter.dto';
 import { chapterMapper } from '../mappers/chapter.mapper';
 import { USE_MOCKS } from '@/shared/config/env';
-import { mockChapters } from '../../mockdata';
+import { mockChapters } from '../mockdata';
 
 export async function createChapter(input: CreateChapterDTO): Promise<Chapter> {
   if (USE_MOCKS) {

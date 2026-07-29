@@ -4,7 +4,7 @@ import { ChapterDTO } from '../dto/chapter.dto';
 import { Chapter } from '../../model/chapter.model';
 import { chapterMapper } from '../mappers/chapter.mapper';
 import { USE_MOCKS } from '@/shared/config/env';
-import { mockChapters } from '../../mockdata';
+import { mockChapters } from '../mockdata';
 
 export async function updateChapter(
   updates: UpdateChapterDTO,

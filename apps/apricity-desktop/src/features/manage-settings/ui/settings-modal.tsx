@@ -1,3 +1,6 @@
+import { Button } from "@/shared/components/shadcn/button";
 export default function SettingsModal() {
-  return <div></div>
+  return <Button>
+    Settings
+  </Button>
 }

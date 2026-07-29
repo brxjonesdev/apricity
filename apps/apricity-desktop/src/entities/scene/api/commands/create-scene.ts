@@ -4,7 +4,7 @@ import { SceneDTO } from '../dto/scene.dto';
 import { CreateSceneDTO } from '../dto/scene.create.dto';
 import { sceneMapper } from '../mappers/scene.mapper';
 import { USE_MOCKS } from '@/shared/config/env';
-import mockScenes from '../mockdata';
+import { mockScenes } from '../mockdata';
 
 export async function createScene(input: CreateSceneDTO): Promise<Scene> {
   if (USE_MOCKS) {
