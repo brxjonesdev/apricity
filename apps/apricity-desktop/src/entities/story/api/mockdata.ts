@@ -8,7 +8,9 @@ const genres: StoryGenre[] = [
 ];
 
 export const mockStories: StoryDetailDTO[] = Array.from(
-  { length: 67 },
+  {
+    length: 30
+  },
   (_, index) => {
     const storyNumber = index + 1;
 

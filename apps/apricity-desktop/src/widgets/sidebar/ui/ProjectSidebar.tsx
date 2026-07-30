@@ -5,7 +5,7 @@ import {
   SidebarGroup,
   SidebarHeader,
 } from '@/shared/components/shadcn/sidebar';
-import StorySelect from '@/features/switch-story/ui/StorySelect';
+import StorySelect from '@/widgets/story-select-menu/ui/StorySelect';
 import ManuscriptOutline from '../../outline/ui/ManuscriptOutline';
 import { useActiveStory } from '@/app/layouts/contexts/active-story.context';
 export default function ApricitySidebar() {

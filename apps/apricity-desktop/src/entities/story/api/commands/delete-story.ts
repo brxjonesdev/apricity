@@ -10,6 +10,7 @@ export async function deleteStory({
   storyId: string;
 }): Promise<boolean> {
   if (USE_MOCKS) {
+    console.log("mwowow")
     const index = mockStories.findIndex((s) => s.id === storyId);
     if (index < 0) throw new Error(`Story not found: ${storyId}`);
     mockStories.splice(index, 1);

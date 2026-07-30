@@ -12,6 +12,7 @@ import { useLastOpenedStoryQuery } from "@/entities/story";
 type ActiveStoryContextValue = {
   activeStoryId: string | undefined;
   setActiveStoryId: Dispatch<SetStateAction<string | undefined>>;
+  isLoading: boolean;
 };
 
 const ActiveStoryContext = createContext<ActiveStoryContextValue | null>(null);
@@ -21,7 +22,7 @@ export function ActiveStoryProvider({
 }: {
   children: ReactNode;
 }) {
-  const { data: lastOpenedStoryId } = useLastOpenedStoryQuery();
+  const { data: lastOpenedStoryId, isLoading } = useLastOpenedStoryQuery();
   console.log(lastOpenedStoryId, "storyIDtarget")
   const [activeStoryId, setActiveStoryId] = useState<string | undefined>();
 
@@ -33,7 +34,7 @@ export function ActiveStoryProvider({
 
   return (
     <ActiveStoryContext.Provider
-      value={{ activeStoryId, setActiveStoryId }}
+      value={{ activeStoryId, setActiveStoryId, isLoading }}
     >
       {children}
     </ActiveStoryContext.Provider>

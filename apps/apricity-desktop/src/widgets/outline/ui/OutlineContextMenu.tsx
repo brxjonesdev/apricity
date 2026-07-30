@@ -22,7 +22,8 @@ export default function OutlineContextMenu({
 }: {
   item: Chapter | SceneOutline;
   type: "chapter" | "scene";
-}) {
+  }) {
+ 
   const menuActions: Record<string, MenuAction[]> = {
     base: [
       {
@@ -152,7 +153,6 @@ export default function OutlineContextMenu({
       {Object.entries(menuActions).map(([category, actions], index) => (
         <div key={category}>
           {index > 0 && <ContextMenuSeparator />}
-
           <ContextMenuGroup>
             {actions.map(renderAction)}
           </ContextMenuGroup>

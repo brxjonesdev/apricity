@@ -6,9 +6,11 @@ import { call } from "@/shared/lib/api/tauriClient";
 import { StoryDTO } from "@/entities/story/api/dto/story.dto";
 import { SceneDTO } from "../dto/scene.dto";
 import { SceneOutlineDTO } from "../dto/scene.outline.dto";
+import { delay } from "@/shared/utils";
 
 export async function getSceneOutlinesByStoryId(storyId: string): Promise<SceneOutline[]> {
   if (USE_MOCKS) {
+    await delay(800)
     const scenes = mockScenes.filter((s) => s.story_id === storyId);
     return scenes.map((s) => sceneMapper.mapSceneOutline(s))
   }

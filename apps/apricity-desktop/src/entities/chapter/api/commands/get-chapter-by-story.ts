@@ -4,11 +4,13 @@ import { Chapter } from '../../model/chapter.model';
 import { chapterMapper } from '../mappers/chapter.mapper';
 import { USE_MOCKS } from '@/shared/config/env';
 import { mockChapters } from '../mockdata';
+import { delay } from '@/shared/utils';
 
 export async function getChaptersByStoryId(
   storyId: string,
 ): Promise<Chapter[]> {
   if (USE_MOCKS) {
+    await delay(1200)
     const chapters = mockChapters.filter((chp) => chp.story_id == storyId);
     return chapters.map((chapter) => chapterMapper.mapChapter(chapter));
   }

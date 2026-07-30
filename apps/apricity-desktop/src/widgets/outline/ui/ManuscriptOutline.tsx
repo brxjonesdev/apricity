@@ -15,6 +15,7 @@ import {
 import { ChapterOutlineItem } from "./ChapterOutlineItem";
 import { useEffect, useState } from "react";
 import { Separator } from "@/shared/components/shadcn/separator";
+import { Skeleton } from "@/shared/components/shadcn/skeleton";
 
 type ManuscriptOutlineProps = {
   storyId: string | undefined;
@@ -30,7 +31,28 @@ export default function ManuscriptOutline({ storyId }: ManuscriptOutlineProps) {
     }
   }, [storyId]);
 
-  if (isLoading) return null;
+  if (isLoading) {
+    return (
+      <>
+        <SidebarGroup>
+          <SidebarGroupLabel className="gap-3 px-0 items-center">
+            <BookOpen className="h-3 w-3" />
+            <span>Manuscript</span>
+          </SidebarGroupLabel>
+  
+          <SidebarGroupContent>
+            <SidebarMenu className="space-y-2 pt-2">
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-2/3" />
+              <Skeleton className="h-4 w-4/5" />
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+  
+        <Separator className="pt-0 mt-0" />
+      </>
+    );
+  }
 
   return (
     <>

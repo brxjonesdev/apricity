@@ -24,7 +24,6 @@ export function SceneOutlineItem({ scene }: SceneOutlineItemProps) {
           </SidebarMenuSubItem>
         </ContextMenuTrigger>
       </SidebarMenuSub>
-
       <OutlineContextMenu item={scene} type="scene" />
     </ContextMenu>
   );
