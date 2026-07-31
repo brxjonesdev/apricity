@@ -1,6 +1,8 @@
 import { ArrowDownAZ, Clock, LayoutGrid, List, Search } from 'lucide-react'
 import { Button } from '@/shared/components/shadcn/button'
 import { Input } from '@/shared/components/shadcn/input'
+import AddStoryButton from '@/features/add-story/ui/add-story-button';
+import AddSeriesButton from '@/features/add-series/ui/add-series-button';
 
 type ToolbarProps = {
   query: string;
@@ -87,13 +89,13 @@ export default function SelectToolbar({query, setQuery, sortKey, setSortKey, vie
           </Button>
         </div>
 
-        <div>
-          <Button>
+        <div className='gap-2 flex'>
+          <AddStoryButton className='bg-red-300'>
             + Story
-          </Button>
-          <Button>
+          </AddStoryButton>
+          <AddSeriesButton>
             + Series
-          </Button>
+          </AddSeriesButton>
         </div>
       </div>
     </div>

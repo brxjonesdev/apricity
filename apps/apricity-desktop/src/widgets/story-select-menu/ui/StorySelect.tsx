@@ -7,7 +7,7 @@ import {
   PopoverTrigger,
 } from "@/shared/components/shadcn/popover"
 import { Button } from "@/shared/components/shadcn/button"
-import ActiveStory from "./activeStory";
+import ActiveStory from "./ActiveStory";
 import { useStoriesQuery } from "@/entities/story"
 import { useActiveStory } from "@/app/layouts/contexts/active-story.context";
 import SelectMenu from "..";

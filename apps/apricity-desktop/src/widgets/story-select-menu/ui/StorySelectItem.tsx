@@ -23,6 +23,7 @@ export function StorySelectItem({ story, isActive, view, onSetActive }: StorySel
             isActive ? 'border-primary bg-muted' : 'hover:bg-muted/50',
             view === 'grid' ? 'flex-row' : 'flex-row items-center',
           )}
+          onClick={()=> onSetActive()}
         >
           {view === 'grid' && story.coverImage && (
             <img

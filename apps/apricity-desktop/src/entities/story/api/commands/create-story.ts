@@ -15,9 +15,7 @@ export async function createStory(
     // Create a mock DTO based on input data
     const newStoryDTO: StoryDetailDTO = {
       id: crypto.randomUUID(),
-      order: input.order,
       series_id: input.seriesId || null,
-      user_id: input.userId || null,
       title: input.title,
       synopsis: input.synopsis || null,
       cover_image: input.coverImage || null,

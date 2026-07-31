@@ -9,7 +9,7 @@ const genres: StoryGenre[] = [
 
 export const mockStories: StoryDetailDTO[] = Array.from(
   {
-    length: 30
+    length: 1
   },
   (_, index) => {
     const storyNumber = index + 1;
@@ -24,7 +24,6 @@ export const mockStories: StoryDetailDTO[] = Array.from(
             ? "series-002"
             : null,
 
-      user_id: "user-001",
 
       title: `Project Story ${storyNumber}`,
 

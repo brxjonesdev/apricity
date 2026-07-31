@@ -23,7 +23,7 @@ function dbStatusToStoryStatus(status: number) {
 function mapBaseStory(dto: StoryDTO | StoryDetailDTO): Story {
   return {
     storyId: dto.id,
-    order: dto.order,
+    order: dto.order || null,
     seriesId: dto.series_id,
     title: dto.title,
     synopsis: dto.synopsis ?? '',
@@ -37,7 +37,6 @@ export const mapDetailStory = (dto: StoryDetailDTO): StoryDetails => ({
   ...mapBaseStory(dto),
   seriesId: dto.series_id,
   order: dto.order || null,
-  userId: dto.user_id,
   genre: dto.genre ?? [],
   status: dbStatusToStoryStatus(dto.status),
   createdAt: new Date(dto.created_at),
@@ -47,7 +46,7 @@ export function convertDetailedToThin(storyDetail: StoryDetailDTO): StoryDTO {
   return {
     id: storyDetail.id,
     is_archived: storyDetail.is_archived,
-    order: storyDetail.order,
+    order: storyDetail.order || null,
     series_id: storyDetail.series_id,
     title: storyDetail.title,
     synopsis: storyDetail.synopsis || '',

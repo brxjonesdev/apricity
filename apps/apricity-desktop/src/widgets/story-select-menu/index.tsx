@@ -5,7 +5,7 @@ import { Card } from '@/shared/components/shadcn/card';
 import { cn } from '@/lib/utils';
 import { useFilteredStories } from './model/useFilteredStories';
 import { StorySelectItem } from './ui/StorySelectItem';
-import SelectToolbar from './ui/toolbar';
+import SelectToolbar from './ui/ToolBar';
 import { Series } from '@/entities/series';
 
 export default function SelectMenu({ stories, series }: { stories: Story[]; series: Series[] }) {
