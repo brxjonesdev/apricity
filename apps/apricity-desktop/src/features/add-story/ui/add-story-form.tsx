@@ -15,7 +15,6 @@ import { Input } from "@/shared/components/shadcn/input";
 import { Textarea } from "@/shared/components/shadcn/textarea";
 import { Button } from "@/shared/components/shadcn/button";
 import { useSeriesQuery } from "@/entities/series";
-import { useActiveStory } from "@/app/layouts/contexts/active-story.context";
 
 const createStorySchema = z.object({
   seriesId: z.string().optional(),
@@ -53,7 +52,7 @@ export function AddStoryForm({
     resolver: zodResolver(createStorySchema),
 
     defaultValues: {
-      title: "aaaaaaaaaaaaaaa",
+      title: "",
       synopsis: "",
       coverImage: "",
       genre: [],
@@ -70,7 +69,6 @@ export function AddStoryForm({
   
       createStory.mutate(payload, {
         onSuccess: () => {
-          console.log("biggie iggy")
           form.reset();
           onSuccess?.();
         },

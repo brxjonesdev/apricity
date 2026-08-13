@@ -1,5 +1,6 @@
 import { StoryDetailDTO } from './dto/story-detail.dto';
 import { StoryGenre } from '../constants';
+import { mockSeries } from '@/entities/series';
 
 const now = new Date().toISOString();
 const genres: StoryGenre[] = [
@@ -9,7 +10,7 @@ const genres: StoryGenre[] = [
 
 export const mockStories: StoryDetailDTO[] = Array.from(
   {
-    length: 1
+    length: 6
   },
   (_, index) => {
     const storyNumber = index + 1;
@@ -18,11 +19,8 @@ export const mockStories: StoryDetailDTO[] = Array.from(
       id: `story-${String(storyNumber).padStart(3, "0")}`,
 
       series_id:
-        storyNumber <= 2
-          ? "series-001"
-          : storyNumber <= 4
-            ? "series-002"
-            : null,
+        storyNumber <= 2 && mockSeries.length > 0
+          ? mockSeries[0].id : null,
 
 
       title: `Project Story ${storyNumber}`,
@@ -49,7 +47,7 @@ export const mockStories: StoryDetailDTO[] = Array.from(
               "Drama",
             ],
 
-      is_archived: false,
+            is_archived: storyNumber % 2 === 0,
 
       status:
         storyNumber % 4 === 0

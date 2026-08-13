@@ -1,6 +1,7 @@
-import { ArrowDownAZ, Clock, LayoutGrid, List, Search } from 'lucide-react'
+import { ArrowDownAZ, Clock, LayoutGrid, List, Search, PackageOpen, Package } from 'lucide-react'
 import { Button } from '@/shared/components/shadcn/button'
 import { Input } from '@/shared/components/shadcn/input'
+import { Toggle } from "@/shared/components/shadcn/toggle"
 import AddStoryButton from '@/features/add-story/ui/add-story-button';
 import AddSeriesButton from '@/features/add-series/ui/add-series-button';
 
@@ -11,28 +12,43 @@ type ToolbarProps = {
   setSortKey: (sortKey: 'lastUpdated' | 'alphabetical') => void;
   view: string;
   setView: (view: 'grid' | 'list') => void;
+  isArchived: boolean,
+  setShowArchived: (isArchived: boolean) => void;
   
 }
 
-export default function SelectToolbar({query, setQuery, sortKey, setSortKey, view, setView}:ToolbarProps) {
+export default function SelectToolbar({query, setQuery, sortKey, setSortKey, view, setView, isArchived, setShowArchived}:ToolbarProps) {
   return (
-    <div className="flex flex-col gap-3 border-b p-4 sm:flex-row sm:items-center">
-      <div className="relative flex-1">
-        <Search
-          aria-hidden="true"
-          className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-        />
-        <Input
-          type="search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search by title..."
-          aria-label="Search stories by title"
-          className="pl-8"
-        />
+    <div className="flex flex-col gap-2 px-4 py-2">
+      <div className='flex-1 flex gap-4'>
+        <div className="relative flex-1">
+          <Search
+            aria-hidden="true"
+            className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+          />
+          <Input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search by title..."
+            aria-label="Search stories by title"
+            className="pl-8"
+          />
+        </div>
+        <Toggle
+          variant="outline"
+          className="group"
+          pressed={isArchived}
+          onPressedChange={setShowArchived}
+        >
+          <Package className="group-data-[state=on]:hidden" />
+          <PackageOpen className="hidden group-data-[state=on]:block" />
+          <span>{isArchived ? "Hide" : "Show"} Archived</span>
+        </Toggle>
       </div>
+      
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-end gap-2 flex-1">
         {/* Sort controls */}
         <div
           role="group"
@@ -89,8 +105,8 @@ export default function SelectToolbar({query, setQuery, sortKey, setSortKey, vie
           </Button>
         </div>
 
-        <div className='gap-2 flex'>
-          <AddStoryButton className='bg-red-300'>
+        <div className='gap-1 flex'>
+          <AddStoryButton>
             + Story
           </AddStoryButton>
           <AddSeriesButton>
