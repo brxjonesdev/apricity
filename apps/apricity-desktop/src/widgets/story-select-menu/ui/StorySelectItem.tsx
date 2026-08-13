@@ -4,7 +4,7 @@ import { Button } from '@/shared/components/shadcn/button';
 import { ContextMenu, ContextMenuTrigger, ContextMenuContent } from '@/shared/components/shadcn/context-menu';
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/shared/utils';
-import { StoryContextMenu } from './SelectItemContextMenu';
+import { StoryContextMenu } from './StoryContextMenu';
 
 type StorySelectItemProps = {
   story: Story;

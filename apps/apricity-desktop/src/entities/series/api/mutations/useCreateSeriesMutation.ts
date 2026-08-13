@@ -10,7 +10,7 @@ export function useCreateSeriesMutation() {
     mutationFn: (input: CreateSeriesDTO) => createSeries(input),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: seriesQueries.lists()
+        queryKey: seriesQueries.all
       })
     }
   })

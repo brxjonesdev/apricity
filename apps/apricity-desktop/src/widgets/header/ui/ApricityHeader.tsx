@@ -5,10 +5,10 @@ import ModeSwitch from "@/features/switch-view-mode/ui/ModeSwitch";
 export default function ApricityAppHeader() {
   return (
     <section className="h-16 max-h-16 border-b flex">
-      <ModeSwitch/>
+      {/*<ModeSwitch/>
       <SearchBar/>
       <ThemeSelect/>
-      <SettingsModal />
+      <SettingsModal />*/}
     </section>
   );
 }

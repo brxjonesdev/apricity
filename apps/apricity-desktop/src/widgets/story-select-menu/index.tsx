@@ -9,6 +9,7 @@ import SelectToolbar from './ui/ToolBar';
 import { Series } from '@/entities/series';
 import { Separator } from '@/shared/components/shadcn/separator';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/shared/components/shadcn/context-menu';
+import SeriesContextMenu from './ui/SeriesContextMenu';
 
 export default function SelectMenu({ stories, series }: { stories: Story[]; series: Series[] }) {
   const { activeStoryId, setActiveStoryId } = useActiveStory();
@@ -108,11 +109,7 @@ export default function SelectMenu({ stories, series }: { stories: Story[]; seri
                       {currentSeries.title}
                     </h3>
                   </ContextMenuTrigger>
-                  <ContextMenuContent>
-                    <ContextMenuItem>
-                      Rename "{currentSeries.title}"?
-                    </ContextMenuItem>
-                  </ContextMenuContent>
+                  <SeriesContextMenu title={currentSeries.title}/>
                 </ContextMenu>
             
                 <ul

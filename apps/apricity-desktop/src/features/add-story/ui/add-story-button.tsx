@@ -3,6 +3,7 @@ import { Button } from "@/shared/components/shadcn/button";
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
   DialogTrigger,
 } from "@/shared/components/shadcn/dialog";
 import { cn } from "@/shared/utils";
