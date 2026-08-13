@@ -6,7 +6,7 @@ import {
   DialogTrigger,
 } from "@/shared/components/shadcn/dialog";
 import { cn } from "@/shared/utils";
-import { AddStoryForm } from "./add-story-form";
+import { AddStoryForm } from "@/shared/forms/add-story-form"
 
 export default function AddStoryButton({
   children,

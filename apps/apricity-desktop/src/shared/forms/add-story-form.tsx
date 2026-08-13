@@ -197,7 +197,7 @@ export function AddStoryForm({
           </Field>
         )}
       />
-      <Controller
+      {series.length > 0 && <Controller
         name="seriesId"
         control={form.control}
         render={({ field, fieldState }) => (
@@ -231,11 +231,12 @@ export function AddStoryForm({
             )}
           </Field>
         )}
-      />
+      />}
 
       <Button
               type="submit"
-              disabled={createStory.isPending}
+        disabled={createStory.isPending}
+        className="w-full"
             >
               {createStory.isPending
                 ? "Creating..."

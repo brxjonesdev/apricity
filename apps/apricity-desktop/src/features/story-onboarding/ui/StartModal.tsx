@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { AddStoryForm } from "@/shared/forms/add-story-form";
 
 type Feature = {
   icon: LucideIcon
@@ -58,105 +59,7 @@ const FEATURES: Feature[] = [
   },
 ]
 
-const STEPS: Step[] = [
-  {
-    eyebrow: "Welcome to Apricity",
-    title: "A home for your fiction",
-    description:
-      "Apricity is a story development tool for writers. Plan characters and worlds, then write your manuscript — all in one place.",
-    body: (
-      <div className="flex items-center justify-center rounded-lg border border-border bg-muted/40 px-6 py-10">
-        <div className="flex flex-col items-center gap-3 text-center">
-          <span className="flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground">
-            <Sparkles className="size-7" aria-hidden="true" />
-          </span>
-          <p className="max-w-xs text-pretty text-sm leading-relaxed text-muted-foreground">
-            {
-              "From a single spark of an idea to a finished draft, Apricity keeps every part of your story connected."
-            }
-          </p>
-        </div>
-      </div>
-    ),
-  },
-  {
-    eyebrow: "The big idea",
-    title: "Everything is connected",
-    description:
-      "Characters, locations, and events are nodes. Apricity links them into a graph so timelines, arcs, and relationships stay accurate as you write.",
-    body: (
-      <div className="rounded-lg border border-border bg-muted/40 p-6">
-        <div className="flex items-center justify-center gap-3">
-          <GraphNode label="Hero" active />
-          <Connector />
-          <GraphNode label="Rival" />
-          <Connector />
-          <GraphNode label="Battle" active />
-        </div>
-        <p className="mt-5 text-pretty text-center text-sm leading-relaxed text-muted-foreground">
-          {
-            "Link an entity once and it shows up everywhere it matters — no more copy-pasting details across notes."
-          }
-        </p>
-      </div>
-    ),
-  },
-  {
-    eyebrow: "What you can do",
-    title: "Tools for every part of the craft",
-    description: "Each feature works on its own and gets richer as you connect things together.",
-    body: (
-      <div className="grid gap-3 sm:grid-cols-2">
-        {FEATURES.map((feature) => (
-          <div
-            key={feature.title}
-            className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4"
-          >
-            <span className="flex size-9 items-center justify-center rounded-md bg-accent text-accent-foreground">
-              <feature.icon className="size-5" aria-hidden="true" />
-            </span>
-            <h3 className="text-sm font-medium text-card-foreground">{feature.title}</h3>
-            <p className="text-pretty text-xs leading-relaxed text-muted-foreground">
-              {feature.description}
-            </p>
-          </div>
-        ))}
-      </div>
-    ),
-  },
-  {
-    eyebrow: "You're all set",
-    title: "Start your first story",
-    description:
-      "Create a story in your Library to begin. You can share and publish finished work later, right from Apricity.",
-    body: (
-      <div className="rounded-lg border border-border bg-muted/40 p-6">
-        <ul className="flex flex-col gap-3">
-          {[
-            "Create a story and add its title, cover, and description",
-            "Sketch characters, locations, and events as you go",
-            "Connect entities to build arcs and timelines automatically",
-          ].map((item) => (
-            <li key={item} className="flex items-start gap-3">
-              <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <Check className="size-3" aria-hidden="true" />
-              </span>
-              <span className="text-pretty text-sm leading-relaxed text-foreground">{item}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    ),
-  },
-  {
-    eyebrow: "Hello",
-    title: "Beow",
-    description: "Anns",
-    body: <div>
-      {/*Craete New Story*/}
-    </div>
-  }
-]
+
 
 function GraphNode({ label, active }: { label: string; active?: boolean }) {
   return (
@@ -185,7 +88,106 @@ export function StartModal({
   open: boolean
   onOpenChange: (open: boolean) => void
   onComplete?: () => void
-}) {
+  }) {
+
+    const STEPS: Step[] = [
+      {
+        eyebrow: "Welcome to Apricity",
+        title: "A home for your fiction",
+        description:
+          "Apricity is a story development tool for writers. Plan characters and worlds, then write your manuscript — all in one place.",
+        body: (
+          <div className="flex items-center justify-center rounded-lg border border-border bg-muted/40 px-6 py-10">
+            <div className="flex flex-col items-center gap-3 text-center">
+              <span className="flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <Sparkles className="size-7" aria-hidden="true" />
+              </span>
+              <p className="max-w-xs text-pretty text-sm leading-relaxed text-muted-foreground">
+                {
+                  "From a single spark of an idea to a finished draft, Apricity keeps every part of your story connected."
+                }
+              </p>
+            </div>
+          </div>
+        ),
+      },
+      {
+        eyebrow: "The big idea",
+        title: "Everything is connected",
+        description:
+          "Characters, locations, and events are nodes. Apricity links them into a graph so timelines, arcs, and relationships stay accurate as you write.",
+        body: (
+          <div className="rounded-lg border border-border bg-muted/40 p-6">
+            <div className="flex items-center justify-center gap-3">
+              <GraphNode label="Hero" active />
+              <Connector />
+              <GraphNode label="Rival" />
+              <Connector />
+              <GraphNode label="Battle" active />
+            </div>
+            <p className="mt-5 text-pretty text-center text-sm leading-relaxed text-muted-foreground">
+              {
+                "Link an entity once and it shows up everywhere it matters — no more copy-pasting details across notes."
+              }
+            </p>
+          </div>
+        ),
+      },
+      {
+        eyebrow: "What you can do",
+        title: "Tools for every part of the craft",
+        description: "Each feature works on its own and gets richer as you connect things together.",
+        body: (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {FEATURES.map((feature) => (
+              <div
+                key={feature.title}
+                className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4"
+              >
+                <span className="flex size-9 items-center justify-center rounded-md bg-accent text-accent-foreground">
+                  <feature.icon className="size-5" aria-hidden="true" />
+                </span>
+                <h3 className="text-sm font-medium text-card-foreground">{feature.title}</h3>
+                <p className="text-pretty text-xs leading-relaxed text-muted-foreground">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        ),
+      },
+      {
+        eyebrow: "You're all set",
+        title: "Start your first story",
+        description:
+          "Create a story in your Library to begin. You can share and publish finished work later, right from Apricity.",
+        body: (
+          <div className="rounded-lg border border-border bg-muted/40 p-6">
+            <ul className="flex flex-col gap-3">
+              {[
+                "Create a story and add its title, cover, and description",
+                "Sketch characters, locations, and events as you go",
+                "Connect entities to build arcs and timelines automatically",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    <Check className="size-3" aria-hidden="true" />
+                  </span>
+                  <span className="text-pretty text-sm leading-relaxed text-foreground">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ),
+      },
+      {
+        eyebrow: "Welcome to Apricity",
+        title: "Let's create your first story",
+        description:
+          "Every great story starts somewhere. Give your story a name to get started, and you can build it out from there.",
+        body: <AddStoryForm onSuccess={() => onOpenChange(false)}/>,
+      }
+    ]
   const [step, setStep] = useState(0)
   const isFirst = step === 0
   const isLast = step === STEPS.length - 1
