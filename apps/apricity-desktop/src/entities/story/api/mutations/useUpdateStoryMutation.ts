@@ -9,8 +9,9 @@ export function useUpdateStoryMutation() {
   return useMutation({
     mutationFn: ({ update }: { update: UpdateStoryDTO }) => updateStory({ update }),
     onSuccess: (_, { update }) => {
+      console.log("wil")
       queryClient.invalidateQueries({ queryKey: storyQueries.detail(update.id) });
-           queryClient.invalidateQueries({ queryKey: storyQueries.all });
+      queryClient.invalidateQueries({ queryKey: storyQueries.all });
     },
     onError: (error) => {
       console.log("Update Failed", error)

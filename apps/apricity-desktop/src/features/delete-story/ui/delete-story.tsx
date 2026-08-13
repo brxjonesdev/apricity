@@ -36,7 +36,7 @@ export default function DeleteStoryModal({ id, open, onOpenChange }: Props) {
             (story) => !story.isArchived && story.storyId !== id
           );
   
-          setActiveStoryId(nextStory?.storyId ?? null);
+          // setActiveStoryId(nextStory?.storyId ?? null);
         },
       },
     );

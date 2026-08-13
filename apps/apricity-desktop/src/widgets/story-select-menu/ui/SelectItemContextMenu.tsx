@@ -1,5 +1,9 @@
 import type { Story } from '@/entities/story';
-import { useDeleteStoryMutation } from '@/entities/story';
+import {
+  useArchiveStoryMutation,
+  useDeleteStoryMutation,
+  useUpdateStoryMutation,
+} from '@/entities/story';
 import DeleteStoryModal from '@/features/delete-story/ui/delete-story';
 import DeleteStoryButton from '@/features/delete-story/ui/delete-story';
 import EditStoryModal from '@/features/edit-story-details/ui/edit-story-details-modal';
@@ -19,6 +23,9 @@ export function StoryContextMenu({ story }: { story: Story }) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
+  const archiveStory = useArchiveStoryMutation();
+  const restoreStory = useUpdateStoryMutation();
+
   return (
     <>
       <ContextMenuGroup>
@@ -32,7 +39,26 @@ export function StoryContextMenu({ story }: { story: Story }) {
         >
           Edit
         </ContextMenuItem>
-        <ContextMenuItem>Archive</ContextMenuItem>
+        {!story.isArchived ? (
+          <ContextMenuItem
+            onClick={() => archiveStory.mutate({ storyId: story.storyId })}
+          >
+            Archive
+          </ContextMenuItem>
+        ) : (
+          <ContextMenuItem
+            onClick={() =>
+              restoreStory.mutate({
+                update: {
+                  id: story.storyId,
+                  is_archived: false,
+                },
+              })
+            }
+          >
+            Restore
+          </ContextMenuItem>
+        )}
         {story.seriesId && <ContextMenuItem>Change Order</ContextMenuItem>}
         {!story.seriesId && <ContextMenuItem>Move to Series</ContextMenuItem>}
         <ContextMenuSeparator />
