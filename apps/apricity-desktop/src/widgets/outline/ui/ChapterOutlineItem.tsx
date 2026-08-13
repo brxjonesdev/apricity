@@ -18,6 +18,7 @@ import { Chapter } from "@/entities/chapter";
 import { SceneOutline } from "@/entities/scene";
 import { SceneOutlineItem } from "./SceneOutlineItem";
 import OutlineContextMenu from "./OutlineContextMenu";
+import EditorHelper from "@/features/set-editor-view/ui/settablething";
 
 type ChapterOutlineItemProps = {
   chapter: Chapter;
@@ -29,19 +30,20 @@ export function ChapterOutlineItem({
   scenes,
 }: ChapterOutlineItemProps) {
   const [open, setOpen] = useState(false);
-   const [contextOpen, setContextOpen] = useState(false);
+   const [isContextOpen, setContextOpen] = useState(false);
 
   return (
    
     
-    <ContextMenu onOpenChange={setContextOpen} open={contextOpen}>
+    <ContextMenu onOpenChange={setContextOpen} open={isContextOpen}>
+      <EditorHelper id={chapter.chapterId}>
       <SidebarMenuItem>
         <Collapsible open={open} onOpenChange={setOpen}>
           <CollapsibleTrigger className="w-full">
             <ContextMenuTrigger className="w-full">
               <SidebarMenuButton
                 className={`w-full ${
-                  contextOpen ? "bg-accent text-accent-foreground" : ""
+                  isContextOpen ? "bg-accent text-accent-foreground" : ""
                 }`}
               >
                 <span className="text-xs">{chapter.title}</span>
@@ -62,7 +64,7 @@ export function ChapterOutlineItem({
           </CollapsibleContent>
         </Collapsible>
       </SidebarMenuItem>
-    
+    </EditorHelper>
       <OutlineContextMenu item={chapter} type="chapter" />
     </ContextMenu>
   );

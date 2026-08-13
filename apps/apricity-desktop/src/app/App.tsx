@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router';
 import ApricityAppShell from './layouts/AppShell';
-import Editor from '@/pages/editor';
+import Editor from '@/widgets/editor/ui/editor';
 
 export default function ApricityApp() {
   return (

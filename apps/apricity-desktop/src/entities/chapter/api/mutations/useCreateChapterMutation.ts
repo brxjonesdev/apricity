@@ -12,6 +12,9 @@ export function useCreateChapterMutation() {
       queryClient.invalidateQueries({
         queryKey: chapterQueries.byStory(input.story_id)
       })
+      queryClient.invalidateQueries({
+        queryKey: chapterQueries.all
+      })
     }
   })
 }

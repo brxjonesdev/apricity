@@ -16,6 +16,8 @@ import { ChapterOutlineItem } from "./ChapterOutlineItem";
 import { useEffect, useState } from "react";
 import { Separator } from "@/shared/components/shadcn/separator";
 import { Skeleton } from "@/shared/components/shadcn/skeleton";
+import { Button } from "@/shared/components/shadcn/button";
+import AddChapterButton from "@/features/add-chapter/ui/add-chapter-btn";
 
 type ManuscriptOutlineProps = {
   storyId: string | undefined;
@@ -31,7 +33,7 @@ export default function ManuscriptOutline({ storyId }: ManuscriptOutlineProps) {
     }
   }, [storyId]);
 
-  if (isLoading) {
+  if (isLoading || !storyId) {
     return (
       <>
         <SidebarGroup>
@@ -85,6 +87,7 @@ export default function ManuscriptOutline({ storyId }: ManuscriptOutlineProps) {
                 ))}
               </SidebarMenu>
             </SidebarGroupContent>
+            <AddChapterButton storyId={storyId} index={outline.length + 1}/>
           </CollapsibleContent>
         </SidebarGroup>
       </Collapsible>
