@@ -9,7 +9,6 @@ import {
 } from "@/shared/components/shadcn/dialog"
 import { EditStoryDetailsForm } from "./edit-details-form"
 
-// edit-story-details-modal.tsx
 type Props = {
   id: string
   title: string
@@ -19,7 +18,7 @@ type Props = {
   onOpenChange: (open: boolean) => void
 }
 
-export default function EditStoryDetails({
+export default function EditStoryModal({
   id,
   title,
   synopsis,

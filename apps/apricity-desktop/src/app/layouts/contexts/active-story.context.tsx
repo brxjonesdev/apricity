@@ -23,7 +23,6 @@ export function ActiveStoryProvider({
   children: ReactNode;
 }) {
   const { data: lastOpenedStoryId, isLoading } = useLastOpenedStoryQuery();
-  console.log(lastOpenedStoryId, "storyIDtarget")
   const [activeStoryId, setActiveStoryId] = useState<string | undefined>();
 
   useEffect(() => {
