@@ -4,6 +4,7 @@ import ApricitySidebar from '@/widgets/sidebar/ui/ProjectSidebar';
 import ApricityAppHeader from '@/widgets/header/ui/ApricityHeader';
 import { ActiveStoryProvider } from './contexts/active-story.context';
 import StoryOnboardingGate from '@/features/story-onboarding/ui/OnboardingGate';
+import { EditorUIProvider } from '@/widgets/editor/model/editor-context';
 
 export default function ApricityAppShell() {
 
@@ -12,11 +13,13 @@ export default function ApricityAppShell() {
     <SidebarProvider>
       <ActiveStoryProvider>
         <StoryOnboardingGate>
+          <EditorUIProvider>
           <ApricitySidebar />
           <SidebarInset>
             <ApricityAppHeader />
             <Outlet />
-          </SidebarInset>
+            </SidebarInset>
+          </EditorUIProvider>
         </StoryOnboardingGate>
       </ActiveStoryProvider>
     </SidebarProvider>

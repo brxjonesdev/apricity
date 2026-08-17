@@ -8,15 +8,21 @@ import { StorySelectItem } from './ui/StorySelectItem';
 import SelectToolbar from './ui/ToolBar';
 import { Series } from '@/entities/series';
 import { Separator } from '@/shared/components/shadcn/separator';
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/shared/components/shadcn/context-menu';
-import SeriesContextMenu from './ui/SeriesContextMenu';
+import SeriesMenu from './ui/SeriesMenu';
+import {
+  Dialog,
+  DialogTrigger,
+} from "@/shared/components/shadcn/dialog"
+import { Button } from '@/shared/components/shadcn/button';
+import { CONNREFUSED } from 'node:dns/promises';
 
 export default function SelectMenu({ stories, series }: { stories: Story[]; series: Series[] }) {
   const { activeStoryId, setActiveStoryId } = useActiveStory();
   const [query, setQuery] = useState('');
   const [sortKey, setSortKey] = useState<'lastUpdated' | 'alphabetical'>('lastUpdated');
   const [view, setView] = useState<'grid' | 'list'>('grid');
-  const [showArchived, setShowArchived] = useState(false)
+  const [showArchived, setShowArchived] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const visibleStories = useFilteredStories(stories, query, sortKey);
 
@@ -28,21 +34,26 @@ export default function SelectMenu({ stories, series }: { stories: Story[]; seri
     const grouped = series
       .map((currentSeries) => ({
         ...currentSeries,
-        stories: displayedStories.filter(
-          (story) => story.seriesId === currentSeries.seriesId
-        ),
+        stories: displayedStories
+          .filter(
+            (story) => story.seriesId === currentSeries.seriesId
+          )
+          .sort((a, b) =>
+            (a.order ?? '').localeCompare(b.order ?? '')
+          ),
       }))
       .filter((currentSeries) => currentSeries.stories.length > 0);
   
     const unassignedStories = displayedStories.filter(
       (story) => !story.seriesId
     );
-  
+
     return {
       grouped,
       unassignedStories,
     };
   }, [series, visibleStories, showArchived]);
+  
 
   const empty =
     storiesBySeries.grouped.every((s) => s.stories.length === 0) &&
@@ -102,15 +113,27 @@ export default function SelectMenu({ stories, series }: { stories: Story[]; seri
             )}
 
             {storiesBySeries.grouped.map((currentSeries) => (
-              <section key={currentSeries.seriesId}>
-                <ContextMenu>
-                  <ContextMenuTrigger>
-                    <h3 className="mb-3 text-sm font-semibold text-muted-foreground hover:underline">
-                      {currentSeries.title}
-                    </h3>
-                  </ContextMenuTrigger>
-                  <SeriesContextMenu title={currentSeries.title}/>
-                </ContextMenu>
+              <section key={currentSeries.seriesId} className='flex flex-col gap-2'>
+                <div className='flex items-center justify-between border-b pb-2'>
+                  <h3 className="text-sm font-semibold text-muted-foreground">
+                    {currentSeries.title}
+                  </h3>
+                  <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
+                    <DialogTrigger>
+                      <Button variant={"ghost"}>
+                        Edit Series
+                      </Button>
+                    </DialogTrigger>
+                    <SeriesMenu
+                      title={currentSeries.title}
+                      desc={currentSeries.description || ""}
+                      id={currentSeries.seriesId}
+                      onSuccess={() => {
+                        setMenuOpen(false)
+                      }}
+                    />
+                  </Dialog>
+                </div>
             
                 <ul
                   className={cn(

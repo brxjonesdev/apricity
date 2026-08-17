@@ -3,7 +3,7 @@ import { Scene, SceneOutline } from "@/entities/scene";
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/shared/components/shadcn/context-menu";
 import OutlineContextMenu from "./OutlineContextMenu";
 import { useState } from "react";
-import EditorHelper from "@/features/set-editor-view/ui/settablething";
+import EditorHelper from "@/features/set-editor-view/ui/editor-helper";
 
 type SceneOutlineItemProps = {
   scene: SceneOutline;
@@ -15,17 +15,17 @@ export function SceneOutlineItem({ scene }: SceneOutlineItemProps) {
   return (
     <ContextMenu onOpenChange={setContextOpen}>
       <SidebarMenuSub>
-        <EditorHelper id={scene.sceneId}>
         <ContextMenuTrigger>
+          <EditorHelper id={scene.sceneId}>
           <SidebarMenuSubItem>
             <SidebarMenuSubButton
               className={contextOpen ? "bg-accent text-accent-foreground" : ""}
             >
               <span className="text-xs">{scene.title}</span>
             </SidebarMenuSubButton>
-          </SidebarMenuSubItem>
+            </SidebarMenuSubItem>
+          </EditorHelper>
           </ContextMenuTrigger>
-        </EditorHelper>
       </SidebarMenuSub>
       <OutlineContextMenu item={scene} type="scene" />
     </ContextMenu>

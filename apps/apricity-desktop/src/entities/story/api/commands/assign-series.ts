@@ -10,14 +10,17 @@ import { mockStories } from '../mockdata';
 export async function assignStoryToSeries({
   storyId,
   seriesId,
+  order
 }: {
   storyId: string;
-  seriesId: string;
+    seriesId: string;
+    order: string;
 }): Promise<StoryDetails> {
   if (USE_MOCKS) {
     const index = mockStories.findIndex((story) => story.id === storyId);
     if (index < 0) throw new Error(`Story not found: ${storyId}`);
     mockStories[index].series_id = seriesId;
+    mockStories[index].order = order
     return storyMapper.mapDetailStory(mockStories[index]);
   }
 

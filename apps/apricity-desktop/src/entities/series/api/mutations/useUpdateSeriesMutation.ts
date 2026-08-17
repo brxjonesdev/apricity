@@ -10,7 +10,7 @@ export function useUpdateSeriesMutation() {
     mutationFn: ({updates, seriesId}: {updates: UpdateSeriesDTO, seriesId: string}) => updateSeries(updates, seriesId),
     onSuccess: (_, { seriesId }) => {
       queryClient.invalidateQueries({
-        queryKey: seriesQueries.detail(seriesId)
+        queryKey: seriesQueries.all
       })
     }
   })

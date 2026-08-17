@@ -5,7 +5,6 @@ import { storyMapper } from '../mappers/map-story';
 import { mockStories } from '../mockdata';
 import { StoryDetails } from '../../models/story-detail';
 
-// Remove story from a series
 export async function removeStoryFromSeries({
   storyId,
 }: {
@@ -15,6 +14,7 @@ export async function removeStoryFromSeries({
     const index = mockStories.findIndex((story) => story.id === storyId);
     if (index < 0) throw new Error(`Story not found: ${storyId}`);
     mockStories[index].series_id = null;
+    mockStories[index].order = null;
     return storyMapper.mapDetailStory(mockStories[index]);
   }
 

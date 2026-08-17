@@ -1,57 +1,40 @@
-import { useEffect, useMemo, useState } from "react";
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import { useSceneDetailsQuery, useScenesByChapterQuery } from "@/entities/scene";
+import { useActiveStory } from "@/app/layouts/contexts/active-story.context";
+import { useEditorView } from "../model/editor-context";
+import { Tiptap, useEditor, useTiptap, useTiptapState } from '@tiptap/react'
+import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus'
+import StarterKit from '@tiptap/starter-kit'
+
 
 export default function Editor() {
-  const [showAllScenes, setShowAllScenes] = useState(true);
+  const { setActiveID } = useEditorView();
+  // fetches chapter or scene by id
+  const editor = useEditor({ extensions: [StarterKit], content: '<p>Hello World!</p>' })
+  if (!editor) return null
 
-  const { data: scenes } = useScenesByChapterQuery("story-001-chapter-1");
-  const { data: scene } = useSceneDetailsQuery("story-001-chapter-1-scene-1");
+  return (
+    <Tiptap editor={editor}>
+      <MenuBar />
+      <Tiptap.Content />
+      <WordCount />
+      <BubbleMenu editor={editor}><button>Bold</button></BubbleMenu>
+      <FloatingMenu editor={editor}><button>Add heading</button></FloatingMenu>
+    </Tiptap>
+  )
+}
 
-  const mergedDocument = useMemo(() => {
-    if (!scenes) return null;
+function MenuBar() {
+  const { editor } = useTiptap()
+  if (!editor) return null
+  return (
+    <button onClick={() => editor.chain().focus().toggleBold().run()}>
+      Bold
+    </button>
+  )
+}
 
-    return {
-      type: "doc",
-      content: scenes.flatMap((scene) => [
-        {
-          type: "heading",
-          attrs: { level: 2 },
-          content: [{ type: "text", text: scene.title }],
-        },
-        ...(scene.content.content ?? []),
-      ]),
-    };
-  }, [scenes]);
-
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: "",
-  });
-
-  useEffect(() => {
-    if (!editor) return;
-
-    if (showAllScenes && mergedDocument) {
-      editor.commands.setContent(mergedDocument);
-    }
-
-    if (!showAllScenes && scene) {
-      editor.commands.setContent(scene.content);
-    }
-  }, [editor, showAllScenes, mergedDocument, scene]);
-
-  if (!editor) return null;
-
-  // return (
-  //   <div>
-  //     <button onClick={() => setShowAllScenes((prev) => !prev)}>
-  //       {showAllScenes ? "Show One Scene" : "Show All Scenes"}
-  //     </button>
-
-  //     <EditorContent editor={editor} />
-  //   </div>
-  // );
-   
+function WordCount() {
+  const wordCount = useTiptapState((state) =>
+    state.editor.state.doc.textContent.split(/\s+/).filter(Boolean).length
+  )
+  return <span>{wordCount} words</span>
 }

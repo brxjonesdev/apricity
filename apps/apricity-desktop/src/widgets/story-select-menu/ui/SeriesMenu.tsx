@@ -1,42 +1,53 @@
 import UpdateSeriesDetails from "@/features/update-series/ui/update-details"
 import UpdateSeriesStoryGrid from "@/features/update-series/ui/update-grid"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/shadcn/card"
-import { ContextMenuContent, ContextMenuItem } from "@/shared/components/shadcn/context-menu"
+import { DialogContent } from "@/shared/components/shadcn/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/shadcn/tabs"
-import { FolderDetailsIcon } from "@hugeicons/core-free-icons"
-export default function SeriesContextMenu({ title }: {
-  title: string
-}) {
+
+export default function SeriesMenu({ title, desc, id, onSuccess }: { title: string, desc: string, id: string, onSuccess: () => void }) {
   return (
-    // adjust postionn later
-    <ContextMenuContent asChild>
-      <Card className="min-w-96">
+    <DialogContent className="min-w-96 p-1" showCloseButton={false}>
+      <Card>
         <CardHeader>
           <CardTitle>
-            Update Series {title}
+            Update {title}
           </CardTitle>
+
           <CardDescription>
-            Update series title, change positions, and add/ remove
+            Manage the series details and organize its stories.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+
+        <CardContent className="w-full">
           <Tabs defaultValue="details" className="w-full">
-            <TabsList>
+            <TabsList className="w-full">
               <TabsTrigger value="details">
-                {/*<UpdateSeriesDetails/>*/}
+                Details
               </TabsTrigger>
+
               <TabsTrigger value="grid">
-               <UpdateSeriesStoryGrid/>
+                Stories
               </TabsTrigger>
             </TabsList>
+
             <TabsContent value="details">
-              
+              <UpdateSeriesDetails
+                title={title}
+                desc={desc}
+                id={id}
+                onSuccess={onSuccess}
+              />
             </TabsContent>
+
             <TabsContent value="grid">
+              <UpdateSeriesStoryGrid
+                id={id}
+                onSuccess={onSuccess}
+              />
             </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
-    </ContextMenuContent>
-  )
+    </DialogContent>
+  );
 }

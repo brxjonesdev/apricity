@@ -18,7 +18,7 @@ import { Chapter } from "@/entities/chapter";
 import { SceneOutline } from "@/entities/scene";
 import { SceneOutlineItem } from "./SceneOutlineItem";
 import OutlineContextMenu from "./OutlineContextMenu";
-import EditorHelper from "@/features/set-editor-view/ui/settablething";
+import EditorHelper from "@/features/set-editor-view/ui/editor-helper";
 
 type ChapterOutlineItemProps = {
   chapter: Chapter;
@@ -35,11 +35,12 @@ export function ChapterOutlineItem({
   return (
    
     
-    <ContextMenu onOpenChange={setContextOpen} open={isContextOpen}>
-      <EditorHelper id={chapter.chapterId}>
+    <ContextMenu onOpenChange={setContextOpen}>
+  
       <SidebarMenuItem>
         <Collapsible open={open} onOpenChange={setOpen}>
           <CollapsibleTrigger className="w-full">
+            <EditorHelper id={chapter.chapterId}>
             <ContextMenuTrigger className="w-full">
               <SidebarMenuButton
                 className={`w-full ${
@@ -54,7 +55,9 @@ export function ChapterOutlineItem({
                   }`}
                 />
               </SidebarMenuButton>
-            </ContextMenuTrigger>
+              </ContextMenuTrigger>
+            </EditorHelper>
+              
           </CollapsibleTrigger>
     
           <CollapsibleContent>
@@ -64,7 +67,6 @@ export function ChapterOutlineItem({
           </CollapsibleContent>
         </Collapsible>
       </SidebarMenuItem>
-    </EditorHelper>
       <OutlineContextMenu item={chapter} type="chapter" />
     </ContextMenu>
   );

@@ -19,18 +19,16 @@ export const mockStories: StoryDetailDTO[] = Array.from(
       id: `story-${String(storyNumber).padStart(3, "0")}`,
 
       series_id:
-        storyNumber <= 2 && mockSeries.length > 0
+         storyNumber <= 4 && mockSeries.length > 0
           ? mockSeries[0].id : null,
 
 
       title: `Project Story ${storyNumber}`,
 
       order:
-        storyNumber <= 2
-          ? storyNumber
-          : storyNumber <= 4
-            ? storyNumber - 2
-            : null,
+        storyNumber <= 4
+          ? ["a", "b", "c", "d"][storyNumber - 1]
+          : null,
 
       synopsis:
         storyNumber % 3 === 0

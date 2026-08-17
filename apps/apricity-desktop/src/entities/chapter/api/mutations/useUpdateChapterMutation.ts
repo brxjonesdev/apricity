@@ -12,7 +12,7 @@ export function useUpdateChapterMutation() {
 
     onSuccess: (updatedChapter) => {
       queryClient.invalidateQueries({
-        queryKey: chapterQueries.detail(updatedChapter.id),
+        queryKey: chapterQueries.detail(updatedChapter.chapterId),
       });
 
       queryClient.invalidateQueries({

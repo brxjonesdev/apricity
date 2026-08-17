@@ -1,6 +1,7 @@
 export type SeriesDTO = {
   id: string;
   title: string;
+  description: string;
 };
 
 export type CreateSeriesDTO = {
@@ -9,4 +10,5 @@ export type CreateSeriesDTO = {
 
 export type UpdateSeriesDTO = {
   title?: string;
+  description?: string;
 };

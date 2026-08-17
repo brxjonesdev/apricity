@@ -3,7 +3,7 @@
 export type StoryDetails = {
   storyId: string;
   seriesId: string | null;
-  order: number | null;
+  order: null;
   title: string;
   synopsis: string;
   coverImage: string | null;

@@ -5,6 +5,7 @@ export function mapSeries(dto: SeriesDTO): Series {
   return {
     seriesId: dto.id,
     title: dto.title,
+    description: dto.description
   };
 }
 

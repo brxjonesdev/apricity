@@ -1,8 +1,11 @@
+import { useSeriesQuery } from '@/entities/series';
 import type { Story } from '@/entities/story';
 import {
   useArchiveStoryMutation,
+  useAssignSeriesMutation,
   useDeleteStoryMutation,
   useUpdateStoryMutation,
+  useRemoveStoryFromSeriesMutation
 } from '@/entities/story';
 import DeleteStoryModal from '@/features/delete-story/ui/delete-story';
 import DeleteStoryButton from '@/features/delete-story/ui/delete-story';
@@ -13,9 +16,11 @@ import {
   ContextMenuLabel,
   ContextMenuSeparator,
   ContextMenuItem,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
 } from '@/shared/components/shadcn/context-menu';
 import { useState } from 'react';
-import { de } from 'zod/v4/locales';
 // import { RenameStoryMenuItem } from '@/features/rename-story';
 // import { ChangeCoverImageMenuItem } from '@/features/change-cover-image';
 
@@ -25,6 +30,9 @@ export function StoryContextMenu({ story }: { story: Story }) {
 
   const archiveStory = useArchiveStoryMutation();
   const restoreStory = useUpdateStoryMutation();
+  const { data: series } = useSeriesQuery();
+  const addStoryToSeries = useAssignSeriesMutation();
+  const removeStoryFromSeries = useRemoveStoryFromSeriesMutation()
 
   return (
     <>
@@ -59,14 +67,40 @@ export function StoryContextMenu({ story }: { story: Story }) {
             Restore
           </ContextMenuItem>
         )}
-        {story.seriesId && <ContextMenuItem>Change Order</ContextMenuItem>}
-        {!story.seriesId && <ContextMenuItem>Move to Series</ContextMenuItem>}
-        <ContextMenuSeparator />
+        {!story.seriesId && series && (
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>Move to Series</ContextMenuSubTrigger>
+            <ContextMenuSubContent>
+              {series.map((series) => {
+                return (
+                  <ContextMenuItem
+                    onClick={() => {
+                      addStoryToSeries.mutate({
+                        seriesId: series.seriesId,
+                        storyId: story.storyId,
+                      });
+                    }}
+                  >
+                    {series.title}
+                  </ContextMenuItem>
+                );
+              })}
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+        )}
         {story.seriesId && (
-          <ContextMenuItem variant='destructive'>
+          <ContextMenuItem
+            onClick={() => {
+              removeStoryFromSeries.mutate({
+                storyId: story.storyId
+              })
+            }}
+          >
             Remove from Series
           </ContextMenuItem>
         )}
+        <ContextMenuSeparator />
+        
         <ContextMenuItem
           variant='destructive'
           onSelect={(e) => {

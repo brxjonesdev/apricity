@@ -1,10 +1,9 @@
-// What the App uses
-import { StoryGenre } from '../../constants';
+
 export type StoryDetailDTO = {
   id: string;
   series_id: string | null;
   title: string;
-  order?: number | null;
+  order?: string | null;
   synopsis: string | null;
   cover_image: string | null;
   genre: string[] | null;

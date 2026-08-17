@@ -7,7 +7,7 @@ export { useAssignSeriesMutation } from "./api/mutations/useAssignSeriesMutation
 export { useCreateStoryMutation } from "./api/mutations/useCreateStoryMutation"
 export { useDeleteStoryMutation } from "./api/mutations/useDeleteStoryMutation"
 export { useDuplicateStoryMutation } from "./api/mutations/useDuplicateStoryMutation"
-export { useRemoveStoryFromSeries } from "./api/mutations/useRemoveStoryFromSeriesMutation"
+export { useRemoveStoryFromSeriesMutation } from "./api/mutations/useRemoveStoryFromSeriesMutation"
 export { useRestoreStoryMutation } from "./api/mutations/useRestoreStoryMutation"
 export { useUpdateStoryMutation } from "./api/mutations/useUpdateStoryMutation"
 export { useLastOpenedStoryQuery } from "./api/queries/useLastOpenedStoryQuery"

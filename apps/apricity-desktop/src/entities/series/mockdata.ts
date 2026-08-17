@@ -25,7 +25,8 @@ const nouns = [
   "Archives",
 ];
 
-export const mockSeries: SeriesDTO[] = Array.from({ length: 0 }, (_, index) => ({
+export const mockSeries: SeriesDTO[] = Array.from({ length: 5 }, (_, index) => ({
   id: `series-${String(index + 1).padStart(3, "0")}`,
   title: `The ${adjectives[index % adjectives.length]} ${nouns[Math.floor(index / adjectives.length) % nouns.length]}`,
+  description: ""
 }));
