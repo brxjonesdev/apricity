@@ -1,5 +1,5 @@
 import { useActiveStory } from "@/app/layouts/contexts/active-story.context";
-import { Chapter, useChaptersByStoryQuery, useUpdateChapterMutation } from "@/entities/chapter";
+import { Chapter, useChaptersByStoryQuery, useDeleteChapterMutation, useDuplicateChapterMutation, useUpdateChapterMutation } from "@/entities/chapter";
 import { SceneOutline } from "@/entities/scene";
 import {
   ContextMenuContent,
@@ -10,7 +10,18 @@ import {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
 } from "@/shared/components/shadcn/context-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/shared/components/shadcn/alert-dialog";
 import { useEditorView } from "@/widgets/editor/model/editor-context";
+import { useState } from "react";
 
 type OutlineContextMenuProps =
   | {
@@ -26,10 +37,13 @@ export default function OutlineContextMenu({
   item,
   type,
 }: OutlineContextMenuProps) {
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const {activeStoryId} = useActiveStory()
   const { data: chapters = [] } = useChaptersByStoryQuery(activeStoryId)
   const { setActiveID } = useEditorView()
   const changeStatus = useUpdateChapterMutation();
+  const deleteChapter = useDeleteChapterMutation();
+  const duplicateChapter = useDuplicateChapterMutation()
   return (
     <ContextMenuContent>
       <ContextMenuGroup>
@@ -95,9 +109,49 @@ export default function OutlineContextMenu({
       </ContextMenuGroup>
       <ContextMenuSeparator />
       <ContextMenuGroup>
-        <ContextMenuItem>Duplicate</ContextMenuItem>
-        <ContextMenuItem>Archive</ContextMenuItem>
-        <ContextMenuItem>Trash</ContextMenuItem>
+        <ContextMenuItem
+          variant="destructive"
+          onSelect={(event) => {
+            event.preventDefault();
+            setDeleteOpen(true);
+          }}
+        >
+          Trash
+        </ContextMenuItem>
+        
+        <AlertDialog
+          open={deleteOpen}
+          onOpenChange={setDeleteOpen}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Delete chapter?
+              </AlertDialogTitle>
+        
+              <AlertDialogDescription>
+                This will permanently delete {item.title} and its scenes.
+                This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+        
+            <AlertDialogFooter>
+              <AlertDialogCancel>
+                Cancel
+              </AlertDialogCancel>
+        
+              <AlertDialogAction
+                onClick={() => {
+                  deleteChapter.mutate({
+                    chapterId: item.chapterId,
+                  });
+                }}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </ContextMenuGroup>
     </ContextMenuContent>
   );
