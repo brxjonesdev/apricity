@@ -67,7 +67,7 @@ export function AddStoryForm({
       ...values,
       genre: values.genre.split(",").map((genre)=> genre.trim()).filter(Boolean),
       };
-    console.log(`Adding ${payload.title}`, payload)
+    
   
       createStory.mutate(payload, {
         onSuccess: () => {
