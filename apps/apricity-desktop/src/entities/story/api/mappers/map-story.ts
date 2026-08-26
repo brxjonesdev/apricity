@@ -4,6 +4,7 @@ import { StoryDTO } from '../dto/story.dto';
 import { StoryDetailDTO } from '../dto/story-detail.dto';
 import { StorySelection } from '../../models/story-selection';
 import { StorySelectionDTO } from '../dto/story-selection.dto';
+import { storyQueries } from '../querykeys';
 
 const STATUS_MAP: Record<number, StoryStatus> = {
   0: 'draft',
@@ -83,10 +84,22 @@ function mapStoryInSeries(dto: StoryDetailDTO): StoryInSeries {
   };
 }
 
+const mapStoryToStoryInSeries = (story: Story): StoryInSeries => ({
+  storyId: story.storyId,
+  seriesId: story.seriesId!,
+  title: story.title,
+  order: story.order ?? "",
+  synopsis: story.synopsis,
+  coverImage: story.coverImage,
+  lastUpdated: story.lastUpdated,
+  isArchived: story.isArchived
+});
+
 export const storyMapper = {
   mapBaseStory,
   mapDetailStory,
   convertDetailedToThin,
   mapStorySelection,
   mapStoryInSeries,
+  mapStoryToStoryInSeries
 };

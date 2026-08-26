@@ -6,7 +6,7 @@ const now = new Date().toISOString();
 export const mockChapters: ChapterDTO[] = mockStories.flatMap((story) =>
   Array.from(
     {
-      length: 10 + Math.floor(Math.random() * 3),
+      length: 3 + Math.floor(Math.random() * 3),
     },
     (_, index) => ({
       id: `${story.id}-chapter-${index + 1}`,

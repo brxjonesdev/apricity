@@ -1,20 +1,16 @@
 import { useMemo, useState } from 'react';
 import { useActiveStory } from '@/app/layouts/contexts/active-story.context';
-import type { Story } from '@/entities/story';
+import { useUpdateStoryMutation, type Story } from '@/entities/story';
 import { Card } from '@/shared/components/shadcn/card';
-import { cn } from '@/lib/utils';
 import { useFilteredStories } from './model/useFilteredStories';
-import { StorySelectItem } from './ui/StorySelectItem';
 import SelectToolbar from './ui/ToolBar';
 import { Series } from '@/entities/series';
 import { Separator } from '@/shared/components/shadcn/separator';
-import SeriesMenu from './ui/SeriesMenu';
-import {
-  Dialog,
-  DialogTrigger,
-} from "@/shared/components/shadcn/dialog"
-import { Button } from '@/shared/components/shadcn/button';
-import { CONNREFUSED } from 'node:dns/promises';
+import { UnassignedStoriesSection } from './ui/UnassignedStoriesSection';
+import { storyMapper } from '@/entities/story/api/mappers/map-story';
+import { SeriesStoriesSection } from './ui/SeriesStoriesSection';
+import { StorySelectItem } from './ui/StorySelectItem';
+import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
 
 export default function SelectMenu({ stories, series }: { stories: Story[]; series: Series[] }) {
   const { activeStoryId, setActiveStoryId } = useActiveStory();
@@ -22,7 +18,9 @@ export default function SelectMenu({ stories, series }: { stories: Story[]; seri
   const [sortKey, setSortKey] = useState<'lastUpdated' | 'alphabetical'>('lastUpdated');
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [showArchived, setShowArchived] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [draggedStoryId, setDraggedStoryId] = useState<string | null>(null);
+  const updateStory = useUpdateStoryMutation();
 
   const visibleStories = useFilteredStories(stories, query, sortKey);
 
@@ -30,34 +28,40 @@ export default function SelectMenu({ stories, series }: { stories: Story[]; seri
     const displayedStories = visibleStories.filter(
       (story) => story.isArchived === showArchived
     );
-  
+
     const grouped = series
       .map((currentSeries) => ({
         ...currentSeries,
         stories: displayedStories
-          .filter(
-            (story) => story.seriesId === currentSeries.seriesId
-          )
-          .sort((a, b) =>
-            (a.order ?? '').localeCompare(b.order ?? '')
-          ),
+          .filter((story) => story.seriesId === currentSeries.seriesId)
+          .map(storyMapper.mapStoryToStoryInSeries)
+          .sort((a, b) => a.order.localeCompare(b.order)),
       }))
       .filter((currentSeries) => currentSeries.stories.length > 0);
-  
-    const unassignedStories = displayedStories.filter(
-      (story) => !story.seriesId
-    );
+
+    const unassignedStories = displayedStories.filter((story) => !story.seriesId);
 
     return {
       grouped,
       unassignedStories,
     };
   }, [series, visibleStories, showArchived]);
-  
+
+  const draggedStory = useMemo(() => {
+    if (!draggedStoryId) return null;
+
+    return (
+      storiesBySeries.unassignedStories.find((s) => s.storyId === draggedStoryId) ??
+      storiesBySeries.grouped
+        .flatMap((s) => s.stories)
+        .find((s) => s.storyId === draggedStoryId) ??
+      null
+    );
+  }, [draggedStoryId, storiesBySeries]);
 
   const empty =
     storiesBySeries.grouped.every((s) => s.stories.length === 0) &&
-    storiesBySeries.unassignedStories.length === 0 
+    storiesBySeries.unassignedStories.length === 0;
 
   return (
     <Card className="w-full max-h-96 min-h-96 gap-0 overflow-hidden py-0 shadow">
@@ -70,11 +74,10 @@ export default function SelectMenu({ stories, series }: { stories: Story[]; seri
         setView={setView}
         isArchived={showArchived}
         setShowArchived={setShowArchived}
-        
       />
-      <Separator/>
+      <Separator />
 
-      <div className='max-h-96 overflow-y-auto p-4'>
+      <div className="max-h-96 overflow-y-auto p-4">
         {empty ? (
           <p className="py-12 text-center text-sm text-muted-foreground">
             {query
@@ -84,79 +87,70 @@ export default function SelectMenu({ stories, series }: { stories: Story[]; seri
                 : "No stories to display."}
           </p>
         ) : (
-          <div className='flex flex-col gap-6'>
-            {storiesBySeries.unassignedStories.length > 0 && (
-              <section>
-                <h3 className='mb-3 text-sm font-semibold text-muted-foreground'>
-                  Your Stories
-                </h3>
+          <DragDropProvider
+            onDragStart={(event) => {
+              setDraggedStoryId(event.operation.source?.id as string ?? null);
+            }}
+            onDragEnd={(event) => {
+              setDraggedStoryId(null);
 
-                <ul
-                  className={cn(
-                    view === 'grid'
-                      ? 'grid grid-cols-1 gap-3 sm:grid-cols-2'
-                      : 'flex flex-col gap-2',
-                  )}
-                >
-                  {storiesBySeries.unassignedStories.map((story) => (
-                    <li key={story.storyId}>
-                      <StorySelectItem
-                        story={story}
-                        isActive={story.storyId === activeStoryId}
-                        view={view}
-                        onSetActive={() => setActiveStoryId(story.storyId)}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
+              if (event.canceled) return;
 
-            {storiesBySeries.grouped.map((currentSeries) => (
-              <section key={currentSeries.seriesId} className='flex flex-col gap-2'>
-                <div className='flex items-center justify-between border-b pb-2'>
-                  <h3 className="text-sm font-semibold text-muted-foreground">
-                    {currentSeries.title}
-                  </h3>
-                  <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
-                    <DialogTrigger>
-                      <Button variant={"ghost"}>
-                        Edit Series
-                      </Button>
-                    </DialogTrigger>
-                    <SeriesMenu
-                      title={currentSeries.title}
-                      desc={currentSeries.description || ""}
-                      id={currentSeries.seriesId}
-                      onSuccess={() => {
-                        setMenuOpen(false)
-                      }}
-                    />
-                  </Dialog>
+              const { source, target } = event.operation;
+              if (!source || !target) return;
+
+              const storyId = source.id as string;
+              const destinationId = target.id as string;
+
+              const newSeriesId = destinationId === 'unassigned-drop-section' ? null : destinationId;
+
+              updateStory.mutate({
+                update: {
+                  id: storyId,
+                  series_id: newSeriesId,
+                },
+              });
+            }}
+          >
+            <div className="flex flex-col gap-6">
+              <UnassignedStoriesSection
+                id="unassigned-drop-section"
+                stories={storiesBySeries.unassignedStories}
+                activeStoryId={activeStoryId}
+                view={view}
+                onSetActive={setActiveStoryId}
+              />
+
+              {storiesBySeries.grouped.map((currentSeries) => (
+                <SeriesStoriesSection
+                  id={currentSeries.seriesId}
+                  key={currentSeries.seriesId}
+                  seriesId={currentSeries.seriesId}
+                  title={currentSeries.title}
+                  description={currentSeries.description}
+                  stories={currentSeries.stories}
+                  activeStoryId={activeStoryId}
+                  view={view}
+                  menuOpen={menuOpen}
+                  onMenuOpenChange={setMenuOpen}
+                  onSetActive={setActiveStoryId}
+                />
+              ))}
+            </div>
+
+            <DragOverlay>
+              {draggedStory && (
+                <div className={view === 'grid' ? 'w-40' : 'w-64'}>
+                  <StorySelectItem
+                    story={draggedStory}
+                    isActive={false}
+                    view={view}
+                    onSetActive={() => {}}
+                  />
                 </div>
-            
-                <ul
-                  className={cn(
-                    view === "grid"
-                      ? "grid grid-cols-1 gap-3 sm:grid-cols-2"
-                      : "flex flex-col gap-2"
-                  )}
-                >
-                  {currentSeries.stories.map((story) => (
-                    <li key={story.storyId}>
-                      <StorySelectItem
-                        story={story}
-                        isActive={story.storyId === activeStoryId}
-                        view={view}
-                        onSetActive={() => setActiveStoryId(story.storyId)}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))}
-
-          </div>
+              )}
+            </DragOverlay>
+          </DragDropProvider>
         )}
       </div>
     </Card>

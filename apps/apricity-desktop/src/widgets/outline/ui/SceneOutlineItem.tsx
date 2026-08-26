@@ -16,7 +16,7 @@ export function SceneOutlineItem({ scene }: SceneOutlineItemProps) {
     <ContextMenu onOpenChange={setContextOpen}>
       <SidebarMenuSub>
         <ContextMenuTrigger>
-          <EditorHelper id={scene.sceneId}>
+          <EditorHelper id={scene.sceneId} type="scene">
           <SidebarMenuSubItem>
             <SidebarMenuSubButton
               className={contextOpen ? "bg-accent text-accent-foreground" : ""}

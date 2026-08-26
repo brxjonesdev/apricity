@@ -99,7 +99,7 @@ export function ChapterOutlineItem({
       <SidebarMenuItem>
         <Collapsible open={open} onOpenChange={setOpen}>
           <CollapsibleTrigger className="w-full">
-            <EditorHelper id={chapter.chapterId}>
+            <EditorHelper id={chapter.chapterId} type="chapter">
               <ContextMenuTrigger className="w-full">
                 <SidebarMenuButton
                   className={`w-full ${

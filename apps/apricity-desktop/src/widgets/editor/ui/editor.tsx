@@ -1,14 +1,11 @@
-import { useActiveStory } from "@/app/layouts/contexts/active-story.context";
-import { useEditorView } from "../model/editor-context";
+// components/editor.tsx
 import { Tiptap, useEditor, useTiptap, useTiptapState } from '@tiptap/react'
-import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus'
+import { BubbleMenu } from '@tiptap/react/menus'
 import StarterKit from '@tiptap/starter-kit'
+import type { JSONContent } from '@tiptap/react'
 
-
-export default function Editor() {
-  const { setActiveID } = useEditorView();
-  // fetches chapter or scene by id
-  const editor = useEditor({ extensions: [StarterKit], content: '<p>Hello World!</p>' })
+export default function Editor({ initialContent, docId }: { initialContent: JSONContent; docId: string }) {
+  const editor = useEditor({ extensions: [StarterKit], content: initialContent })
   if (!editor) return null
 
   return (
@@ -17,7 +14,6 @@ export default function Editor() {
       <Tiptap.Content />
       <WordCount />
       <BubbleMenu editor={editor}><button>Bold</button></BubbleMenu>
-      <FloatingMenu editor={editor}><button>Add heading</button></FloatingMenu>
     </Tiptap>
   )
 }
@@ -25,11 +21,7 @@ export default function Editor() {
 function MenuBar() {
   const { editor } = useTiptap()
   if (!editor) return null
-  return (
-    <button onClick={() => editor.chain().focus().toggleBold().run()}>
-      Bold
-    </button>
-  )
+  return <button onClick={() => editor.chain().focus().toggleBold().run()}>Bold</button>
 }
 
 function WordCount() {

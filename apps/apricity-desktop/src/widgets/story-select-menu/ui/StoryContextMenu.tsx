@@ -7,6 +7,7 @@ import {
   useUpdateStoryMutation,
   useRemoveStoryFromSeriesMutation
 } from '@/entities/story';
+import { StoryInSeries } from '@/entities/story/types';
 import DeleteStoryModal from '@/features/delete-story/ui/delete-story';
 import DeleteStoryButton from '@/features/delete-story/ui/delete-story';
 import EditStoryModal from '@/features/edit-story-details/ui/edit-story-details-modal';
@@ -24,7 +25,7 @@ import { useState } from 'react';
 // import { RenameStoryMenuItem } from '@/features/rename-story';
 // import { ChangeCoverImageMenuItem } from '@/features/change-cover-image';
 
-export function StoryContextMenu({ story }: { story: Story }) {
+export function StoryContextMenu({ story }: { story: Story | StoryInSeries }) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 

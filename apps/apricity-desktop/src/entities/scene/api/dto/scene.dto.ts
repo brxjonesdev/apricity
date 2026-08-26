@@ -5,7 +5,7 @@ export type SceneDTO = {
   story_id: string;
   title: string;
   synopsis: string;
-  content: JSONContent; // stringified json
+  content: JSONContent;
   order: number;
   last_updated_at?: string | null;
   created_at: string;
