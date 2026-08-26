@@ -35,7 +35,7 @@ const createStorySchema = z.object({
     .optional()
     .or(z.literal("")),
 
-  genre: z.array(z.string()),
+  genre: z.string(),
 });
 
 type CreateStoryFormValues = z.infer<typeof createStorySchema>;
@@ -55,7 +55,7 @@ export function AddStoryForm({
       title: "",
       synopsis: "",
       coverImage: "",
-      genre: [],
+      genre: "",
       seriesId: ""
     },
   });
@@ -63,9 +63,11 @@ export function AddStoryForm({
   const createStory = useCreateStoryMutation();
 
   function onSubmit(values: CreateStoryFormValues) {
-      const payload: CreateStoryDTO = {
-        ...values,
+    const payload: CreateStoryDTO = {
+      ...values,
+      genre: values.genre.split(",").map((genre)=> genre.trim()).filter(Boolean),
       };
+    console.log(`Adding ${payload.title}`, payload)
   
       createStory.mutate(payload, {
         onSuccess: () => {
@@ -172,25 +174,18 @@ export function AddStoryForm({
             <FieldLabel htmlFor="genre">
               Genres
             </FieldLabel>
-
+      
             <Input
               id="genre"
-              value={field.value.join(", ")}
-              onChange={(event) => {
-                field.onChange(
-                  event.target.value
-                    .split(",")
-                    .map((item) => item.trim())
-                    .filter(Boolean)
-                );
-              }}
+              value={field.value}
+              onChange={field.onChange}
               placeholder="Fantasy, Adventure"
             />
-
+      
             <FieldDescription>
               Separate genres with commas.
             </FieldDescription>
-
+      
             {fieldState.invalid && (
               <FieldError errors={[fieldState.error]} />
             )}
