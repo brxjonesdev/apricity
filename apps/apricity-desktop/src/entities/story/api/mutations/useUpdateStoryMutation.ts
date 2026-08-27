@@ -17,7 +17,7 @@ export function useUpdateStoryMutation() {
       const previousStories = queryClient.getQueryData<Story[]>(storyQueries.all);
       const previousStory = queryClient.getQueryData<Story>(storyQueries.detail(update.id));
 
-      // optimistically patch the list
+
       queryClient.setQueryData<Story[]>(storyQueries.all, (old) =>
         old?.map((story) =>
           story.storyId === update.id
@@ -26,7 +26,6 @@ export function useUpdateStoryMutation() {
         )
       );
 
-      // optimistically patch the single-story cache too, if it exists
       queryClient.setQueryData<Story>(storyQueries.detail(update.id), (old) =>
         old
           ? { ...old, seriesId: update.series_id !== undefined ? update.series_id : old.seriesId }
