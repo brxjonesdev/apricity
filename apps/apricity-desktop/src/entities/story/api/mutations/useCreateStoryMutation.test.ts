@@ -4,13 +4,10 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { createStory } from "../commands";
-import { useCreateChapterMutation } from "@/entities/chapter";
 import { createWrapper } from "@/lib/testing-query-wrapper";
-import { Story, StoryDetails } from "../../types";
-import { StoryDTO } from "../dto/story.dto";
+import { Story } from "../../types";
 import { useCreateStoryMutation } from "./useCreateStoryMutation";
 import { ActiveStoryProvider } from "@/app/layouts/contexts/active-story.context";
-import { QueryClient } from "@tanstack/react-query";
 import { storyQueries } from "../querykeys";
 import { CreateStoryDTO } from "../dto/create-story.dto";
 
