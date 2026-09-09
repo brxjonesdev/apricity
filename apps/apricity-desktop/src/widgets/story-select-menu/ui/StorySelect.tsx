@@ -18,7 +18,7 @@ export default function StorySelect() {
   const { data: stories, isLoading: storiesLoading } = useStoriesQuery();
   const { data: series, isLoading: seriesLoading } = useSeriesQuery();
   const { activeStoryId, isLoading: activeStoryLoading } = useActiveStory();
-
+console.log(stories)
   const isLoading = storiesLoading || seriesLoading || activeStoryLoading;
 
   const activeStory = stories?.find((s) => s.storyId === activeStoryId);

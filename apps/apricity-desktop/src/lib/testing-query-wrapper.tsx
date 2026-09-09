@@ -2,24 +2,37 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
+import type { ReactNode, ComponentType } from "react";
 
-export const createWrapper = () => {
+type Provider = ComponentType<{ children: ReactNode }>;
+
+export const createWrapper = (providers: Provider[] = []) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        retry: false
+        retry: false,
       },
       mutations: {
-        retry: false
-      }
-    }
+        retry: false,
+      },
+    },
   });
-  const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  );
-return {
-    wrapper, queryClient
-  }
-}
+
+  const wrapper = ({ children }: { children: ReactNode }) => {
+    const content = providers.reduceRight(
+      (acc, Provider) => <Provider>{acc}</Provider>,
+      children
+    );
+
+    return (
+      <QueryClientProvider client={queryClient}>
+        {content}
+      </QueryClientProvider>
+    );
+  };
+
+  return {
+    wrapper,
+    queryClient,
+  };
+};

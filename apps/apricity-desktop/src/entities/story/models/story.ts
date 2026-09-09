@@ -6,8 +6,10 @@ export type Story = {
   order: null
   synopsis: string;
   coverImage: string | null;
-  lastUpdated: Date;
   isArchived: boolean;
+  status: StoryStatus;
+  lastUpdated: Date;
+  createdAt: Date;
 };
 
 export type StoryInSeries = {
@@ -17,7 +19,9 @@ export type StoryInSeries = {
   title: string;
   synopsis: string;
   coverImage: string | null;
-  lastUpdated: Date;
   isArchived: boolean;
+   status: StoryStatus;
+  lastUpdated: Date;
+  createdAt: Date;
 };
 

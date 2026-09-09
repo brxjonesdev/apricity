@@ -23,6 +23,8 @@ const stories: Story[] = [
     synopsis: "",
     coverImage: null,
     lastUpdated: new Date(),
+    status: "draft",
+    createdAt: new Date()
   },
   {
     storyId: "story-2",
@@ -33,6 +35,8 @@ const stories: Story[] = [
     synopsis: "",
     coverImage: null,
     lastUpdated: new Date(),
+    status: "draft",
+    createdAt: new Date()
   },
 ];
 
@@ -45,6 +49,8 @@ const mockArchivedStory: Story = {
   synopsis: "",
   coverImage: null,
   lastUpdated: new Date(),
+  status: "draft",
+  createdAt: new Date()
 };
 
 describe("useArchiveStoryMutation", () => {

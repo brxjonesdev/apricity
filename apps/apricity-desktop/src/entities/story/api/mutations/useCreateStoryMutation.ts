@@ -28,7 +28,9 @@ export function useCreateStoryMutation() {
         isArchived: false,
         seriesId: null,
         synopsis: input.synopsis || "",
-        coverImage: input.coverImage || ""
+        coverImage: input.coverImage || "",
+        status: "draft",
+        createdAt: new Date()
       }
 
       queryClient.setQueryData<Story[]>(storyQueries.all, (oldStories = []) => [...oldStories, optimisticStory]);

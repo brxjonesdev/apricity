@@ -21,7 +21,9 @@ const mockStoryInSeries: StoryInSeries[] = [{
   synopsis: "hello",
   coverImage: null,
   lastUpdated: new Date,
-  isArchived: false
+  isArchived: false,
+  status: "draft",
+  createdAt: new Date()
 }]
 
 const stories: Story[] = [
@@ -29,11 +31,13 @@ const stories: Story[] = [
     storyId: "story-1",
     seriesId: "series-1",
     title: "story_1",
-    isArchived: false,
+  isArchived: false,
     order: null,
     synopsis: "",
     coverImage: null,
     lastUpdated: new Date(),
+    status: "draft",
+    createdAt: new Date()
   },
   {
     storyId: "story-2",
@@ -44,6 +48,8 @@ const stories: Story[] = [
     synopsis: "",
     coverImage: null,
     lastUpdated: new Date(),
+    status: "draft",
+    createdAt: new Date()
   },
   {
     storyId: "story-3",
@@ -54,6 +60,8 @@ const stories: Story[] = [
     synopsis: "",
     coverImage: null,
     lastUpdated: new Date(),
+    status: "draft",
+    createdAt: new Date()
   },
 ];
 
