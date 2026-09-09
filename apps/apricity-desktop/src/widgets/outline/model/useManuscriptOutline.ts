@@ -1,5 +1,5 @@
 import {useChaptersByStoryQuery} from "@/entities/chapter";
-import { useScenesByStoryQuery, useSceneOutlinesByStoryQuery } from "@/entities/scene";
+import { useSceneOutlinesByStoryQuery } from "@/entities/scene";
 import { useMemo } from "react";
 import { composeOutline } from "./composeOutline";
 export function useManuscriptOutline(storyId: string | undefined) {

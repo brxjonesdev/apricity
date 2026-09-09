@@ -31,7 +31,6 @@ export function useArchiveStoryMutation() {
         storyQueries.all,
         context,
       );
-      console.log(error);
     },
     onSettled: () => {
       queryClient.invalidateQueries({

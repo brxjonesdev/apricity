@@ -44,6 +44,7 @@ export function useAssignSeriesMutation() {
         queryKey: storyQueries.all,
       });
 
+      // getting current stories
       const prevStories = queryClient.getQueryData<Story[]>(
         storyQueries.all
       );
@@ -52,6 +53,7 @@ export function useAssignSeriesMutation() {
         throw new Error("Stories aren't loaded");
       }
 
+      // looking for the story we want to change its seriesID
       const story = prevStories.find(
         (story) => story.storyId === storyId
       );
