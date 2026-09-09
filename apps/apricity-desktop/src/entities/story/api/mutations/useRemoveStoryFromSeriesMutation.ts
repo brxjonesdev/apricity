@@ -7,10 +7,10 @@ export function useRemoveStoryFromSeriesMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ storyId }: { storyId: string; seriesId: string }) => {
+    mutationFn: ({ storyId }: { storyId: string}) => {
       return removeStoryFromSeries({ storyId });
     },
-    onMutate: async ({ storyId, seriesId }) => {
+    onMutate: async ({ storyId}) => {
       await queryClient.cancelQueries({
         queryKey: storyQueries.all,
       });
