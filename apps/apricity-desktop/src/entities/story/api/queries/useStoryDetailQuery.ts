@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { storyQueries } from "../querykeys";
-import { getStoryDetailsById } from "../commands/get-detail-story";
+import { getStoryById } from "../commands/get-story";
 
-export function useStoryDetailQuery(storyId: string) {
+export function useStoryQuery(storyId: string) {
   return useQuery({
     queryKey: storyQueries.detail(storyId),
-    queryFn: () => getStoryDetailsById(storyId),
+    queryFn: () => getStoryById(storyId),
     enabled: !!storyId
   })
 }

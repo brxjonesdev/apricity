@@ -4,7 +4,7 @@ export type Story = {
   seriesId: string | null;
   title: string;
   order: null
-  synopsis: string;
+  synopsis: string | null;
   coverImage: string | null;
   isArchived: boolean;
   status: StoryStatus;
@@ -17,7 +17,7 @@ export type StoryInSeries = {
   seriesId: string | null;
   order: string;
   title: string;
-  synopsis: string;
+  synopsis: string | null;
   coverImage: string | null;
   isArchived: boolean;
    status: StoryStatus;

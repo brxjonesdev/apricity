@@ -1,12 +1,9 @@
 import { USE_MOCKS } from '@/shared/config/env';
 import { call } from '@/shared/lib/api/tauriClient';
-import { StoryDetails } from '../../models/story-detail';
-import { StoryDetailDTO } from '../dto/story-detail.dto';
+import { StoryDTO } from '../dto/story.dto';
 import { storyMapper } from '../mappers/map-story';
 import { mockStories } from '../mockdata';
 import { StoryInSeries } from '../../types';
-
-// Assign story to a series
 
 export async function assignStoryToSeries({
   storyId,
@@ -25,7 +22,7 @@ export async function assignStoryToSeries({
     return storyMapper.mapStoryInSeries(mockStories[index]);
   }
 
-  const res = await call<StoryDetailDTO>('assign_story_to_series', {
+  const res = await call<StoryDTO>('assign_story_to_series', {
     storyId,
     seriesId,
   });

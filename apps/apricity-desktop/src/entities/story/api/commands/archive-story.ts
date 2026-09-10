@@ -10,11 +10,15 @@ export async function archiveStory({
 }: {
   storyId: string;
 }): Promise<Story> {
+  if (!storyId) {
+    throw new Error('Story id is required');
+  }
+
   if (USE_MOCKS) {
     const index = mockStories.findIndex((s) => s.id === storyId);
     if (index !== -1) {
       mockStories[index].is_archived = true;
-      return storyMapper.mapBaseStory(mockStories[index]);
+      return storyMapper.mapStory(mockStories[index]);
     }
   }
 
@@ -23,5 +27,6 @@ export async function archiveStory({
     throw new Error(res.error);
   }
 
-  return storyMapper.mapBaseStory(res.data);
-}
+  return storyMapper.mapStory(res.data);
+}  
+

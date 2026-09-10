@@ -1,18 +1,16 @@
 import { USE_MOCKS } from '@/shared/config/env';
 import { call } from '@/shared/lib/api/tauriClient';
-import { StoryDetails } from '../../models/story-detail';
-import { StoryDetailDTO } from '../dto/story-detail.dto';
+import { Story } from '../../types';
+import { StoryDTO } from '../dto/story.dto';
 import { storyMapper } from '../mappers/map-story';
 import { mockStories } from '../mockdata';
 
-// Get story details by id
-
-export async function getStoryDetailsById(
+export async function getStoryById(
   storyId: string,
-): Promise<StoryDetails> {
+): Promise<Story> {
   const res = USE_MOCKS
     ? { ok: true as const, data: mockStories.find((s) => s.id === storyId) }
-    : await call<StoryDetailDTO>('get_story_details', { id: storyId });
+    : await call<StoryDTO>('get_story_details', { id: storyId });
 
   if (!res.ok) {
     throw new Error(res.error);
@@ -22,5 +20,5 @@ export async function getStoryDetailsById(
     throw new Error(`Story not found: ${storyId}`);
   }
 
-  return storyMapper.mapDetailStory(res.data);
+  return storyMapper.mapStory(res.data);
 }

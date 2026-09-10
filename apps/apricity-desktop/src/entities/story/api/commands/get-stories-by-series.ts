@@ -4,7 +4,6 @@ import { StoryDTO } from '../dto/story.dto';
 import { storyMapper } from '../mappers/map-story';
 import { USE_MOCKS } from '@/shared/config/env';
 import { mockStories } from '../mockdata';
-import { StoryDetailDTO } from '../dto/story-detail.dto';
 
 export async function getStoriesBySeriesId({
   seriesId,
@@ -25,7 +24,7 @@ export async function getStoriesBySeriesId({
     );
   }
 
-  const res = await call<StoryDetailDTO[]>('get_story_by_series', {
+  const res = await call<StoryDTO[]>('get_story_by_series', {
     series_id: seriesId,
   });
 

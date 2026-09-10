@@ -1,7 +1,6 @@
 import { USE_MOCKS } from '@/shared/config/env';
 import { call } from '@/shared/lib/api/tauriClient';
 import { CreateStoryDTO } from '../dto/create-story.dto';
-import { StoryDetailDTO } from '../dto/story-detail.dto';
 import { storyMapper } from '../mappers/map-story';
 import { mockStories } from '../mockdata';
 import { Story } from '../../types';
