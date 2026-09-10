@@ -25,7 +25,7 @@ export function StorySelectItem({ story, isActive, view, onSetActive }: StorySel
       <ContextMenuTrigger ref={ref}>
         <div
           className={cn(
-            'flex h-full gap-3 rounded-lg border p-2 transition-colors',
+            'flex h-full gap-3 rounded-lg border p-2 transition-colors w-full',
             isDragging && 'opacity-40',
             isActive ? 'border-primary bg-muted' : 'hover:bg-muted/50',
             view === 'grid' ? 'flex-row' : 'flex-row items-center',

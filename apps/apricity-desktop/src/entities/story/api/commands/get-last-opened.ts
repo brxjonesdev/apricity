@@ -1,4 +1,3 @@
-import { Story } from '@/entities/story';
 import { StoryDTO } from '../dto/story.dto';
 import { call } from '@/shared/lib/api/tauriClient';
 import { storyMapper } from '../mappers/map-story';
@@ -10,7 +9,7 @@ import { mockStories } from '../mockdata';
 export async function getLastOpenedStory(): Promise<string>{
   if (USE_MOCKS) {
     const stories = mockStories.map((story) =>
-      storyMapper.mapBaseStory(story)
+      storyMapper.mapStory(story)
     );
   
     const lastUpdated = stories.reduce((latest, story) =>

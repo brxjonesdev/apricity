@@ -9,11 +9,11 @@ export async function getStories(): Promise<Story[]> {
 
   if (USE_MOCKS) {
     await delay(800);
-    return mockStories.map((story)=> storyMapper.mapBaseStory(story))
+    return mockStories.map((story)=> storyMapper.mapStory(story))
   }
   const res = await call<StoryDTO[]>('get_stories');
   if (!res.ok) {
     throw new Error(res.error);
   }
-  return res.data.map((s) => storyMapper.mapBaseStory(s));
+  return res.data.map((s) => storyMapper.mapStory(s));
 }

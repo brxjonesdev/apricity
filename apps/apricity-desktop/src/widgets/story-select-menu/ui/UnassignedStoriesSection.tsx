@@ -27,7 +27,7 @@ export function UnassignedStoriesSection({
    });
 
   return (
-    <section>
+    <section className='w-full'>
       <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
         Your Stories
       </h3>

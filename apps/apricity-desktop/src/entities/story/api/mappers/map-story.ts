@@ -1,27 +1,9 @@
-import { Story, StoryStatus, StoryInSeries } from '../../models/story';
-import { StoryDetails } from '../../models/story-detail';
+import { Story,StoryInSeries } from '../../models/story';
 import { StoryDTO } from '../dto/story.dto';
-import { StoryDetailDTO } from '../dto/story-detail.dto';
 import { StorySelection } from '../../models/story-selection';
 import { StorySelectionDTO } from '../dto/story-selection.dto';
-import { storyQueries } from '../querykeys';
 
-const STATUS_MAP: Record<number, StoryStatus> = {
-  0: 'draft',
-  1: 'in-progress',
-  2: 'complete',
-  3: 'archived',
-};
-
-function dbStatusToStoryStatus(status: number) {
-  const mapped = STATUS_MAP[status];
-  if (!mapped) {
-    throw new Error(`Unknown story status from DB: ${status}`);
-  }
-  return mapped;
-}
-
-function mapBaseStory(dto: StoryDTO | StoryDetailDTO): Story {
+function mapStory(dto: StoryDTO): Story {
   return {
     storyId: dto.id,
     order: null,
@@ -31,44 +13,23 @@ function mapBaseStory(dto: StoryDTO | StoryDetailDTO): Story {
     coverImage: dto.cover_image,
     isArchived: dto.is_archived,
     lastUpdated: new Date(dto.last_updated),
-  };
-}
-
-export const mapDetailStory = (dto: StoryDetailDTO): StoryDetails => ({
-  ...mapBaseStory(dto),
-  seriesId: dto.series_id,
-  order: null,
-  genre: dto.genre ?? [],
-  status: dbStatusToStoryStatus(dto.status),
-  createdAt: new Date(dto.created_at),
-});
-
-export function convertDetailedToThin(storyDetail: StoryDetailDTO): StoryDTO {
-  return {
-    id: storyDetail.id,
-    is_archived: storyDetail.is_archived,
-    order: null,
-    series_id: storyDetail.series_id,
-    title: storyDetail.title,
-    synopsis: storyDetail.synopsis || '',
-    cover_image: storyDetail.cover_image,
-    last_updated: storyDetail.last_updated,
-    created_at: storyDetail.created_at,
+    status: dto.status,
+    createdAt: new Date(dto.created_at)
   };
 }
 
 export function mapStorySelection(dto: StorySelectionDTO): StorySelection {
   return {
-    standalone: dto.standalone.map(mapBaseStory),
+    standalone: dto.standalone.map(mapStory),
     series: dto.series.map((series) => ({
       id: series.id,
       title: series.title,
-      stories: series.stories.map(mapBaseStory),
+      stories: series.stories.map(mapStory),
     })),
   };
 }
 
-function mapStoryInSeries(dto: StoryDetailDTO): StoryInSeries {
+function mapStoryInSeries(dto: StoryDTO): StoryInSeries {
   if (dto.order == null) {
      throw new Error(`Story ${dto.id} is missing an order`);
    }
@@ -81,6 +42,8 @@ function mapStoryInSeries(dto: StoryDetailDTO): StoryInSeries {
     coverImage: dto.cover_image,
     lastUpdated: new Date(dto.last_updated),
     isArchived: dto.is_archived,
+    status: dto.status,
+    createdAt: new Date(dto.created_at)
   };
 }
 
@@ -92,13 +55,13 @@ const mapStoryToStoryInSeries = (story: Story): StoryInSeries => ({
   synopsis: story.synopsis,
   coverImage: story.coverImage,
   lastUpdated: story.lastUpdated,
-  isArchived: story.isArchived
+  isArchived: story.isArchived,
+  status: story.status,
+  createdAt: story.createdAt,
 });
 
 export const storyMapper = {
-  mapBaseStory,
-  mapDetailStory,
-  convertDetailedToThin,
+  mapStory,
   mapStorySelection,
   mapStoryInSeries,
   mapStoryToStoryInSeries

@@ -20,7 +20,7 @@ type ToolbarProps = {
 export default function SelectToolbar({query, setQuery, sortKey, setSortKey, view, setView, isArchived, setShowArchived}:ToolbarProps) {
   return (
     <div className="flex flex-col gap-2 px-4 py-2">
-      <div className='flex-1 flex gap-4'>
+      <div className='flex-1 flex gap-2'>
         <div className="relative flex-1">
           <Search
             aria-hidden="true"
@@ -48,7 +48,7 @@ export default function SelectToolbar({query, setQuery, sortKey, setSortKey, vie
       </div>
       
 
-      <div className="flex items-center justify-end gap-2 flex-1">
+      <div className="flex items-center justify-center gap-2 flex-1">
         {/* Sort controls */}
         <div
           role="group"
@@ -63,7 +63,6 @@ export default function SelectToolbar({query, setQuery, sortKey, setSortKey, vie
             onClick={() => setSortKey('lastUpdated')}
           >
             <Clock aria-hidden="true" />
-            Last updated
           </Button>
           <Button
             type="button"
@@ -73,7 +72,6 @@ export default function SelectToolbar({query, setQuery, sortKey, setSortKey, vie
             onClick={() => setSortKey('alphabetical')}
           >
             <ArrowDownAZ aria-hidden="true" />
-            A–Z
           </Button>
         </div>
 
@@ -105,12 +103,12 @@ export default function SelectToolbar({query, setQuery, sortKey, setSortKey, vie
           </Button>
         </div>
 
-        <div className='gap-1 flex'>
-          <AddStoryButton>
-            + Story
+        <div className='gap-1 flex flex-1'>
+          <AddStoryButton className='flex-1'>
+            + New Story
           </AddStoryButton>
-          <AddSeriesButton>
-            + Series
+          <AddSeriesButton className='flex-1'>
+            + New Series
           </AddSeriesButton>
         </div>
       </div>

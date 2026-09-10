@@ -4,10 +4,12 @@ export type Story = {
   seriesId: string | null;
   title: string;
   order: null
-  synopsis: string;
+  synopsis: string | null;
   coverImage: string | null;
-  lastUpdated: Date;
   isArchived: boolean;
+  status: StoryStatus;
+  lastUpdated: Date;
+  createdAt: Date;
 };
 
 export type StoryInSeries = {
@@ -15,9 +17,11 @@ export type StoryInSeries = {
   seriesId: string | null;
   order: string;
   title: string;
-  synopsis: string;
+  synopsis: string | null;
   coverImage: string | null;
-  lastUpdated: Date;
   isArchived: boolean;
+   status: StoryStatus;
+  lastUpdated: Date;
+  createdAt: Date;
 };
 

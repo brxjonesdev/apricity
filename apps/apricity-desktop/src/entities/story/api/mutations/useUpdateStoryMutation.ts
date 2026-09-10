@@ -15,21 +15,29 @@ export function useUpdateStoryMutation() {
       await queryClient.cancelQueries({ queryKey: storyQueries.detail(update.id) });
 
       const previousStories = queryClient.getQueryData<Story[]>(storyQueries.all);
-      const previousStory = queryClient.getQueryData<Story>(storyQueries.detail(update.id));
+      const previousStory = queryClient.getQueryData<Story>(
+        storyQueries.detail(update.id)
+      );
 
-      // optimistically patch the list
+      const { id, ...changes } = update;
+
       queryClient.setQueryData<Story[]>(storyQueries.all, (old) =>
         old?.map((story) =>
-          story.storyId === update.id
-            ? { ...story, seriesId: update.series_id !== undefined ? update.series_id : story.seriesId }
+          story.storyId === id
+            ? {
+                ...story,
+                ...changes,
+              }
             : story
         )
       );
 
-      // optimistically patch the single-story cache too, if it exists
-      queryClient.setQueryData<Story>(storyQueries.detail(update.id), (old) =>
+      queryClient.setQueryData<Story>(storyQueries.detail(id), (old) =>
         old
-          ? { ...old, seriesId: update.series_id !== undefined ? update.series_id : old.seriesId }
+          ? {
+              ...old,
+              ...changes,
+            }
           : old
       );
 
@@ -47,8 +55,12 @@ export function useUpdateStoryMutation() {
       if (context?.previousStories) {
         queryClient.setQueryData(storyQueries.all, context.previousStories);
       }
+
       if (context?.previousStory) {
-        queryClient.setQueryData(storyQueries.detail(update.id), context.previousStory);
+        queryClient.setQueryData(
+          storyQueries.detail(update.id),
+          context.previousStory
+        );
       }
     },
   });

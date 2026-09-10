@@ -64,7 +64,7 @@ export default function SelectMenu({ stories, series }: { stories: Story[]; seri
     storiesBySeries.unassignedStories.length === 0;
 
   return (
-    <Card className="w-full max-h-96 min-h-96 gap-0 overflow-hidden py-0 shadow">
+    <Card className="h-96 w-96 gap-0 overflow-hidden py-0 shadow">
       <SelectToolbar
         query={query}
         setQuery={setQuery}
@@ -77,7 +77,7 @@ export default function SelectMenu({ stories, series }: { stories: Story[]; seri
       />
       <Separator />
 
-      <div className="max-h-96 overflow-y-auto p-4">
+      <div className="w-full overflow-y-auto p-4">
         {empty ? (
           <p className="py-12 text-center text-sm text-muted-foreground">
             {query
@@ -112,7 +112,7 @@ export default function SelectMenu({ stories, series }: { stories: Story[]; seri
               });
             }}
           >
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-6 w-full">
               <UnassignedStoriesSection
                 id="unassigned-drop-section"
                 stories={storiesBySeries.unassignedStories}
