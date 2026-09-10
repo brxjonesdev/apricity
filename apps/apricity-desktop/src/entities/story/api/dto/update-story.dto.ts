@@ -6,6 +6,6 @@ export type UpdateStoryDTO = {
   cover_image?: string | null;
   series_id?: string | null;
   is_archived?: boolean
-  status: StoryStatus;
-  genre: string[]
+  status?: StoryStatus;
+  genre?: string[]
 };
