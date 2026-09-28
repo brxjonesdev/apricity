@@ -7,7 +7,7 @@ export type Scene = {
   title: string;
   synopsis: string;
   content: JSONContent;
-  order: number;
+  order: string;
   lastUpdatedAt: Date | null;
 };
 
@@ -15,7 +15,7 @@ export type SceneOutline = {
   sceneId: string;
   chapterId: string;
   storyId: string;
-  order: number;
+  order: string;
   title: string | null;
   // no `content` — deliberately excluded, that's the whole point
 };

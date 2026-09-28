@@ -15,15 +15,17 @@ import {
 } from "@/shared/components/shadcn/context-menu";
 import { SceneOutline } from "@/entities/scene";
 import EditorHelper from "@/features/set-editor-view/ui/editor-helper";
-
+import { SceneContextMenu } from "./SceneContextMenu";
 type SceneOutlineItemProps = {
   scene: SceneOutline;
   index: number;
+  sceneCount: number;
 };
 
 export function SceneOutlineItem({
   scene,
   index,
+  sceneCount,
 }: SceneOutlineItemProps) {
   return (
     <SidebarMenuSub>
@@ -40,43 +42,11 @@ export function SceneOutlineItem({
           </SidebarMenuSubItem>
         </ContextMenuTrigger>
 
-        <ContextMenuContent>
-          <ContextMenuItem>
-            Move Up
-          </ContextMenuItem>
-
-          <ContextMenuItem>
-            Move Down
-          </ContextMenuItem>
-
-          <ContextMenuSeparator />
-
-          <ContextMenuSub>
-            <ContextMenuSubTrigger>
-              Move to
-            </ContextMenuSubTrigger>
-
-            <ContextMenuSubContent>
-              <ContextMenuItem>
-                Chapter 1
-              </ContextMenuItem>
-
-              <ContextMenuItem>
-                Chapter 2
-              </ContextMenuItem>
-
-              <ContextMenuItem>
-                Chapter 3
-              </ContextMenuItem>
-            </ContextMenuSubContent>
-          </ContextMenuSub>
-
-          <ContextMenuSeparator />
-
-          <ContextMenuItem className="text-destructive focus:text-destructive">
-            Delete
-          </ContextMenuItem>
-        </ContextMenuContent>
+        <SceneContextMenu
+          scene={scene}
+          index={index}
+          sceneCount={sceneCount}
+        />
       </ContextMenu>
     </SidebarMenuSub>
   );

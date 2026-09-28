@@ -87,6 +87,7 @@ export function ChapterOutlineItem({
                     key={scene.sceneId}
                     scene={scene}
                     index={index}
+                    sceneCount={scenes.length}
                   />
                 ))}
               </CollapsibleContent>
