@@ -2,12 +2,9 @@ import { BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { DragDropProvider } from "@dnd-kit/react";
 import { generateKeyBetween } from "fractional-indexing";
-
 import { useManuscriptOutline } from "../model/useManuscriptOutline";
 import { ChapterOutlineItem } from "./ChapterOutlineItem";
-import { ChapterDropZone } from "./ChapterDropZone";
 import { useRef } from "react";
-
 import {
   SidebarGroup,
   SidebarGroupContent,
