@@ -1,7 +1,7 @@
 export type UpdateChapterDTO = {
   id: string;
   story_id: string;
-  order?: number;
+  order?: string;
   title?: string;
   synopsis?: string | null;
   status?: 0 | 1 | 2;

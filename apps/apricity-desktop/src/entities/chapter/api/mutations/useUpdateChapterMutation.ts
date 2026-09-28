@@ -10,14 +10,14 @@ export function useUpdateChapterMutation() {
     mutationFn: ({ updates }: { updates: UpdateChapterDTO }) =>
       updateChapter(updates),
 
-    onSuccess: (updatedChapter) => {
-      queryClient.invalidateQueries({
-        queryKey: chapterQueries.detail(updatedChapter.chapterId),
-      });
+    onSuccess: async (updatedChapter) => {
+      console.log("✅ UPDATED CHAPTER:", updatedChapter);
 
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: chapterQueries.byStory(updatedChapter.storyId),
       });
+
+      console.log("🔄 CHAPTER QUERY INVALIDATED");
     },
   });
 }
