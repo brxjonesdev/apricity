@@ -19,13 +19,13 @@ import { SceneContextMenu } from "./SceneContextMenu";
 type SceneOutlineItemProps = {
   scene: SceneOutline;
   index: number;
-  sceneCount: number;
+  scenes: SceneOutline[];
 };
 
 export function SceneOutlineItem({
   scene,
   index,
-  sceneCount,
+  scenes,
 }: SceneOutlineItemProps) {
   return (
     <SidebarMenuSub>
@@ -45,7 +45,7 @@ export function SceneOutlineItem({
         <SceneContextMenu
           scene={scene}
           index={index}
-          sceneCount={sceneCount}
+          scenes={scenes}
         />
       </ContextMenu>
     </SidebarMenuSub>
