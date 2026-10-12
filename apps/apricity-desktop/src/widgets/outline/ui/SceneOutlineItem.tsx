@@ -1,33 +1,53 @@
-import { SidebarMenuSub, SidebarMenuSubItem, SidebarMenuSubButton } from "@/shared/components/shadcn/sidebar";
-import { Scene, SceneOutline } from "@/entities/scene";
-import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/shared/components/shadcn/context-menu";
-import OutlineContextMenu from "./OutlineContextMenu";
-import { useState } from "react";
+import {
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
+} from "@/shared/components/shadcn/sidebar";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from "@/shared/components/shadcn/context-menu";
+import { SceneOutline } from "@/entities/scene";
 import EditorHelper from "@/features/set-editor-view/ui/editor-helper";
-
+import { SceneContextMenu } from "./SceneContextMenu";
 type SceneOutlineItemProps = {
   scene: SceneOutline;
+  index: number;
+  scenes: SceneOutline[];
 };
 
-export function SceneOutlineItem({ scene }: SceneOutlineItemProps) {
-  const [contextOpen, setContextOpen] = useState(false);
-
+export function SceneOutlineItem({
+  scene,
+  index,
+  scenes,
+}: SceneOutlineItemProps) {
   return (
-    <ContextMenu onOpenChange={setContextOpen}>
-      <SidebarMenuSub>
-        <ContextMenuTrigger>
-          <EditorHelper id={scene.sceneId} type="scene">
+    <SidebarMenuSub>
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
           <SidebarMenuSubItem>
-            <SidebarMenuSubButton
-              className={contextOpen ? "bg-accent text-accent-foreground" : ""}
-            >
-              <span className="text-xs">{scene.title}</span>
-            </SidebarMenuSubButton>
-            </SidebarMenuSubItem>
-          </EditorHelper>
-          </ContextMenuTrigger>
-      </SidebarMenuSub>
-      <OutlineContextMenu item={scene} type="scene" />
-    </ContextMenu>
+            <EditorHelper id={scene.sceneId} type="scene">
+              <SidebarMenuSubButton className="cursor-pointer hover:bg-accent hover:text-accent-foreground">
+                <span className="truncate text-xs">
+                  {scene.title}
+                </span>
+              </SidebarMenuSubButton>
+            </EditorHelper>
+          </SidebarMenuSubItem>
+        </ContextMenuTrigger>
+
+        <SceneContextMenu
+          scene={scene}
+          index={index}
+          scenes={scenes}
+        />
+      </ContextMenu>
+    </SidebarMenuSub>
   );
 }

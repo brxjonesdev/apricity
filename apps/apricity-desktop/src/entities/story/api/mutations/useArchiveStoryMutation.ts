@@ -26,7 +26,7 @@ export function useArchiveStoryMutation() {
 
       return previousStories;
     },
-    onError: (error, _, context) => {
+    onError: (_, __, context) => {
       queryClient.setQueryData(
         storyQueries.all,
         context,

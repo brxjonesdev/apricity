@@ -15,11 +15,10 @@ export default function AddChapterButton({storyId, index}: {storyId:string, inde
       last_updated: new Date().toDateString()
     }
     addChapter.mutate({ input: DEFAULT__NEW_CHAPTER })
-    console.log("hello?")
   }
   return (
-    <Button variant={"ghost"} size={"xs"} onClick={handleClick}>
-      + Add New Chapter
+    <Button variant={"outline"} size={"lg"} onClick={handleClick} className="">
+      + New Chapter
     </Button>
   )
 }

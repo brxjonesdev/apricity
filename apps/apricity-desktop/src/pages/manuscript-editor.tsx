@@ -19,7 +19,7 @@ export default function ManuscriptEditor() {
 
   return (
     <main>
-      <section className="border-b p-1">
+      <section className="border-b p-1 h-16">
         <div>{data.title}</div>
         <ButtonGroup>
           <Button onClick={() => setViewMode("editor")}>Editor</Button>
